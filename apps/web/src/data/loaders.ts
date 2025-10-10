@@ -14,7 +14,67 @@ import autoEscolaV5 from './tracks/aes/versions/v5/curriculum.json'
 import autoEscolaV6 from './tracks/aes/versions/v6/curriculum.json'
 import autoEscolaV7 from './tracks/aes/versions/v7/curriculum.json'
 
-type TrackId = 'LEG-U1-CONCEITOS' | 'LEG-U3-SINALIZACAO-I'
+export type TrackId = 'LEG-U1-CONCEITOS' | 'LEG-U3-SINALIZACAO-I'
+
+type TrackCardBlock = {
+  kind: 'card'
+  id: string
+  title: string
+  body: string
+}
+
+type TrackQuizBlock = {
+  kind: 'quiz'
+  id: string
+  questions: Array<{
+    id: string
+    stem: string
+    choices: Array<{
+      id: string
+      text: string
+    }>
+    correctId: string
+    explain: string
+  }>
+}
+
+type TrackImageBlock = {
+  kind: 'image'
+  id: string
+  caption: string
+  src: string
+  alt: string
+}
+
+type TrackDrillSignsBlock = {
+  kind: 'drill-signs'
+  id: string
+  signs: Array<{
+    code: string
+    name: string
+    img: string
+  }>
+}
+
+type TrackVideoBlock = {
+  kind: 'video'
+  id: string
+  caption: string
+  src: string
+}
+
+type TrackBlock =
+  | TrackCardBlock
+  | TrackQuizBlock
+  | TrackImageBlock
+  | TrackDrillSignsBlock
+  | TrackVideoBlock
+
+export interface Track {
+  id: TrackId
+  title: string
+  blocks: TrackBlock[]
+}
 
 type AutoEscolaVersionId = 'v1' | 'v2' | 'v3' | 'v4' | 'v5' | 'v6' | 'v7'
 
@@ -57,12 +117,16 @@ const autoEscolaSimVersions: Record<AutoEscolaVersionId, AutoEscolaCurriculum> =
   v7: autoEscolaV7,
 }
 
-const tracks: Record<TrackId, unknown> = {
-  'LEG-U1-CONCEITOS': trackU1,
-  'LEG-U3-SINALIZACAO-I': trackU3,
+const tracks: Record<TrackId, Track> = {
+  'LEG-U1-CONCEITOS': trackU1 as Track,
+  'LEG-U3-SINALIZACAO-I': trackU3 as Track,
 }
 
-export function loadTrackById(id: TrackId) {
+export function isTrackId(value: string | undefined): value is TrackId {
+  return typeof value === 'string' && value in tracks
+}
+
+export function loadTrackById(id: TrackId): Track {
   return tracks[id]
 }
 
