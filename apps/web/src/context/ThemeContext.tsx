@@ -20,9 +20,13 @@ function getStoredPreference(): ThemeMode | null {
   if (typeof window === 'undefined') {
     return null
   }
-  const stored = window.localStorage.getItem(STORAGE_KEY)
-  if (stored === 'light' || stored === 'dark') {
-    return stored
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY)
+    if (stored === 'light' || stored === 'dark') {
+      return stored
+    }
+  } catch (error) {
+    console.warn('Não foi possível ler preferência de tema salva', error)
   }
   return null
 }
@@ -47,10 +51,14 @@ export function ThemeProvider({ children }: PropsWithChildren) {
     root.style.setProperty('color-scheme', theme)
     root.dataset.theme = theme
 
-    if (manualPreference) {
-      window.localStorage.setItem(STORAGE_KEY, theme)
-    } else {
-      window.localStorage.removeItem(STORAGE_KEY)
+    try {
+      if (manualPreference) {
+        window.localStorage.setItem(STORAGE_KEY, theme)
+      } else {
+        window.localStorage.removeItem(STORAGE_KEY)
+      }
+    } catch (error) {
+      console.warn('Não foi possível persistir preferência de tema', error)
     }
   }, [theme, manualPreference])
 

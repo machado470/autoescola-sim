@@ -3,23 +3,58 @@
 @tailwind utilities;
 
 :root {
+  --bg-base-light: #f8fafc;
+  --text-base-light: #0f172a;
+  --card-bg-light: #ffffff;
+  --accent-light: #2563eb;
+
+  --bg-base-dark: #050b18;
+  --text-base-dark: #e2e8f0;
+  --card-bg-dark: #0f172a;
+  --accent-dark: #60a5fa;
+}
+
+:root,
+:root[data-theme='light'] {
   color-scheme: light;
-  --bg-base: #f8fafc;
-  --text-base: #0f172a;
-  --card-bg: #ffffff;
-  --accent: #2563eb;
+  --bg-base: var(--bg-base-light);
+  --text-base: var(--text-base-light);
+  --card-bg: var(--card-bg-light);
+  --accent: var(--accent-light);
   --border-subtle: color-mix(in srgb, var(--text-base) 12%, transparent);
   --muted: color-mix(in srgb, var(--text-base) 45%, transparent);
 }
 
-.dark {
+:root[data-theme='dark'] {
   color-scheme: dark;
-  --bg-base: #050b18;
-  --text-base: #e2e8f0;
-  --card-bg: #0f172a;
-  --accent: #60a5fa;
+  --bg-base: var(--bg-base-dark);
+  --text-base: var(--text-base-dark);
+  --card-bg: var(--card-bg-dark);
+  --accent: var(--accent-dark);
   --border-subtle: color-mix(in srgb, var(--text-base) 22%, transparent);
   --muted: color-mix(in srgb, var(--text-base) 60%, transparent);
+}
+
+.dark {
+  color-scheme: dark;
+  --bg-base: var(--bg-base-dark);
+  --text-base: var(--text-base-dark);
+  --card-bg: var(--card-bg-dark);
+  --accent: var(--accent-dark);
+  --border-subtle: color-mix(in srgb, var(--text-base) 22%, transparent);
+  --muted: color-mix(in srgb, var(--text-base) 60%, transparent);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --bg-base: var(--bg-base-dark);
+    --text-base: var(--text-base-dark);
+    --card-bg: var(--card-bg-dark);
+    --accent: var(--accent-dark);
+    --border-subtle: color-mix(in srgb, var(--text-base) 22%, transparent);
+    --muted: color-mix(in srgb, var(--text-base) 60%, transparent);
+  }
 }
 
 * {

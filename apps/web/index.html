@@ -4,6 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AutoEscola Sim</title>
+  <script>
+    ;(() => {
+      const storageKey = 'autoescola-theme'
+      const root = document.documentElement
+
+      try {
+        const storedTheme = window.localStorage.getItem(storageKey)
+        const media = window.matchMedia('(prefers-color-scheme: dark)')
+        const systemTheme = media.matches ? 'dark' : 'light'
+        const theme = storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : systemTheme
+
+        root.dataset.theme = theme
+        root.style.colorScheme = theme
+        root.classList.toggle('dark', theme === 'dark')
+      } catch (error) {
+        root.dataset.theme = 'light'
+        root.style.colorScheme = 'light'
+      }
+    })()
+  </script>
 </head>
 <body>
   <div id="root"></div>
