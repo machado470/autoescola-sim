@@ -10,6 +10,7 @@ import { AppService } from './app.service'
 import { InstrutoresModule } from './instrutores/instrutores.module'
 import { PrismaModule } from './prisma/prisma.module'
 import { SimuladosModule } from './simulados/simulados.module'
+import { StatsModule } from './stats/stats.module'
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { SimuladosModule } from './simulados/simulados.module'
     AlunosModule,
     InstrutoresModule,
     SimuladosModule,
+    StatsModule,
   ],
   controllers: [AppController],
   providers: [
