@@ -76,7 +76,14 @@ export interface Track {
   blocks: TrackBlock[]
 }
 
-type AutoEscolaVersionId = 'v1' | 'v2' | 'v3' | 'v4' | 'v5' | 'v6' | 'v7'
+type AutoEscolaVersionId =
+  | 'AES-V1'
+  | 'AES-V2'
+  | 'AES-V3'
+  | 'AES-V4'
+  | 'AES-V5'
+  | 'AES-V6'
+  | 'AES-V7'
 
 type AutoEscolaCurriculum = {
   id: string
@@ -108,13 +115,13 @@ type AutoEscolaManifest = {
 }
 
 const autoEscolaSimVersions: Record<AutoEscolaVersionId, AutoEscolaCurriculum> = {
-  v1: autoEscolaV1,
-  v2: autoEscolaV2,
-  v3: autoEscolaV3,
-  v4: autoEscolaV4,
-  v5: autoEscolaV5,
-  v6: autoEscolaV6,
-  v7: autoEscolaV7,
+  'AES-V1': autoEscolaV1,
+  'AES-V2': autoEscolaV2,
+  'AES-V3': autoEscolaV3,
+  'AES-V4': autoEscolaV4,
+  'AES-V5': autoEscolaV5,
+  'AES-V6': autoEscolaV6,
+  'AES-V7': autoEscolaV7,
 }
 
 const tracks: Record<TrackId, Track> = {
