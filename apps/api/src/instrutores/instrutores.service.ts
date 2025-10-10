@@ -10,15 +10,17 @@ export class InstrutoresService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createInstrutorDto: CreateInstrutorDto) {
-    const { senha, ...data } = createInstrutorDto
+    const { senha, nome, email, cnh } = createInstrutorDto
     const senhaHash = await bcrypt.hash(senha, 10)
 
-    return this.prisma.instrutor.create({
-      data: {
-        ...data,
-        senhaHash,
-      },
-    })
+    const data: Prisma.InstrutorCreateInput = {
+      nome,
+      email,
+      senhaHash,
+      cnh: cnh ?? null,
+    }
+
+    return this.prisma.instrutor.create({ data })
   }
 
   findAll() {
@@ -44,8 +46,20 @@ export class InstrutoresService {
   async update(id: string, updateInstrutorDto: UpdateInstrutorDto) {
     await this.findOne(id)
 
-    const { senha, ...data } = updateInstrutorDto
-    const updateData: Prisma.InstrutorUpdateInput = { ...data }
+    const { senha, nome, email, cnh } = updateInstrutorDto
+    const updateData: Prisma.InstrutorUpdateInput = {}
+
+    if (typeof nome !== 'undefined') {
+      updateData.nome = nome
+    }
+
+    if (typeof email !== 'undefined') {
+      updateData.email = email
+    }
+
+    if (typeof cnh !== 'undefined') {
+      updateData.cnh = cnh ?? null
+    }
 
     if (senha) {
       updateData.senhaHash = await bcrypt.hash(senha, 10)

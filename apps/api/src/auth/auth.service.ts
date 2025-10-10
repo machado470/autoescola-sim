@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
+import { Prisma } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
 import * as bcrypt from 'bcrypt'
 
@@ -20,14 +21,26 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, senha: string): Promise<AuthenticatedUser | null> {
-    const aluno = await this.prisma.aluno.findUnique({ where: { email } })
-    if (aluno && (await bcrypt.compare(senha, aluno.senhaHash))) {
+    const alunoWhere: Prisma.AlunoWhereUniqueInput = { email }
+    const aluno = await this.prisma.aluno.findUnique({ where: alunoWhere })
+    if (
+      aluno?.email &&
+      aluno.senhaHash &&
+      (await bcrypt.compare(senha, aluno.senhaHash))
+    ) {
       const { id, nome } = aluno
       return { id, email: aluno.email, nome, role: 'aluno' }
     }
 
-    const instrutor = await this.prisma.instrutor.findUnique({ where: { email } })
-    if (instrutor && (await bcrypt.compare(senha, instrutor.senhaHash))) {
+    const instrutorWhere: Prisma.InstrutorWhereUniqueInput = { email }
+    const instrutor = await this.prisma.instrutor.findUnique({
+      where: instrutorWhere,
+    })
+    if (
+      instrutor?.email &&
+      instrutor.senhaHash &&
+      (await bcrypt.compare(senha, instrutor.senhaHash))
+    ) {
       const { id, nome } = instrutor
       return { id, email: instrutor.email, nome, role: 'instrutor' }
     }
@@ -38,7 +51,7 @@ export class AuthService {
   async getUserById(id: string, role: UserRole): Promise<AuthenticatedUser | null> {
     if (role === 'aluno') {
       const aluno = await this.prisma.aluno.findUnique({ where: { id } })
-      if (!aluno) {
+      if (!aluno || !aluno.email) {
         return null
       }
       const { email, nome } = aluno
@@ -46,17 +59,23 @@ export class AuthService {
     }
 
     const instrutor = await this.prisma.instrutor.findUnique({ where: { id } })
-    if (!instrutor) {
+    if (!instrutor || !instrutor.email) {
       return null
     }
     const { email, nome } = instrutor
     return { id: instrutor.id, email, nome, role }
   }
 
-  async login(user: AuthenticatedUser): Promise<{ access_token: string }> {
+  async login(user: AuthenticatedUser): Promise<{
+    access_token: string
+    user: AuthenticatedUser
+  }> {
     const payload = { sub: user.id, email: user.email, role: user.role }
+    const accessToken = await this.jwtService.signAsync(payload)
+
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: accessToken,
+      user,
     }
   }
 }
