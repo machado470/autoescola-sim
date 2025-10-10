@@ -96,7 +96,7 @@ type AutoEscolaCurriculum = {
     lessons: Array<{
       id: string
       title: string
-      status: 'draft' | 'planned'
+      status: string
       notes: string[]
     }>
   }>

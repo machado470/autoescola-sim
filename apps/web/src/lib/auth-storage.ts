@@ -1,4 +1,6 @@
-export const AUTH_TOKEN_KEY = 'autoescola-sim.authToken'
+import { TOKEN_STORAGE_KEY } from '../config'
+
+export const AUTH_TOKEN_KEY = TOKEN_STORAGE_KEY
 
 export function getStoredToken(): string | null {
   if (typeof window === 'undefined') {
