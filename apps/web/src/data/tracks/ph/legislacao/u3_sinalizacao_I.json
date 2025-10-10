@@ -1,0 +1,66 @@
+{
+  "id": "LEG-U3-SINALIZACAO-I",
+  "title": "Sinalização I — Regulamentação",
+  "blocks": [
+    {
+      "kind": "image",
+      "id": "r1",
+      "caption": "R-1: Parada Obrigatória",
+      "src": "/signs/R-1.png",
+      "alt": "Placa R-1: Pare"
+    },
+    {
+      "kind": "quiz",
+      "id": "quiz-r",
+      "questions": [
+        {
+          "id": "q1",
+          "stem": "O que a R-1 exige?",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Reduzir"
+            },
+            {
+              "id": "b",
+              "text": "Parar totalmente"
+            },
+            {
+              "id": "c",
+              "text": "Buzinar"
+            }
+          ],
+          "correctId": "b",
+          "explain": "Parada total antes da linha."
+        }
+      ]
+    },
+    {
+      "kind": "drill-signs",
+      "id": "drill-r",
+      "signs": [
+        {
+          "code": "R-3",
+          "name": "Proibido virar à esquerda",
+          "img": "/signs/R-3.png"
+        },
+        {
+          "code": "R-4a",
+          "name": "Proibido estacionar",
+          "img": "/signs/R-4a.png"
+        },
+        {
+          "code": "R-6a",
+          "name": "Velocidade máxima",
+          "img": "/signs/R-6a.png"
+        }
+      ]
+    },
+    {
+      "kind": "video",
+      "id": "risk-01",
+      "caption": "Preferência no cruzamento",
+      "src": "/videos/cross_01.mp4"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "AutoEscola Sim",
+  "short_name": "AESim",
+  "start_url": "/",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "/icons/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

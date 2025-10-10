@@ -1,0 +1,13 @@
+{
+  "name": "autoescola-sim",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "lint": "echo 'add eslint later'"
+  }
+}

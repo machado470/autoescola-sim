@@ -1,0 +1,22 @@
+datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+generator client { provider = "prisma-client-js" }
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  role      Role     @default(STUDENT)
+  progress  Progress[]
+  createdAt DateTime @default(now())
+}
+enum Role { STUDENT INSTRUCTOR ADMIN }
+model Lesson { id String @id @default(cuid()); trackId String; json Json }
+model Quiz   { id String @id @default(cuid()); trackId String; json Json }
+model Progress {
+  id        String  @id @default(cuid())
+  userId    String
+  trackId   String
+  scores    Json
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+}
