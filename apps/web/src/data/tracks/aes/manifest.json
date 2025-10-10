@@ -4,43 +4,43 @@
   "description": "Conteúdo versionado para o curso AutoEscola Sim.",
   "versions": [
     {
-      "id": "v1",
+      "id": "AES-V1",
       "label": "v1 — Base inicial",
       "status": "draft",
       "summary": "Estrutura fundamental com placeholders para aulas e avaliações."
     },
     {
-      "id": "v2",
+      "id": "AES-V2",
       "label": "v2 — Conteúdo teórico",
       "status": "planned",
       "summary": "Reservado para ampliar materiais teóricos de legislação e direção defensiva."
     },
     {
-      "id": "v3",
+      "id": "AES-V3",
       "label": "v3 — Exercícios",
       "status": "planned",
       "summary": "Placeholder para ampliar banco de questões e simulados."
     },
     {
-      "id": "v4",
+      "id": "AES-V4",
       "label": "v4 — Recursos multimídia",
       "status": "planned",
       "summary": "Espaço para vídeos, infográficos e material complementar."
     },
     {
-      "id": "v5",
+      "id": "AES-V5",
       "label": "v5 — Simulados adaptativos",
       "status": "planned",
       "summary": "Versão destinada a simulados inteligentes com feedback personalizado."
     },
     {
-      "id": "v6",
+      "id": "AES-V6",
       "label": "v6 — Atualização legislativa",
       "status": "planned",
       "summary": "Reservado para ajustes conforme alterações do CTB e resoluções do Contran."
     },
     {
-      "id": "v7",
+      "id": "AES-V7",
       "label": "v7 — Preparação prática",
       "status": "planned",
       "summary": "Placeholder para materiais focados em aulas práticas e checklist de prova."
