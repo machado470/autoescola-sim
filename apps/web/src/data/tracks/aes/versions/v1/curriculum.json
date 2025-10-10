@@ -1,0 +1,48 @@
+{
+  "id": "AES-V1",
+  "label": "AutoEscola Sim v1",
+  "summary": "Versão base com estrutura mínima de módulos e lições.",
+  "modules": [
+    {
+      "id": "fundamentos",
+      "title": "Fundamentos do curso",
+      "description": "Placeholder para visão geral, objetivos e trilha de aprendizagem.",
+      "lessons": [
+        {
+          "id": "fundamentos-introducao",
+          "title": "Introdução ao AutoEscola Sim",
+          "status": "draft",
+          "notes": [
+            "Adicionar apresentação do curso e requisitos para CNH.",
+            "Inserir checklist de documentos para matrícula."
+          ]
+        },
+        {
+          "id": "fundamentos-expectativas",
+          "title": "Expectativas de estudo",
+          "status": "draft",
+          "notes": [
+            "Definir carga horária sugerida semanal.",
+            "Listar materiais de apoio previstos."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "simulados",
+      "title": "Simulados iniciais",
+      "description": "Placeholder para os primeiros questionários e simulados do Detran.",
+      "lessons": [
+        {
+          "id": "simulado-teorico-base",
+          "title": "Simulado teórico base",
+          "status": "draft",
+          "notes": [
+            "Inserir questões de legislação, infrações e sinalização.",
+            "Definir feedback padrão para respostas incorretas."
+          ]
+        }
+      ]
+    }
+  ]
+}
