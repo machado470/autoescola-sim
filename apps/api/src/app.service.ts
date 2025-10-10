@@ -1,21 +1,36 @@
 import { Injectable } from '@nestjs/common'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 
-export type EnvironmentSummary = {
-  port: number
-  databaseUrl: string | null
-  webApiUrl: string | null
+export type HealthResponse = {
+  status: 'ok'
+  api: string
+  version: string
 }
 
 @Injectable()
 export class AppService {
-  getEnvironmentSummary(): EnvironmentSummary {
-    const portValue = process.env.PORT ?? '3333'
-    const port = Number(portValue)
+  private readonly version: string
 
-    return {
-      port,
-      databaseUrl: process.env.DATABASE_URL ?? null,
-      webApiUrl: process.env.VITE_API_URL ?? null,
+  constructor() {
+    const packageJsonPath = resolve(__dirname, '..', 'package.json')
+    try {
+      const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'))
+      this.version = packageJson.version ?? '0.0.0'
+    } catch (error) {
+      this.version = '0.0.0'
     }
+  }
+
+  getHealth(): HealthResponse {
+    return {
+      status: 'ok',
+      api: 'autoescola-sim',
+      version: this.version,
+    }
+  }
+
+  getVersion() {
+    return this.version
   }
 }
