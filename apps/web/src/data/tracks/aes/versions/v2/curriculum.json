@@ -1,0 +1,39 @@
+{
+  "id": "AES-V2",
+  "label": "AutoEscola Sim v2",
+  "summary": "Expansão prevista para materiais teóricos detalhados.",
+  "modules": [
+    {
+      "id": "legislacao",
+      "title": "Legislação de trânsito",
+      "description": "Placeholder para textos baseados no CTB e resoluções do Contran.",
+      "lessons": [
+        {
+          "id": "legislacao-capitulos",
+          "title": "Capítulos do CTB",
+          "status": "planned",
+          "notes": [
+            "Adicionar resumo dos capítulos I ao XX.",
+            "Criar mapa mental para infrações mais comuns."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "direcao-defensiva",
+      "title": "Direção defensiva",
+      "description": "Reservado para boas práticas, técnicas e prevenção de acidentes.",
+      "lessons": [
+        {
+          "id": "direcao-principios",
+          "title": "Princípios da direção defensiva",
+          "status": "planned",
+          "notes": [
+            "Elaborar tabela com condições adversas.",
+            "Adicionar exemplos de comportamento seguro."
+          ]
+        }
+      ]
+    }
+  ]
+}
