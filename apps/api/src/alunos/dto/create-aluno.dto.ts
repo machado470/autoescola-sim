@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator'
+import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator'
 
 export class CreateAlunoDto {
   @IsString()
@@ -12,7 +12,10 @@ export class CreateAlunoDto {
   })
   cpf!: string
 
-  @IsOptional()
   @IsEmail()
-  email?: string
+  email!: string
+
+  @IsString()
+  @IsNotEmpty()
+  senha!: string
 }

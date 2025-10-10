@@ -11,7 +11,8 @@ model Aluno {
   id        String   @id @default(uuid())
   nome      String
   cpf       String   @unique
-  email     String?
+  email     String   @unique
+  senhaHash String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   simulados Simulado[]
@@ -20,6 +21,8 @@ model Aluno {
 model Instrutor {
   id        String   @id @default(uuid())
   nome      String
+  email     String   @unique
+  senhaHash String
   cnh       String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
