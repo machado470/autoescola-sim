@@ -2,10 +2,28 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", "build/**"]
     },
-    "dev": {}
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "api#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["apps/api/dist/**"]
+    },
+    "web#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["apps/web/dist/**"]
+    },
+    "api#dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "web#dev": {
+      "cache": false,
+      "persistent": true
+    }
   }
 }
