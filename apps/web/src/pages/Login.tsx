@@ -37,88 +37,60 @@ export default function Login() {
   }
 
   return (
-    <div
-      style={{
-        maxWidth: 360,
-        margin: '64px auto',
-        padding: 24,
-        borderRadius: 12,
-        boxShadow: '0 8px 24px rgba(15, 23, 42, 0.08)',
-        background: '#ffffff',
-      }}
-    >
-      <h1 style={{ fontSize: 24, marginBottom: 8 }}>Entrar</h1>
-      <p style={{ marginBottom: 24, color: '#475569' }}>
-        Acesse sua conta para continuar os estudos.
-      </p>
-      <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 16 }}>
-        <label style={{ display: 'grid', gap: 4 }}>
-          <span style={{ fontWeight: 600 }}>E-mail</span>
-          <input
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-            placeholder="seu@email.com"
-            style={{
-              padding: '10px 12px',
-              borderRadius: 8,
-              border: '1px solid #cbd5f5',
-              fontSize: 16,
-            }}
-          />
-        </label>
-        <label style={{ display: 'grid', gap: 4 }}>
-          <span style={{ fontWeight: 600 }}>Senha</span>
-          <input
-            type="password"
-            value={senha}
-            onChange={(event) => setSenha(event.target.value)}
-            required
-            placeholder="••••••"
-            style={{
-              padding: '10px 12px',
-              borderRadius: 8,
-              border: '1px solid #cbd5f5',
-              fontSize: 16,
-            }}
-          />
-        </label>
-        {(formError || error) && (
-          <div
-            role="alert"
-            style={{
-              padding: '10px 12px',
-              borderRadius: 8,
-              background: '#fee2e2',
-              color: '#991b1b',
-              fontSize: 14,
-            }}
+    <section className="flex flex-1 items-center justify-center py-10 sm:py-16">
+      <div className="mx-auto w-full max-w-md rounded-3xl border border-[var(--border-subtle)] bg-card-bg/80 p-6 shadow-2xl shadow-black/5 backdrop-blur sm:p-8">
+        <div className="mb-8 space-y-2 text-center">
+          <h1 className="text-3xl font-semibold tracking-tight">Entrar</h1>
+          <p className="text-sm text-[color:var(--muted)]">
+            Acesse sua conta para continuar os estudos.
+          </p>
+        </div>
+        <form className="grid gap-5" onSubmit={handleSubmit}>
+          <label className="grid gap-2 text-left">
+            <span className="text-sm font-medium text-text-base">E-mail</span>
+            <input
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+              placeholder="seu@email.com"
+              className="w-full rounded-2xl border border-[var(--border-subtle)] bg-transparent px-4 py-3 text-base shadow-inner shadow-black/5 transition-all duration-200 focus:border-accent/60 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:ring-offset-2 focus:ring-offset-[var(--bg-base)]"
+            />
+          </label>
+          <label className="grid gap-2 text-left">
+            <span className="text-sm font-medium text-text-base">Senha</span>
+            <input
+              type="password"
+              value={senha}
+              onChange={(event) => setSenha(event.target.value)}
+              required
+              placeholder="••••••"
+              className="w-full rounded-2xl border border-[var(--border-subtle)] bg-transparent px-4 py-3 text-base shadow-inner shadow-black/5 transition-all duration-200 focus:border-accent/60 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:ring-offset-2 focus:ring-offset-[var(--bg-base)]"
+            />
+          </label>
+          {(formError || error) && (
+            <div
+              role="alert"
+              className="rounded-2xl border border-rose-200/80 bg-rose-100/70 px-4 py-3 text-sm text-rose-800 shadow-sm dark:border-rose-400/40 dark:bg-rose-500/10 dark:text-rose-100"
+            >
+              {formError ?? error}
+            </div>
+          )}
+          <button
+            type="submit"
+            disabled={loading}
+            className="inline-flex w-full items-center justify-center rounded-2xl bg-accent px-4 py-3 text-base font-semibold text-white shadow-lg shadow-accent/30 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)] disabled:cursor-not-allowed disabled:opacity-80"
           >
-            {formError ?? error}
-          </div>
-        )}
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            padding: '12px 16px',
-            borderRadius: 8,
-            border: 'none',
-            fontWeight: 600,
-            fontSize: 16,
-            cursor: loading ? 'not-allowed' : 'pointer',
-            background: loading ? '#94a3b8' : '#2563eb',
-            color: '#ffffff',
-            transition: 'background 0.2s ease',
-          }}
-        >
-          {loading ? 'Entrando...' : 'Entrar'}
-        </button>
-      </form>
-      <p style={{ marginTop: 16, fontSize: 14, color: '#475569' }}>
-        Ainda não tem conta? <Link to="/cadastro">Cadastre-se</Link>
-      </p>
-    </div>
+            {loading ? 'Entrando...' : 'Entrar'}
+          </button>
+        </form>
+        <p className="mt-6 text-center text-sm text-[color:var(--muted)]">
+          Ainda não tem conta?{' '}
+          <Link to="/cadastro" className="font-semibold text-accent hover:underline">
+            Cadastre-se
+          </Link>
+        </p>
+      </div>
+    </section>
   )
 }

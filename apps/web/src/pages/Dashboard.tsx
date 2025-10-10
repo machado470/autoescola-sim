@@ -107,72 +107,45 @@ export default function Dashboard() {
     [stats],
   )
 
-  const statusStyles: Record<ApiStatus, { background: string; color: string }> = {
-    online: { background: '#dcfce7', color: '#166534' },
-    offline: { background: '#fee2e2', color: '#991b1b' },
-  }
-
   return (
-    <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 24px' }}>
-      <h1 style={{ fontSize: 28, marginBottom: 24 }}>Dashboard</h1>
-      {loading && <p>Carregando dados...</p>}
+    <section className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
+        <p className="text-sm text-[color:var(--muted)]">
+          Acompanhe o desempenho da AutoEscola em tempo real.
+        </p>
+      </div>
+      {loading && <p className="text-sm text-[color:var(--muted)]">Carregando dados...</p>}
       {error && (
-        <div
-          style={{
-            background: '#fef3c7',
-            color: '#92400e',
-            padding: 12,
-            borderRadius: 8,
-            marginBottom: 24,
-          }}
-        >
+        <div className="rounded-2xl border border-orange-200/70 bg-orange-100/60 px-4 py-3 text-sm text-orange-900 shadow-sm dark:border-orange-400/40 dark:bg-orange-500/10 dark:text-orange-100">
           {error}
         </div>
       )}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: 16,
-        }}
-      >
-        {cards.map((card) => (
-          <div
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {cards.map((card, index) => (
+          <article
             key={card.title}
-            style={{
-              background: '#ffffff',
-              borderRadius: 12,
-              padding: 20,
-              boxShadow: '0 1px 2px rgba(15, 23, 42, 0.08)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 8,
-            }}
+            className="group flex flex-col gap-3 rounded-2xl border border-transparent bg-card-bg/90 p-5 shadow-sm ring-1 ring-[var(--border-subtle)] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:ring-accent/40 animate-fade-in-up dark:ring-0 dark:hover:ring-0"
+            style={{ animationDelay: `${index * 80}ms` }}
           >
-            <span style={{ fontSize: 14, color: '#64748b', fontWeight: 500 }}>
-              {card.title}
-            </span>
-            <strong style={{ fontSize: 32, color: '#0f172a' }}>{card.value}</strong>
-          </div>
+            <span className="text-sm font-medium text-[color:var(--muted)]">{card.title}</span>
+            <strong className="text-4xl font-semibold text-text-base">{card.value}</strong>
+          </article>
         ))}
-        <div
-          style={{
-            borderRadius: 12,
-            padding: 20,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-            gap: 8,
-            ...statusStyles[status],
-          }}
+        <article
+          className={`flex flex-col justify-center gap-3 rounded-2xl p-5 text-sm font-medium transition-all duration-300 animate-fade-in-up ${
+            status === 'online'
+              ? 'bg-emerald-100/80 text-emerald-800 shadow-sm dark:bg-emerald-500/10 dark:text-emerald-200'
+              : 'bg-rose-100/80 text-rose-800 shadow-sm dark:bg-rose-500/10 dark:text-rose-200'
+          }`}
+          style={{ animationDelay: `${cards.length * 80}ms` }}
         >
-          <span style={{ fontSize: 14, fontWeight: 500 }}>Status da API</span>
-          <strong style={{ fontSize: 24 }}>
+          <span>Status da API</span>
+          <strong className="text-2xl font-semibold">
             {status === 'online' ? 'Online' : 'Offline'}
           </strong>
-        </div>
+        </article>
       </div>
-    </div>
+    </section>
   )
 }
