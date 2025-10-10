@@ -1,9 +1,16 @@
-import { IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator'
+import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator'
 
 export class CreateInstrutorDto {
   @IsString()
   @IsNotEmpty()
   nome!: string
+
+  @IsEmail()
+  email!: string
+
+  @IsString()
+  @IsNotEmpty()
+  senha!: string
 
   @IsOptional()
   @IsString()
