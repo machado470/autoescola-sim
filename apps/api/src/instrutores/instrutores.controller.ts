@@ -7,13 +7,17 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { CreateInstrutorDto } from './dto/create-instrutor.dto'
 import { UpdateInstrutorDto } from './dto/update-instrutor.dto'
 import { InstrutoresService } from './instrutores.service'
 
 @ApiTags('Instrutores')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('instrutores')
 export class InstrutoresController {
   constructor(private readonly instrutoresService: InstrutoresService) {}

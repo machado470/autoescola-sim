@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
+import { APP_GUARD } from '@nestjs/core'
 import { resolve } from 'node:path'
+import { AuthModule } from './auth/auth.module'
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard'
 import { AlunosModule } from './alunos/alunos.module'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
@@ -18,11 +21,18 @@ import { SimuladosModule } from './simulados/simulados.module'
       ],
     }),
     PrismaModule,
+    AuthModule,
     AlunosModule,
     InstrutoresModule,
     SimuladosModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

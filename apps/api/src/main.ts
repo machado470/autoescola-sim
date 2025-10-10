@@ -36,9 +36,23 @@ async function bootstrap() {
     .setTitle('AutoEscola Sim')
     .setDescription('API documentation for AutoEscola Sim')
     .setVersion(appService.getVersion())
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        in: 'header',
+        name: 'Authorization',
+      },
+      'JWT',
+    )
     .build()
   const document = SwaggerModule.createDocument(app, swaggerConfig)
-  SwaggerModule.setup('docs', app, document)
+  SwaggerModule.setup('docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  })
 
   const port = Number(configService.get('API_PORT') ?? 3333)
 

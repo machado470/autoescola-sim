@@ -7,13 +7,17 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { CreateSimuladoDto } from './dto/create-simulado.dto'
 import { UpdateSimuladoDto } from './dto/update-simulado.dto'
 import { SimuladosService } from './simulados.service'
 
 @ApiTags('Simulados')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('simulados')
 export class SimuladosController {
   constructor(private readonly simuladosService: SimuladosService) {}
