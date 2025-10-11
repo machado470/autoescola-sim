@@ -3,8 +3,10 @@
 Guia rápido:
 - Requisitos: Node 20+, pnpm, PostgreSQL 15+.
 - Instalação: `pnpm i`
-- Backend: copie `.env.example` para `.env`, ajuste `DATABASE_URL`, rode migrações/seed e `pnpm --filter @aes/api dev`.
+- Backend: copie `.env.example` para `.env`, ajuste `DATABASE_URL`, rode migrações/seed e `pnpm --filter @autoescola/api dev`.
+  - Caso precise apenas validar rotas sem um Postgres disponível, defina `PRISMA_SKIP_CONNECT=true` para pular a conexão do Prisma.
 - Frontend: `pnpm --filter @autoescola/web dev`
+- Variáveis de ambiente: consulte `.env.sample`, `.env.example` e `.env.example.prod` para todas as chaves exigidas.
 
 ## Acesso de testes
 
@@ -35,7 +37,7 @@ Estrutura de conteúdo em `apps/web/src/data/tracks/**`. Use os schemas em `pack
 - Crie os arquivos de variáveis a partir dos exemplos:
   - API: copie `.env.example` ou `.env.example.prod` para `.env` dentro de `apps/api` e ajuste `DATABASE_URL`, `JWT_SECRET` e demais chaves.
   - Web: use `apps/web/.env.example.prod` como base para definir `VITE_API_URL` e `VITE_TOKEN_KEY`.
-- Gere o cliente Prisma e construa tudo localmente para validar:
+- Gere o cliente Prisma e construa tudo localmente para validar (o `postinstall` já chama `pnpm --filter @autoescola/api prisma:generate` automaticamente, mas o comando abaixo serve como fallback):
   ```bash
   pnpm install
   pnpm --filter @autoescola/api prisma:generate
