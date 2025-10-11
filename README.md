@@ -8,6 +8,13 @@ Guia rápido:
 - Frontend: `pnpm --filter @autoescola/web dev`
 - Variáveis de ambiente: consulte `.env.sample`, `.env.example` e `.env.example.prod` para todas as chaves exigidas.
 
+## Manutenção do ambiente local
+
+- **Sincronize o repositório**: confirme que a branch atual está limpa (`git status`) e, quando um remoto estiver configurado, atualize com `git pull origin <branch>`.
+- **WSL/Linux**: execute `wsl.exe --status` (no Windows) para garantir que a distribuição padrão esteja saudável e atualize os pacotes básicos (`sudo apt update && sudo apt upgrade`).
+- **pnpm**: verifique a versão instalada com `pnpm -v` (a base atual usa `>=10.18`) e instale dependências com `pnpm install` para acionar o `postinstall` que gera o cliente Prisma.
+- **Build do monorepo**: valide com `pnpm build`, que roda `pnpm -r build` nos workspaces `apps/api` e `apps/web`.
+
 ## Acesso de testes
 
 - Login administrador: `admin@aes.com`
