@@ -1,28 +1,64 @@
+import axios, {
+  AxiosHeaders,
+  type AxiosHeaderValue,
+  type AxiosRequestConfig,
+  type AxiosResponse,
+  type RawAxiosRequestHeaders,
+} from 'axios'
 import { clearStoredToken, getStoredToken } from './auth-storage'
 
 import { API_BASE_URL } from '../config'
 
-type ApiFetchOptions = RequestInit & {
-  auth?: boolean
+type ApiRequestConfig<TData = unknown> = AxiosRequestConfig<TData> & {
+  withAuth?: boolean
 }
 
-function buildHeaders(initHeaders: HeadersInit | undefined, withAuth: boolean): Headers {
-  const headers = new Headers(initHeaders)
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+})
+
+function buildHeaders(
+  initHeaders: AxiosRequestConfig['headers'],
+  withAuth: boolean,
+): RawAxiosRequestHeaders {
+  const headers: RawAxiosRequestHeaders = {}
+
+  if (initHeaders instanceof AxiosHeaders) {
+    initHeaders.forEach((value: AxiosHeaderValue | undefined, name: string) => {
+      if (typeof value !== 'undefined') {
+        headers[name] = Array.isArray(value) ? value.join(', ') : String(value)
+      }
+    })
+  } else if (initHeaders && typeof initHeaders === 'object') {
+    Object.entries(initHeaders).forEach(([name, value]) => {
+      if (typeof value !== 'undefined' && value !== null) {
+        headers[name] = Array.isArray(value) ? value.join(', ') : String(value)
+      }
+    })
+  }
+
   if (withAuth) {
     const token = getStoredToken()
     if (token) {
-      headers.set('Authorization', `Bearer ${token}`)
+      headers.Authorization = `Bearer ${token}`
     }
   }
+
   return headers
 }
 
-export async function apiFetch(input: string, init: ApiFetchOptions = {}): Promise<Response> {
-  const { auth = true, headers: initHeaders, ...rest } = init
-  const headers = buildHeaders(initHeaders, auth)
-  const response = await fetch(`${API_BASE_URL}${input}`, {
+export async function apiFetch<TResponse = unknown>(
+  input: string,
+  config: ApiRequestConfig = {},
+): Promise<AxiosResponse<TResponse>> {
+  const { withAuth = true, headers: initHeaders, ...rest } = config
+  const headers = buildHeaders(initHeaders, withAuth)
+
+  const response = await apiClient.request<TResponse>({
+    url: input,
     ...rest,
     headers,
+    validateStatus: () => true,
   })
 
   if (response.status === 401) {
