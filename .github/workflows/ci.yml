@@ -42,7 +42,7 @@ jobs:
         run: pnpm install
 
       - name: Prisma migrate
-        run: npx prisma migrate deploy
+        run: pnpm --filter @autoescola/api exec prisma migrate deploy --schema apps/api/prisma/schema.prisma
 
       - name: Build
         run: pnpm build
