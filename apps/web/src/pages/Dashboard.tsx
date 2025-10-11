@@ -1,3 +1,4 @@
+import { isAxiosError, type AxiosResponse } from 'axios'
 import { useEffect, useMemo, useState } from 'react'
 import { apiFetch } from '../lib/apiClient'
 
@@ -10,25 +11,24 @@ type StatsResponse = {
 type ApiStatus = 'online' | 'offline'
 
 function parseError(error: unknown): string {
+  if (isAxiosError(error) && error.message) {
+    return error.message
+  }
   if (error instanceof Error && error.message) {
     return error.message
   }
   return 'Não foi possível carregar os dados do dashboard.'
 }
 
-async function readErrorMessage(response: Response): Promise<string> {
-  try {
-    const data = await response.json()
-    if (typeof data?.message === 'string') {
-      return data.message
-    }
-    if (Array.isArray(data?.message)) {
-      return data.message.join(', ')
-    }
-  } catch (error) {
-    console.error('Falha ao interpretar erro da API', error)
+function readErrorMessage(response: AxiosResponse<unknown>): string {
+  const data = response.data as { message?: string | string[] } | undefined
+  if (typeof data?.message === 'string') {
+    return data.message
   }
-  return `${response.status} - ${response.statusText}`.trim()
+  if (Array.isArray(data?.message)) {
+    return data.message.join(', ')
+  }
+  return `${response.status} - ${response.statusText ?? ''}`.trim()
 }
 
 export default function Dashboard() {
@@ -45,12 +45,12 @@ export default function Dashboard() {
       setError(null)
 
       try {
-        const statsResponse = await apiFetch('/stats')
-        if (!statsResponse.ok) {
-          const message = await readErrorMessage(statsResponse)
+        const statsResponse = await apiFetch<StatsResponse>('/stats')
+        if (statsResponse.status >= 400) {
+          const message = readErrorMessage(statsResponse)
           throw new Error(message)
         }
-        const statsData: StatsResponse = await statsResponse.json()
+        const statsData = statsResponse.data
         if (active) {
           setStats(statsData)
         }
@@ -62,11 +62,11 @@ export default function Dashboard() {
       }
 
       try {
-        const healthResponse = await apiFetch('/health', { auth: false })
-        if (!healthResponse.ok) {
+        const healthResponse = await apiFetch<{ status?: string }>('/health', { withAuth: false })
+        if (healthResponse.status >= 400) {
           throw new Error('Health check falhou')
         }
-        const healthData: { status?: string } = await healthResponse.json()
+        const healthData = healthResponse.data
         if (active) {
           setStatus(healthData?.status === 'ok' ? 'online' : 'offline')
         }
