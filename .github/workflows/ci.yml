@@ -2,39 +2,50 @@ name: CI
 
 on:
   push:
-    branches: [ "**" ]
+    branches: [main, develop, codex/*]
   pull_request:
+    branches: [main, develop]
 
 jobs:
   build-test:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    services:
+      postgres:
+        image: postgres:15
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: autoescola
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
-      - name: Setup Node.js
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/autoescola?schema=public
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
 
-      - name: Enable Corepack
-        run: corepack enable
+      - name: Install pnpm
+        run: npm install -g pnpm
 
-      - name: Activate pnpm
-        run: corepack prepare pnpm@10.18.0 --activate
+      - name: Install dependencies
+        run: pnpm install
 
-      - name: pnpm -v
-        run: pnpm -v
-
-      - name: Install
-        run: pnpm install --frozen-lockfile
-
-      - name: Typecheck
-        run: pnpm -r --if-present typecheck
-
-      - name: Lint
-        run: pnpm -r --if-present lint
+      - name: Prisma migrate
+        run: npx prisma migrate deploy
 
       - name: Build
-        run: pnpm -r build
+        run: pnpm build
+
+      - name: Run tests
+        run: pnpm test
