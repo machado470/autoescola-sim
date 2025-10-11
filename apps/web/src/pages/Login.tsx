@@ -37,11 +37,12 @@ export default function Login() {
   }
 
   return (
-    <section className="flex flex-1 items-center justify-center py-10 sm:py-16">
-      <div className="mx-auto w-full max-w-md rounded-3xl border border-[var(--border-subtle)] bg-card-bg/80 p-6 shadow-2xl shadow-black/5 backdrop-blur sm:p-8">
+    <section className="relative grid min-h-[calc(100vh-6rem)] place-items-center overflow-hidden px-4 py-12 sm:px-6 sm:py-20">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,var(--accent)/18%,transparent_55%)]" />
+      <div className="mx-auto w-full max-w-md rounded-[2.5rem] border border-[var(--border-subtle)] bg-card-bg/80 p-6 shadow-2xl shadow-black/5 backdrop-blur-lg transition-colors duration-300 sm:p-8">
         <div className="mb-8 space-y-2 text-center">
-          <h1 className="text-3xl font-semibold tracking-tight">Entrar</h1>
-          <p className="text-sm text-[color:var(--muted)]">
+          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Entrar</h1>
+          <p className="text-sm text-[color:var(--muted)] sm:text-base">
             Acesse sua conta para continuar os estudos.
           </p>
         </div>

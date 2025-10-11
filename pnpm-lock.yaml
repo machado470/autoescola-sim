@@ -58,6 +58,9 @@ importers:
       passport-local:
         specifier: ^1.0.0
         version: 1.0.0
+      prisma:
+        specifier: ^5.9.1
+        version: 5.22.0
       reflect-metadata:
         specifier: ^0.1.13
         version: 0.1.14
@@ -86,9 +89,6 @@ importers:
       '@types/passport-local':
         specifier: ^1.0.38
         version: 1.0.38
-      prisma:
-        specifier: ^5.9.1
-        version: 5.22.0
       ts-node:
         specifier: ^10.9.1
         version: 10.9.2(@types/node@20.19.20)(typescript@5.9.3)
