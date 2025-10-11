@@ -94,14 +94,20 @@ export default function Dashboard() {
       {
         title: 'Alunos Cadastrados',
         value: stats?.alunos ?? '--',
+        icon: '👩‍🎓',
+        description: 'Total de matrículas ativas na plataforma.',
       },
       {
         title: 'Instrutores',
         value: stats?.instrutores ?? '--',
+        icon: '🧑‍🏫',
+        description: 'Profissionais acompanhando as turmas.',
       },
       {
         title: 'Simulados',
         value: stats?.simulados ?? '--',
+        icon: '🧠',
+        description: 'Avaliações disponíveis para os alunos.',
       },
     ],
     [stats],
@@ -121,29 +127,60 @@ export default function Dashboard() {
           {error}
         </div>
       )}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card, index) => (
           <article
             key={card.title}
-            className="group flex flex-col gap-3 rounded-2xl border border-transparent bg-card-bg/90 p-5 shadow-sm ring-1 ring-[var(--border-subtle)] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:ring-accent/40 animate-fade-in-up dark:ring-0 dark:hover:ring-0"
+            className="group relative flex h-full flex-col justify-between gap-4 overflow-hidden rounded-3xl border border-transparent bg-card-bg/90 p-6 shadow-soft ring-1 ring-[var(--border-subtle)] transition-all duration-300 animate-fade-in-up motion-safe:hover:-translate-y-1 motion-safe:hover:scale-[1.01] motion-safe:hover:shadow-2xl motion-safe:hover:ring-accent/40 dark:ring-0"
             style={{ animationDelay: `${index * 80}ms` }}
           >
-            <span className="text-sm font-medium text-[color:var(--muted)]">{card.title}</span>
-            <strong className="text-4xl font-semibold text-text-base">{card.value}</strong>
+            <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/15 text-2xl text-accent transition-transform duration-300 motion-safe:group-hover:-translate-y-0.5">
+              {card.icon}
+            </span>
+            <header className="space-y-1">
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[color:var(--muted)]">{card.title}</p>
+              <strong className="text-4xl font-semibold text-text-base">{card.value}</strong>
+            </header>
+            <p className="text-sm text-[color:var(--muted)]">{card.description}</p>
+            <span className="pointer-events-none absolute inset-x-0 bottom-0 h-16 translate-y-8 bg-gradient-to-t from-accent/10 via-transparent to-transparent opacity-0 transition-all duration-300 motion-safe:group-hover:translate-y-0 motion-safe:group-hover:opacity-100" />
           </article>
         ))}
+      </div>
+      <div className="grid gap-4 lg:grid-cols-2">
         <article
-          className={`flex flex-col justify-center gap-3 rounded-2xl p-5 text-sm font-medium transition-all duration-300 animate-fade-in-up ${
+          className={`flex flex-col justify-center gap-2 rounded-3xl border border-transparent p-6 text-sm font-medium shadow-soft transition-all duration-300 animate-fade-in-up motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-xl ${
             status === 'online'
-              ? 'bg-emerald-100/80 text-emerald-800 shadow-sm dark:bg-emerald-500/10 dark:text-emerald-200'
-              : 'bg-rose-100/80 text-rose-800 shadow-sm dark:bg-rose-500/10 dark:text-rose-200'
+              ? 'bg-emerald-100/80 text-emerald-900 dark:bg-emerald-500/10 dark:text-emerald-200'
+              : 'bg-rose-100/80 text-rose-900 dark:bg-rose-500/10 dark:text-rose-200'
           }`}
           style={{ animationDelay: `${cards.length * 80}ms` }}
         >
-          <span>Status da API</span>
-          <strong className="text-2xl font-semibold">
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--muted)]">Status da API</span>
+          <strong className="text-3xl font-semibold">
             {status === 'online' ? 'Online' : 'Offline'}
           </strong>
+          <p className="text-sm text-[color:var(--muted)]">
+            {status === 'online'
+              ? 'Seu backend está respondendo normalmente. Continue monitorando para manter o uptime alto.'
+              : 'Identificamos instabilidade no backend. Verifique logs e serviços associados assim que possível.'}
+          </p>
+        </article>
+        <article
+          className="flex flex-col justify-center gap-4 rounded-3xl border border-[var(--border-subtle)] bg-card-bg/90 p-6 text-sm shadow-soft transition-all duration-300 animate-fade-in-up motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-xl"
+          style={{ animationDelay: `${(cards.length + 1) * 80}ms` }}
+        >
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--muted)]">Insights</span>
+            <h2 className="mt-2 text-xl font-semibold text-text-base">Acompanhe a evolução semanal</h2>
+          </div>
+          <p className="text-sm text-[color:var(--muted)]">
+            Consulte relatórios completos no módulo de simulados para identificar tendências de aprovação e quais conteúdos merecem reforço. Use os filtros de período para cruzar os dados com campanhas em andamento.
+          </p>
+          <div className="flex flex-wrap gap-2 text-xs font-medium">
+            <span className="rounded-full bg-accent/10 px-3 py-1 text-accent">Simulados recentes</span>
+            <span className="rounded-full bg-accent/10 px-3 py-1 text-accent/80">Taxa de aprovação</span>
+            <span className="rounded-full bg-accent/10 px-3 py-1 text-accent/60">Feedbacks</span>
+          </div>
         </article>
       </div>
     </section>

@@ -20,9 +20,14 @@ async function bootstrap() {
   const appService = app.get(AppService)
 
   const corsOrigins = configService.get<string>('CORS_ORIGINS')
+  const defaultOrigins = [
+    'http://localhost:5173',
+    'https://autoescola-sim.vercel.app',
+  ]
+
   const origins = corsOrigins
     ? corsOrigins.split(',').map((origin) => origin.trim()).filter(Boolean)
-    : []
+    : defaultOrigins
 
   app.enableCors(
     origins.length > 0
@@ -54,7 +59,7 @@ async function bootstrap() {
     },
   })
 
-  const port = Number(configService.get('API_PORT') ?? 3333)
+  const port = Number(configService.get('API_PORT') ?? 8080)
 
   await app.listen(port)
   const url = await app.getUrl()

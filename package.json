@@ -8,6 +8,10 @@
   "scripts": {
     "dev": "pnpm -r --parallel dev",
     "build": "pnpm -r build",
-    "lint": "echo 'add eslint later'"
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "start": "pnpm -r --if-present start",
+    "test": "pnpm -r --if-present test",
+    "postinstall": "pnpm --filter @autoescola/api prisma:generate"
   }
 }

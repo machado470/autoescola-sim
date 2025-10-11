@@ -1,6 +1,6 @@
 import { clearStoredToken, getStoredToken } from './auth-storage'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
+import { API_BASE_URL } from '../config'
 
 type ApiFetchOptions = RequestInit & {
   auth?: boolean
