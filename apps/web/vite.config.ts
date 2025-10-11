@@ -5,4 +5,6 @@ import path from 'node:path'
 export default defineConfig({
   plugins: [react()],
   envDir: path.resolve(__dirname, '..', '..'),
+  base: process.env.VITE_BASE || '/',
 })
+  
