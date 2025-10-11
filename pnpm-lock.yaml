@@ -7,8 +7,6 @@ settings:
 importers:
 
   .: {}
-<<<<<<< HEAD
-=======
 
   apps/api:
     dependencies:
@@ -4835,4 +4833,3 @@ snapshots:
   yargs-parser@21.1.1: {}
 
   yn@3.1.1: {}
->>>>>>> 16d0868ce609f8a7aff0bc19485baaded95c2700
