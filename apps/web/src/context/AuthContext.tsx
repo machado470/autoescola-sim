@@ -1,3 +1,4 @@
+import { isAxiosError, type AxiosResponse } from 'axios'
 import {
   PropsWithChildren,
   createContext,
@@ -31,17 +32,13 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
-async function parseErrorMessage(response: Response): Promise<string> {
-  try {
-    const data = await response.json()
-    if (typeof data?.message === 'string') {
-      return data.message
-    }
-    if (Array.isArray(data?.message)) {
-      return data.message.join(', ')
-    }
-  } catch (error) {
-    console.error('Failed to parse error response', error)
+function parseErrorMessage(response: AxiosResponse<unknown>): string {
+  const data = response.data as { message?: string | string[] } | undefined
+  if (typeof data?.message === 'string') {
+    return data.message
+  }
+  if (Array.isArray(data?.message)) {
+    return data.message.join(', ')
   }
   return 'Não foi possível realizar o login. Tente novamente.'
 }
@@ -70,23 +67,23 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setError(null)
 
     try {
-      const response = await apiFetch('/auth/login', {
-        method: 'POST',
+      const response = await apiFetch<{ access_token?: string }>('/auth/login', {
+        method: 'post',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, senha }),
-        auth: false,
+        data: { email, senha },
+        withAuth: false,
       })
 
-      if (!response.ok) {
-        const message = await parseErrorMessage(response)
+      if (response.status >= 400) {
+        const message = parseErrorMessage(response)
         setError(message)
         throw new Error(message)
       }
 
-      const data: { access_token?: string } = await response.json()
-      if (!data.access_token) {
+      const { data } = response
+      if (!data?.access_token) {
         const message = 'Resposta do servidor não contém token.'
         setError(message)
         throw new Error(message)
@@ -97,10 +94,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
       setError(null)
       return data.access_token
     } catch (error) {
-      const message =
-        error instanceof Error && error.message
-          ? error.message
-          : 'Não foi possível realizar o login. Tente novamente.'
+      let message = 'Não foi possível realizar o login. Tente novamente.'
+      if (isAxiosError(error) && error.message) {
+        message = error.message
+      } else if (error instanceof Error && error.message) {
+        message = error.message
+      }
       setError(message)
       throw new Error(message)
     } finally {
