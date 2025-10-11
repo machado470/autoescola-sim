@@ -2,14 +2,12 @@ name: CI
 
 on:
   push:
+    branches: [ "**" ]
   pull_request:
 
 jobs:
   build-test:
     runs-on: ubuntu-latest
-    env:
-      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,28 +18,23 @@ jobs:
           node-version: 20
           cache: 'pnpm'
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 8
-          run_install: false
+      - name: Enable Corepack
+        run: corepack enable
 
-      - name: Install dependencies
+      - name: Activate pnpm
+        run: corepack prepare pnpm@10.18.0 --activate
+
+      - name: pnpm -v
+        run: pnpm -v
+
+      - name: Install
         run: pnpm install --frozen-lockfile
 
-      - name: Cache turbo
-        uses: actions/cache@v3
-        with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-
-
-      - name: Build
-        run: pnpm build
+      - name: Typecheck
+        run: pnpm -r --if-present typecheck
 
       - name: Lint
-        run: pnpm lint
+        run: pnpm -r --if-present lint
 
-      - name: Typecheck
-        run: pnpm typecheck
+      - name: Build
+        run: pnpm -r build
