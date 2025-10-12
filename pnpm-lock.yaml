@@ -40,6 +40,9 @@ importers:
       bcrypt:
         specifier: ^6.0.0
         version: 6.0.0
+      bcryptjs:
+        specifier: ^3.0.2
+        version: 3.0.2
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
@@ -81,7 +84,7 @@ importers:
         specifier: ^4.17.21
         version: 4.17.23
       '@types/node':
-        specifier: ^20.10.5
+        specifier: ^20.19.21
         version: 20.19.21
       '@types/passport-jwt':
         specifier: ^4.0.1
@@ -90,7 +93,7 @@ importers:
         specifier: ^1.0.38
         version: 1.0.38
       ts-node:
-        specifier: ^10.9.1
+        specifier: ^10.9.2
         version: 10.9.2(@types/node@20.19.21)(typescript@5.9.3)
       typescript:
         specifier: ^5.3.3
@@ -1709,6 +1712,11 @@ packages:
     dependencies:
       node-addon-api: 8.5.0
       node-gyp-build: 4.8.4
+    dev: false
+
+  /bcryptjs@3.0.2:
+    resolution: {integrity: sha512-k38b3XOZKv60C4E2hVsXTolJWfkGRMbILBIe2IBITXciy5bOsTKot5kDrf3ZfufQtQOUN5mXceUEpU1rTl9Uog==}
+    hasBin: true
     dev: false
 
   /binary-extensions@2.3.0:
