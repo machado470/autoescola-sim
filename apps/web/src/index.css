@@ -1,108 +1,68 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 :root {
-  --bg-base-light: #f8fafc;
-  --text-base-light: #0f172a;
-  --card-bg-light: #ffffff;
-  --accent-light: #2563eb;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
 
-  --bg-base-dark: #050b18;
-  --text-base-dark: #e2e8f0;
-  --card-bg-dark: #0f172a;
-  --accent-dark: #60a5fa;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-:root,
-:root[data-theme='light'] {
-  color-scheme: light;
-  --bg-base: var(--bg-base-light);
-  --text-base: var(--text-base-light);
-  --card-bg: var(--card-bg-light);
-  --accent: var(--accent-light);
-  --border-subtle: color-mix(in srgb, var(--text-base) 12%, transparent);
-  --muted: color-mix(in srgb, var(--text-base) 45%, transparent);
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
 }
-
-:root[data-theme='dark'] {
-  color-scheme: dark;
-  --bg-base: var(--bg-base-dark);
-  --text-base: var(--text-base-dark);
-  --card-bg: var(--card-bg-dark);
-  --accent: var(--accent-dark);
-  --border-subtle: color-mix(in srgb, var(--text-base) 22%, transparent);
-  --muted: color-mix(in srgb, var(--text-base) 60%, transparent);
-}
-
-.dark {
-  color-scheme: dark;
-  --bg-base: var(--bg-base-dark);
-  --text-base: var(--text-base-dark);
-  --card-bg: var(--card-bg-dark);
-  --accent: var(--accent-dark);
-  --border-subtle: color-mix(in srgb, var(--text-base) 22%, transparent);
-  --muted: color-mix(in srgb, var(--text-base) 60%, transparent);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) {
-    color-scheme: dark;
-    --bg-base: var(--bg-base-dark);
-    --text-base: var(--text-base-dark);
-    --card-bg: var(--card-bg-dark);
-    --accent: var(--accent-dark);
-    --border-subtle: color-mix(in srgb, var(--text-base) 22%, transparent);
-    --muted: color-mix(in srgb, var(--text-base) 60%, transparent);
-  }
-}
-
-* {
-  border-color: var(--border-subtle);
+a:hover {
+  color: #535bf2;
 }
 
 body {
   margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
   min-height: 100vh;
-  background-color: var(--bg-base);
-  color: var(--text-base);
-  font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  transition: background-color 0.4s ease, color 0.4s ease;
-  text-rendering: optimizeLegibility;
 }
 
-main {
-  width: 100%;
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
 }
 
-a:hover {
-  color: var(--accent);
-}
-
-button,
-input,
-textarea,
-select {
-  font: inherit;
-  color: inherit;
-}
-
-::selection {
-  background: color-mix(in srgb, var(--accent) 35%, transparent);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
   }
 }
