@@ -1,125 +1,99 @@
 import { PrismaClient } from '@prisma/client'
-import * as bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
 async function main() {
-  await prisma.simulado.deleteMany()
+  console.info('🌱 Seeding dados básicos v1...')
 
-  const alunos = await Promise.all(
-    [
-      {
-        nome: 'Aluno Padrão',
-        cpf: '00000000000',
-        email: 'aluno@aes.com',
-        senha: '123456',
-      },
-      {
-        nome: 'Ana Souza',
-        cpf: '12345678901',
-        email: 'ana.souza@example.com',
-        senha: 'senhaAna123',
-      },
-      {
-        nome: 'Bruno Lima',
-        cpf: '23456789012',
-        email: 'bruno.lima@example.com',
-        senha: 'senhaBruno123',
-      },
-      {
-        nome: 'Carla Mendes',
-        cpf: '34567890123',
-        email: 'carla.mendes@example.com',
-        senha: 'senhaCarla123',
-      },
-    ].map(async ({ senha, ...aluno }) => {
-      const senhaHash = await bcrypt.hash(senha, 10)
-      return prisma.aluno.upsert({
-        where: { email: aluno.email },
-        update: {
-          nome: aluno.nome,
-          cpf: aluno.cpf,
-          senhaHash,
-        },
-        create: {
-          ...aluno,
-          senhaHash,
+  const devPassword = '123456' // senha dev apenas
+  const adminPasswordHash = await bcrypt.hash(devPassword, 10)
+
+  const admin = await prisma.instrutor.upsert({
+    where: { email: 'admin@aes.com' },
+    update: {
+      nome: 'Administrador',
+      senhaHash: adminPasswordHash,
+    },
+    create: {
+      nome: 'Administrador',
+      email: 'admin@aes.com',
+      senhaHash: adminPasswordHash,
+      cnh: null,
+    },
+  })
+  console.info(`✅ Admin dev garantido (${admin.email}).`)
+
+  const alunoPasswordHash = await bcrypt.hash(devPassword, 10)
+  const alunoDemo = await prisma.aluno.upsert({
+    where: { cpf: '00011122233' },
+    update: {
+      nome: 'Aluno Demo',
+      email: 'aluno.demo@aes.com',
+      senhaHash: alunoPasswordHash,
+    },
+    create: {
+      nome: 'Aluno Demo',
+      cpf: '00011122233',
+      email: 'aluno.demo@aes.com',
+      senhaHash: alunoPasswordHash,
+    },
+  })
+  console.info(`✅ Aluno demo pronto (${alunoDemo.email}).`)
+
+  const instrutorPasswordHash = await bcrypt.hash(devPassword, 10)
+  const instrutorDemo = await prisma.instrutor.upsert({
+    where: { email: 'instrutor.demo@aes.com' },
+    update: {
+      nome: 'Instrutor Demo',
+      senhaHash: instrutorPasswordHash,
+      cnh: '99988877766',
+    },
+    create: {
+      nome: 'Instrutor Demo',
+      email: 'instrutor.demo@aes.com',
+      senhaHash: instrutorPasswordHash,
+      cnh: '99988877766',
+    },
+  })
+  console.info(`✅ Instrutor demo pronto (${instrutorDemo.email}).`)
+
+  const prismaAny = prisma as PrismaClient & Record<string, any>
+  const aulaModel = prismaAny.aula
+
+  if (aulaModel && typeof aulaModel.findFirst === 'function') {
+    try {
+      const existingAula = await aulaModel.findFirst({
+        where: {
+          alunoId: alunoDemo.id,
+          instrutorId: instrutorDemo.id,
         },
       })
-    }),
-  )
 
-  await Promise.all(
-    [
-      {
-        nome: 'Administrador',
-        email: 'admin@aes.com',
-        senha: '123456',
-        cnh: null,
-      },
-      {
-        nome: 'Eduardo Almeida',
-        email: 'eduardo.almeida@example.com',
-        senha: 'senhaEdu123',
-        cnh: 'ABC1234567',
-      },
-      {
-        nome: 'Fernanda Ribeiro',
-        email: 'fernanda.ribeiro@example.com',
-        senha: 'senhaFer123',
-        cnh: 'XYZ9876543',
-      },
-    ].map(async ({ senha, ...instrutor }) => {
-      const senhaHash = await bcrypt.hash(senha, 10)
-      return prisma.instrutor.upsert({
-        where: { email: instrutor.email },
-        update: {
-          nome: instrutor.nome,
-          cnh: instrutor.cnh,
-          senhaHash,
-        },
-        create: {
-          ...instrutor,
-          senhaHash,
-        },
-      })
-    }),
-  )
-
-  const alunosPorEmail = new Map(alunos.map((aluno) => [aluno.email, aluno]))
-
-  const simuladosData = [
-    {
-      email: 'ana.souza@example.com',
-      acertos: 18,
-      totalQuestoes: 20,
-    },
-    {
-      email: 'bruno.lima@example.com',
-      acertos: 15,
-      totalQuestoes: 20,
-    },
-    {
-      email: 'carla.mendes@example.com',
-      acertos: 20,
-      totalQuestoes: 20,
-    },
-  ]
-
-  for (const simulado of simuladosData) {
-    const aluno = alunosPorEmail.get(simulado.email)
-    if (!aluno) {
-      continue
+      if (!existingAula) {
+        const aulaDate = new Date()
+        await aulaModel.create({
+          data: {
+            alunoId: alunoDemo.id,
+            instrutorId: instrutorDemo.id,
+            data: aulaDate,
+          },
+        })
+        console.info('✅ Aula prática demo criada.')
+      } else {
+        console.info('ℹ️  Aula prática demo já existente, mantendo registro.')
+      }
+    } catch (error) {
+      console.warn(
+        '⚠️  Não foi possível criar aula prática demo automaticamente; verifique o schema antes de rodar novamente.',
+        error instanceof Error ? error.message : error,
+      )
     }
-
-    await prisma.simulado.create({
-      data: {
-        alunoId: aluno.id,
-        acertos: simulado.acertos,
-        totalQuestoes: simulado.totalQuestoes,
-      },
-    })
+  } else {
+    console.info('ℹ️  Modelo Aula não encontrado; pulando criação de aula prática.')
   }
+
+  console.info('🌱 Seed finalizado.')
 }
 
 main()
@@ -127,7 +101,7 @@ main()
     await prisma.$disconnect()
   })
   .catch(async (e) => {
-    console.error(e)
+    console.error('❌ Erro durante seed v1:', e)
     await prisma.$disconnect()
     process.exit(1)
   })

@@ -1,0 +1,22 @@
+{
+  "id": "legislacao",
+  "title": "Legislação de Trânsito",
+  "items": [
+    {
+      "type": "text",
+      "title": "Regras básicas",
+      "content": "Conteúdo introdutório placeholder v1."
+    },
+    {
+      "type": "quiz",
+      "title": "Quiz 1",
+      "questions": [
+        {
+          "q": "Qual órgão define normas de trânsito no Brasil?",
+          "options": ["CONTRAN", "IBGE", "ANVISA", "ANEEL"],
+          "answer": 0
+        }
+      ]
+    }
+  ]
+}

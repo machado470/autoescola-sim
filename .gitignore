@@ -3,3 +3,5 @@ node_modules/
 dist/
 .pnpm-store/
 .env
+!apps/api/.env
+!apps/web/.env
