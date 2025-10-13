@@ -1,0 +1,7 @@
+{
+  "version": "v1",
+  "modules": [
+    { "id": "legislacao", "title": "Legislação de Trânsito", "lessons": 10 },
+    { "id": "direcao-defensiva", "title": "Direção Defensiva", "lessons": 8 }
+  ]
+}

@@ -8,6 +8,16 @@ Guia rápido:
 - Frontend: `pnpm --filter @autoescola/web dev`
 - Variáveis de ambiente: consulte `.env.sample`, `.env.example` e `.env.example.prod` para todas as chaves exigidas.
 
+## Dev rápido
+
+1. `docker compose up -d`
+2. `pnpm install`
+3. `pnpm -C apps/api prisma generate`
+4. `pnpm -C apps/api prisma migrate dev --name init_v1`
+5. `pnpm -C apps/api seed`
+6. `pnpm -C apps/api dev`
+7. `pnpm -C apps/web dev`
+
 ## Manutenção do ambiente local
 
 - **Sincronize o repositório**: confirme que a branch atual está limpa (`git status`) e, quando um remoto estiver configurado, atualize com `git pull origin <branch>`.

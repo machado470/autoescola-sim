@@ -2,22 +2,15 @@ import { ValidationPipe } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import cors from 'cors'
 import helmet from 'helmet'
 import { AppModule } from './app.module'
 import { AppService } from './app.service'
+import { health } from './routes/health'
+import { relatorios } from './routes/relatorios'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
-
-  app.use(helmet())
-
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-      forbidUnknownValues: true,
-    }),
-  )
 
   const configService = app.get(ConfigService)
   const appService = app.get(AppService)
@@ -32,12 +25,29 @@ async function bootstrap() {
     ? corsOrigins.split(',').map((origin) => origin.trim()).filter(Boolean)
     : defaultOrigins
 
-  app.enableCors(
+  const corsOptions =
     origins.length > 0
       ? {
           origin: origins,
+          credentials: true,
         }
-      : undefined,
+      : {
+          origin: true,
+          credentials: true,
+        }
+
+  app.use(cors(corsOptions))
+
+  app.use(helmet())
+
+  app.use(health)
+  app.use(relatorios)
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidUnknownValues: true,
+    }),
   )
 
   const swaggerConfig = new DocumentBuilder()
