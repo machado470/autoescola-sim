@@ -40,7 +40,7 @@ function Login({ onLogin }: LoginProps) {
       <h1 className="title">AutoEscola Sim</h1>
       <form className="login-form" onSubmit={handleSubmit}>
         {error && <p className="error">{error}</p>}
-        <input
+        <nput
           type="email"
           placeholder="Email"
           value={email}
