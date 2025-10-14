@@ -1,34 +1,41 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
+import Login from './Login'
 import './App.css'
+import './styles.css';
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  const tokenKey = import.meta.env.VITE_TOKEN_KEY || '@autoescola/token'
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  useEffect(() => {
+    const stored = localStorage.getItem(tokenKey)
+    if (stored) {
+      setIsAuthenticated(true)
+    }
+  }, [tokenKey])
+
+  const handleLogin = () => {
+    setIsAuthenticated(true)
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem(tokenKey)
+    setIsAuthenticated(false)
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="app">
+      {!isAuthenticated ? (
+        <Login onLogin={handleLogin} />
+      ) : (
+        <div className="dashboard">
+     <h1 className="title">Bem-vindo à AutoEscola Sim</h1>
+          <p>Você está conectado.</p>
+          <button onClick={handleLogout}>Sair</button>
+        </div>
+      )}
+    </div>
   )
 }
 
