@@ -1,0 +1,4 @@
+> build
+> pnpm -r build
+
+sh: 1: pnpm: not found
