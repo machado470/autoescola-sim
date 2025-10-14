@@ -1,20 +1,20 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model Aluno {
-  id        String   @id @default(uuid())
+  id        String     @id @default(uuid())
   nome      String
-  cpf       String   @unique
-  email     String   @unique
+  cpf       String     @unique
+  email     String     @unique
   senhaHash String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   simulados Simulado[]
 }
 
@@ -31,8 +31,15 @@ model Instrutor {
 model Simulado {
   id            String   @id @default(uuid())
   alunoId       String
-  aluno         Aluno    @relation(fields: [alunoId], references: [id])
   acertos       Int
   totalQuestoes Int
   data          DateTime @default(now())
+  aluno         Aluno    @relation(fields: [alunoId], references: [id])
+}
+
+model School {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
