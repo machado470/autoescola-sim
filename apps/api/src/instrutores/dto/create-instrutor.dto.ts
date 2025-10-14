@@ -3,7 +3,7 @@ import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches } from 'class-valida
 export class CreateInstrutorDto {
   @IsString()
   @IsNotEmpty()
-  nome!: string
+  nome: string
 
   @IsEmail()
   email!: string
@@ -14,8 +14,12 @@ export class CreateInstrutorDto {
 
   @IsOptional()
   @IsString()
-  @Matches(/^[A-Z0-9]{5,15}$/iu, {
+  @Matches(/^[A-Z0-9]{5,15}$/i, {
     message: 'cnh must be an alphanumeric value between 5 and 15 characters',
   })
   cnh?: string
+
+  @IsOptional()
+  @IsString()
+  schoolId?: string
 }

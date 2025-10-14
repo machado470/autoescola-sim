@@ -2,12 +2,14 @@
   "name": "@autoescola/api",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
+
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/main.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "build": "tsc -p -p tsconfig.json",
+    "start": "node dist/main.js"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.6",
