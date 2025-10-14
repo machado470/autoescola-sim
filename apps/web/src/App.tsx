@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import Login from './Login'
 import './App.css'
+import './styles.css';
+
 
 function App() {
   const tokenKey = import.meta.env.VITE_TOKEN_KEY || '@autoescola/token'
@@ -28,7 +30,7 @@ function App() {
         <Login onLogin={handleLogin} />
       ) : (
         <div className="dashboard">
-          <h1>Bem-vindo ao AutoEscola Sim</h1>
+     <h1 className="title">Bem-vindo à AutoEscola Sim</h1>
           <p>Você está conectado.</p>
           <button onClick={handleLogout}>Sair</button>
         </div>
