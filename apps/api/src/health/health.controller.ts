@@ -3,7 +3,8 @@ import { Controller, Get } from '@nestjs/common';
 @Controller('health')
 export class HealthController {
   @Get()
-  health() {
-    return { ok: true, service: 'api', ts: new Date().toISOString() };
+  check() {
+    // Simples resposta de status sem depender do banco
+    return { status: 'ok', timestamp: new Date().toISOString() };
   }
 }
