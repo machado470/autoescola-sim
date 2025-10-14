@@ -82,3 +82,5 @@ curl -s -X POST https://sua-api/auth/login \
 ```
 
 Confirme também o carregamento do frontend e das telas protegidas utilizando o token retornado pela API.
+
+# commit assinado 2025-10-14T02:35:11-03:00
