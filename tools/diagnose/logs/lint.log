@@ -1,0 +1,4 @@
+> lint
+> pnpm -r --if-present lint
+
+sh: 1: pnpm: not found
