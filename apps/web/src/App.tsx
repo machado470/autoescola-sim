@@ -16,6 +16,7 @@ const navigationItems: NavigationItem[] = [
   { to: '/trilhas', label: 'Trilhas', icon: '🛣️' },
   { to: '/simulado/a', label: 'Simulados', icon: '🧠' },
   { to: '/dashboard', label: 'Dashboard', icon: '📊', requiresAuth: true },
+  { to: '/relatorios', label: 'Relatórios', icon: '📈', requiresAuth: true },
   { to: '/perfil', label: 'Perfil', icon: '👤', requiresAuth: true },
   { to: '/instrutor', label: 'Instrutor', icon: '🧑‍🏫', requiresAuth: true },
 ]
