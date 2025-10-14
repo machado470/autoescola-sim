@@ -16,6 +16,8 @@ model Aluno {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   simulados Simulado[]
+  aulas     Aula[]
+  progresso ProgressoTeorico[]
 }
 
 model Instrutor {
@@ -26,6 +28,7 @@ model Instrutor {
   cnh       String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  aulas     Aula[]
 }
 
 model Simulado {
@@ -35,4 +38,34 @@ model Simulado {
   acertos       Int
   totalQuestoes Int
   data          DateTime @default(now())
+}
+
+model Aula {
+  id          String     @id @default(uuid())
+  alunoId     String
+  instrutorId String
+  data        DateTime
+  status      AulaStatus
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  aluno     Aluno     @relation(fields: [alunoId], references: [id])
+  instrutor Instrutor @relation(fields: [instrutorId], references: [id])
+}
+
+model ProgressoTeorico {
+  id      String   @id @default(uuid())
+  alunoId String
+  itemId  String
+  doneAt  DateTime @default(now())
+
+  aluno Aluno @relation(fields: [alunoId], references: [id])
+
+  @@unique([alunoId, itemId])
+}
+
+enum AulaStatus {
+  AGENDADA
+  CONCLUIDA
+  CANCELADA
 }

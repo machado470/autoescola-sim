@@ -58,39 +58,58 @@ async function main() {
   })
   console.info(`✅ Instrutor demo pronto (${instrutorDemo.email}).`)
 
-  const prismaAny = prisma as PrismaClient & Record<string, any>
-  const aulaModel = prismaAny.aula
+  try {
+    const existingAula = await prisma.aula.findFirst({
+      where: {
+        alunoId: alunoDemo.id,
+        instrutorId: instrutorDemo.id,
+      },
+    })
 
-  if (aulaModel && typeof aulaModel.findFirst === 'function') {
-    try {
-      const existingAula = await aulaModel.findFirst({
-        where: {
+    if (!existingAula) {
+      const aulaDate = new Date()
+      await prisma.aula.create({
+        data: {
           alunoId: alunoDemo.id,
           instrutorId: instrutorDemo.id,
+          data: aulaDate,
+          status: 'AGENDADA',
         },
       })
-
-      if (!existingAula) {
-        const aulaDate = new Date()
-        await aulaModel.create({
-          data: {
-            alunoId: alunoDemo.id,
-            instrutorId: instrutorDemo.id,
-            data: aulaDate,
-          },
-        })
-        console.info('✅ Aula prática demo criada.')
-      } else {
-        console.info('ℹ️  Aula prática demo já existente, mantendo registro.')
-      }
-    } catch (error) {
-      console.warn(
-        '⚠️  Não foi possível criar aula prática demo automaticamente; verifique o schema antes de rodar novamente.',
-        error instanceof Error ? error.message : error,
-      )
+      console.info('✅ Aula prática demo criada.')
+    } else {
+      console.info('ℹ️  Aula prática demo já existente, mantendo registro.')
     }
-  } else {
-    console.info('ℹ️  Modelo Aula não encontrado; pulando criação de aula prática.')
+  } catch (error) {
+    console.warn(
+      '⚠️  Não foi possível criar aula prática demo automaticamente; verifique o schema antes de rodar novamente.',
+      error instanceof Error ? error.message : error,
+    )
+  }
+
+  try {
+    const teoricoItens = ['fundamentos-introducao', 'fundamentos-expectativas']
+    for (const itemId of teoricoItens) {
+      await prisma.progressoTeorico.upsert({
+        where: {
+          alunoId_itemId: {
+            alunoId: alunoDemo.id,
+            itemId,
+          },
+        },
+        update: {},
+        create: {
+          alunoId: alunoDemo.id,
+          itemId,
+        },
+      })
+    }
+    console.info('✅ Progresso teórico demo atualizado.')
+  } catch (error) {
+    console.warn(
+      '⚠️  Não foi possível registrar progresso teórico demo; verifique o schema antes de rodar novamente.',
+      error instanceof Error ? error.message : error,
+    )
   }
 
   console.info('🌱 Seed finalizado.')

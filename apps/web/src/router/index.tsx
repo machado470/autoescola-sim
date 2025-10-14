@@ -9,6 +9,7 @@ import Cadastro from '../pages/Cadastro'
 import Perfil from '../pages/Perfil'
 import Instrutor from '../pages/Instrutor'
 import Dashboard from '../pages/Dashboard'
+import Relatorios from '../pages/Relatorios'
 import { PrivateRoute } from './PrivateRoute'
 
 export const router = createBrowserRouter([
@@ -37,6 +38,14 @@ export const router = createBrowserRouter([
     element: (
       <PrivateRoute>
         <Dashboard />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/relatorios',
+    element: (
+      <PrivateRoute>
+        <Relatorios />
       </PrivateRoute>
     ),
   },
