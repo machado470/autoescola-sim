@@ -1,6 +1,5 @@
 import axios, {
-  AxiosHeaders,
-  type AxiosHeaderValue,
+  type AxiosHeaders,
   type AxiosRequestConfig,
   type AxiosResponse,
   type RawAxiosRequestHeaders,
@@ -18,23 +17,32 @@ const apiClient = axios.create({
 })
 
 function buildHeaders(
-  initHeaders: AxiosRequestConfig['headers'],
+  initHeaders: AxiosRequestConfig['headers'] = undefined,
   withAuth: boolean,
 ): RawAxiosRequestHeaders {
   const headers: RawAxiosRequestHeaders = {}
 
-  if (initHeaders instanceof AxiosHeaders) {
-    initHeaders.forEach((value: AxiosHeaderValue | undefined, name: string) => {
-      if (typeof value !== 'undefined') {
-        headers[name] = Array.isArray(value) ? value.join(', ') : String(value)
+  if (
+    initHeaders &&
+    typeof (initHeaders as AxiosHeaders).forEach === 'function'
+  ) {
+    ;(initHeaders as AxiosHeaders).forEach((value: unknown, name: string) => {
+      if (typeof value !== 'undefined' && value !== null) {
+        headers[name] = Array.isArray(value)
+          ? value.map((entry) => String(entry)).join(', ')
+          : String(value)
       }
     })
   } else if (initHeaders && typeof initHeaders === 'object') {
-    Object.entries(initHeaders).forEach(([name, value]) => {
-      if (typeof value !== 'undefined' && value !== null) {
-        headers[name] = Array.isArray(value) ? value.join(', ') : String(value)
-      }
-    })
+    Object.entries(initHeaders as Record<string, unknown>).forEach(
+      ([name, value]) => {
+        if (typeof value !== 'undefined' && value !== null) {
+          headers[name] = Array.isArray(value)
+            ? value.join(', ')
+            : String(value)
+        }
+      },
+    )
   }
 
   if (withAuth) {

@@ -5,6 +5,7 @@ import { resolve } from 'node:path'
 import { AuthModule } from './auth/auth.module'
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard'
 import { AlunosModule } from './alunos/alunos.module'
+import { AulasModule } from './aulas/aulas.module'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { InstrutoresModule } from './instrutores/instrutores.module'
@@ -25,6 +26,7 @@ import { StatsModule } from './stats/stats.module'
     AuthModule,
     AlunosModule,
     InstrutoresModule,
+    AulasModule,
     SimuladosModule,
     StatsModule,
   ],

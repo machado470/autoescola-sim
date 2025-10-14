@@ -16,6 +16,7 @@ model Aluno {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   simulados Simulado[]
+  aulas     Aula[]
 }
 
 model Instrutor {
@@ -26,6 +27,7 @@ model Instrutor {
   cnh       String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  aulas     Aula[]
 }
 
 model Simulado {
@@ -35,4 +37,27 @@ model Simulado {
   acertos       Int
   totalQuestoes Int
   data          DateTime @default(now())
+}
+
+enum AulaStatus {
+  AGENDADA
+  CONCLUIDA
+  CANCELADA
+}
+
+model Aula {
+  id          String      @id @default(uuid())
+  alunoId     String
+  instrutorId String
+  data        DateTime
+  status      AulaStatus  @default(AGENDADA)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  aluno     Aluno     @relation(fields: [alunoId], references: [id])
+  instrutor Instrutor @relation(fields: [instrutorId], references: [id])
+
+  @@index([data])
+  @@index([instrutorId])
+  @@index([alunoId])
 }

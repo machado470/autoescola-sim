@@ -53,7 +53,7 @@ function AppShell() {
                 key={item.to}
                 to={item.to}
                 end={item.to === '/'}
-                className={({ isActive }) =>
+                className={({ isActive }: { isActive: boolean }) =>
                   [
                     'group flex items-center gap-3 rounded-2xl px-2.5 py-2 text-[11px] font-medium uppercase tracking-[0.18em] transition-all duration-200 sm:px-3 lg:text-sm lg:normal-case lg:tracking-normal',
                     'hover:bg-accent/10 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]',

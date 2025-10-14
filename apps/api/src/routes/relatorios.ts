@@ -1,6 +1,6 @@
 import { Router } from 'express'
 
-export const relatorios = Router()
+export const relatorios: Router = Router()
 
 relatorios.get('/relatorios/progresso', (req, res) => {
   void req.query.alunoId

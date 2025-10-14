@@ -4,7 +4,8 @@ import { BlockRenderer } from '../components/lessons/BlockRenderer'
 import { isTrackId, loadTrackById, TrackId } from '../data/loaders'
 
 export default function Aula() {
-  const { trackId } = useParams<{ trackId: TrackId }>()
+  const params = useParams() as { trackId?: TrackId }
+  const { trackId } = params
 
   if (!isTrackId(trackId)) {
     return (
