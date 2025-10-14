@@ -10,7 +10,7 @@ export class InstrutoresService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createInstrutorDto: CreateInstrutorDto) {
-    const { senha, nome, email, cnh } = createInstrutorDto
+    const { senha, nome, email, cnh, schoolId } = createInstrutorDto
     const senhaHash = await bcrypt.hash(senha, 10)
 
     const data: Prisma.InstrutorCreateInput = {
@@ -18,64 +18,43 @@ export class InstrutoresService {
       email,
       senhaHash,
       cnh: cnh ?? null,
+      ...(schoolId && { school: { connect: { id: schoolId } } }),
     }
 
     return this.prisma.instrutor.create({ data })
   }
 
   findAll() {
-    return this.prisma.instrutor.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
+    return this.prisma.instrutor.findMany({ include: { school: true } })
   }
 
   async findOne(id: string) {
     const instrutor = await this.prisma.instrutor.findUnique({
       where: { id },
+      include: { school: true },
     })
-
-    if (!instrutor) {
-      throw new NotFoundException(`Instrutor with ID "${id}" not found`)
-    }
-
+    if (!instrutor)
+      throw new NotFoundException(`Instrutor '${id}' não encontrado`)
     return instrutor
   }
 
   async update(id: string, updateInstrutorDto: UpdateInstrutorDto) {
-    await this.findOne(id)
-
-    const { senha, nome, email, cnh } = updateInstrutorDto
-    const updateData: Prisma.InstrutorUpdateInput = {}
-
-    if (typeof nome !== 'undefined') {
-      updateData.nome = nome
-    }
-
-    if (typeof email !== 'undefined') {
-      updateData.email = email
-    }
-
-    if (typeof cnh !== 'undefined') {
-      updateData.cnh = cnh ?? null
-    }
-
-    if (senha) {
-      updateData.senhaHash = await bcrypt.hash(senha, 10)
+    const { nome, email, cnh, senha, schoolId } = updateInstrutorDto
+    const data: Prisma.InstrutorUpdateInput = {
+      nome,
+      email,
+      cnh: cnh ?? null,
+      ...(senha && { senhaHash: await bcrypt.hash(senha, 10) }),
+      ...(schoolId && { school: { connect: { id: schoolId } } }),
     }
 
     return this.prisma.instrutor.update({
       where: { id },
-      data: updateData,
+      data,
     })
   }
 
-  async remove(id: string) {
-    await this.findOne(id)
-
-    return this.prisma.instrutor.delete({
-      where: { id },
-    })
+  remove(id: string) {
+    return this.prisma.instrutor.delete({ where: { id } })
   }
 }
