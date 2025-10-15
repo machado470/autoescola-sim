@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-10-15T05:03:31.598Z",
+  "generatedAt": "2025-10-15T18:18:50.107Z",
   "collisions": [
     {
       "normalised": ".env",
@@ -204,12 +204,6 @@
     }
   ],
   "mislocated": [],
-  "orphanPackages": [
-    {
-      "file": "package.json",
-      "dependencies": 0,
-      "scripts": 9
-    }
-  ],
+  "orphanPackages": [],
   "tsconfigIssues": []
 }
