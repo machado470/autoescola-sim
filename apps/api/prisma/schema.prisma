@@ -69,3 +69,10 @@ enum AulaStatus {
   CONCLUIDA
   CANCELADA
 }
+
+model School {
+  id    Int     @id @default(autoincrement())
+  name  String
+  city  String
+  phone String?
+}
