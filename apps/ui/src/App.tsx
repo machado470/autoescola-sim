@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import SchoolsPage from './SchoolsPage'
 
 type HealthResponse = {
   status: string
@@ -37,17 +38,20 @@ function App() {
   }, [fetchHealth])
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank" rel="noreferrer">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Autoescola UI</h1>
-      <div className="card">
+    <div className="app">
+      <header className="app-header">
+        <div className="logos">
+          <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
+            <img src={viteLogo} className="logo" alt="Vite logo" />
+          </a>
+          <a href="https://react.dev" target="_blank" rel="noreferrer">
+            <img src={reactLogo} className="logo react" alt="React logo" />
+          </a>
+        </div>
+        <h1>Autoescola UI</h1>
+      </header>
+
+      <section className="card">
         <button type="button" onClick={() => void fetchHealth()} disabled={isLoading}>
           {isLoading ? 'Checking…' : 'Recheck API health'}
         </button>
@@ -55,11 +59,14 @@ function App() {
           API status: <strong>{status}</strong>
         </p>
         {error ? <p role="alert">Erro ao consultar API: {error}</p> : null}
-      </div>
+      </section>
+
       <p className="read-the-docs">
         A UI está configurada para usar a API local disponível em <code>http://localhost:3000</code>.
       </p>
-    </>
+
+      <SchoolsPage />
+    </div>
   )
 }
 

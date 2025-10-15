@@ -11,6 +11,7 @@ import { InstrutoresModule } from './instrutores/instrutores.module'
 import { PrismaModule } from './prisma/prisma.module'
 import { SimuladosModule } from './simulados/simulados.module'
 import { StatsModule } from './stats/stats.module'
+import { SchoolsModule } from './schools/schools.module'
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { StatsModule } from './stats/stats.module'
     InstrutoresModule,
     SimuladosModule,
     StatsModule,
+    SchoolsModule,
   ],
   controllers: [AppController],
   providers: [
