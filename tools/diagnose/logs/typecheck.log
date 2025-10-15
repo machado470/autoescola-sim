@@ -1,4 +1,0 @@
-> typecheck
-> pnpm -r --if-present typecheck
-
-sh: 1: pnpm: not found
