@@ -7,75 +7,60 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Aluno {
+model User {
   id        String   @id @default(uuid())
-  nome      String
-  cpf       String   @unique
+  name      String
   email     String   @unique
-  telefone  String?
-  dataNascimento DateTime? @map("data_nascimento")
-  senhaHash String
+  password  String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  simulados Simulado[]
-  aulas     Aula[]
-  progresso ProgressoTeorico[]
 }
 
-model Instrutor {
+model Instructor {
   id        String   @id @default(uuid())
-  nome      String
-  cpf       String   @unique
+  name      String
   email     String   @unique
-  senhaHash String
-  cnh       String?
+  phone     String?
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  aulas     Aula[]
-}
 
-model Simulado {
-  id            String   @id @default(uuid())
-  alunoId       String
-  aluno         Aluno    @relation(fields: [alunoId], references: [id])
-  acertos       Int
-  totalQuestoes Int
-  data          DateTime @default(now())
-}
-
-model Aula {
-  id          String     @id @default(uuid())
-  alunoId     String
-  instrutorId String
-  data        DateTime
-  status      AulaStatus
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
-  aluno     Aluno     @relation(fields: [alunoId], references: [id])
-  instrutor Instrutor @relation(fields: [instrutorId], references: [id])
-}
-
-model ProgressoTeorico {
-  id      String   @id @default(uuid())
-  alunoId String
-  itemId  String
-  doneAt  DateTime @default(now())
-
-  aluno Aluno @relation(fields: [alunoId], references: [id])
-
-  @@unique([alunoId, itemId])
-}
-
-enum AulaStatus {
-  AGENDADA
-  CONCLUIDA
-  CANCELADA
+  lessons Lesson[]
 }
 
 model School {
-  id    Int     @id @default(autoincrement())
-  name  String
-  city  String
-  phone String?
+  id        String    @id @default(uuid())
+  name      String
+  cnpj      String    @unique
+  phone     String?
+  address   String
+  createdAt DateTime @default(now())
+
+  students Student[]
+  lessons  Lesson[]
+}
+
+model Student {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  birth     DateTime
+  createdAt DateTime @default(now())
+
+  schoolId String
+  school   School   @relation(fields: [schoolId], references: [id])
+
+  lessons Lesson[]
+}
+
+model Lesson {
+  id          String   @id @default(uuid())
+  date        DateTime @default(now())
+  notes       String?
+
+  instructorId String
+  studentId    String
+  schoolId     String
+
+  instructor Instructor @relation(fields: [instructorId], references: [id])
+  student    Student    @relation(fields: [studentId], references: [id])
+  school     School     @relation(fields: [schoolId], references: [id])
 }
