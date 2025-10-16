@@ -2,25 +2,25 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
 import { PrismaService } from '../prisma/prisma.service'
-import { CreateInstrutorDto } from './dto/create-instrutor.dto'
-import { UpdateInstrutorDto } from './dto/update-instrutor.dto'
+import { CreateInstructorDto, UpdateInstructorDto } from './instrutores.dto'
 
 @Injectable()
 export class InstrutoresService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createInstrutorDto: CreateInstrutorDto) {
-    const { senha, nome, email, cnh } = createInstrutorDto
+  async create(data: CreateInstructorDto) {
+    const { senha, nome, email, cpf, cnh } = data
     const senhaHash = await bcrypt.hash(senha, 10)
 
-    const data: Prisma.InstrutorCreateInput = {
+    const createData: Prisma.InstrutorCreateInput = {
       nome,
       email,
+      cpf,
       senhaHash,
       cnh: cnh ?? null,
     }
 
-    return this.prisma.instrutor.create({ data })
+    return this.prisma.instrutor.create({ data: createData })
   }
 
   findAll() {
@@ -43,10 +43,10 @@ export class InstrutoresService {
     return instrutor
   }
 
-  async update(id: string, updateInstrutorDto: UpdateInstrutorDto) {
+  async update(id: string, data: UpdateInstructorDto) {
     await this.findOne(id)
 
-    const { senha, nome, email, cnh } = updateInstrutorDto
+    const { senha, nome, email, cpf, cnh } = data
     const updateData: Prisma.InstrutorUpdateInput = {}
 
     if (typeof nome !== 'undefined') {
@@ -57,11 +57,15 @@ export class InstrutoresService {
       updateData.email = email
     }
 
+    if (typeof cpf !== 'undefined') {
+      updateData.cpf = cpf
+    }
+
     if (typeof cnh !== 'undefined') {
       updateData.cnh = cnh ?? null
     }
 
-    if (senha) {
+    if (typeof senha !== 'undefined') {
       updateData.senhaHash = await bcrypt.hash(senha, 10)
     }
 

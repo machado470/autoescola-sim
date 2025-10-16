@@ -1,31 +1,10 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  Put,
-  UseGuards,
-} from '@nestjs/common'
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
-import { CreateInstrutorDto } from './dto/create-instrutor.dto'
-import { UpdateInstrutorDto } from './dto/update-instrutor.dto'
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common'
+import { CreateInstructorDto, UpdateInstructorDto } from './instrutores.dto'
 import { InstrutoresService } from './instrutores.service'
 
-@ApiTags('Instrutores')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
-@Controller('instrutores')
+@Controller('instructors')
 export class InstrutoresController {
   constructor(private readonly instrutoresService: InstrutoresService) {}
-
-  @Post()
-  create(@Body() createInstrutorDto: CreateInstrutorDto) {
-    return this.instrutoresService.create(createInstrutorDto)
-  }
 
   @Get()
   findAll() {
@@ -37,12 +16,17 @@ export class InstrutoresController {
     return this.instrutoresService.findOne(id)
   }
 
+  @Post()
+  create(@Body() data: CreateInstructorDto) {
+    return this.instrutoresService.create(data)
+  }
+
   @Put(':id')
   update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateInstrutorDto: UpdateInstrutorDto,
+    @Body() data: UpdateInstructorDto,
   ) {
-    return this.instrutoresService.update(id, updateInstrutorDto)
+    return this.instrutoresService.update(id, data)
   }
 
   @Delete(':id')
