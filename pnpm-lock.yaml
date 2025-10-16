@@ -180,6 +180,12 @@ importers:
         specifier: ^7.1.7
         version: 7.1.9(@types/node@24.7.2)
 
+  packages/config: {}
+
+  packages/content: {}
+
+  packages/ui: {}
+
 packages:
 
   /@babel/code-frame@7.27.1:
