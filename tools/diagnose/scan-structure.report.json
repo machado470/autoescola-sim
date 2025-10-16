@@ -1,10 +1,26 @@
 {
-  "generatedAt": "2025-10-14T22:21:16.101Z",
+  "generatedAt": "2025-10-15T18:18:50.107Z",
   "collisions": [
+    {
+      "normalised": ".env",
+      "paths": [
+        ".env",
+        "apps/api/.env"
+      ]
+    },
+    {
+      "normalised": ".gitignore",
+      "paths": [
+        ".gitignore",
+        "apps/ui/.gitignore",
+        "apps/web/.gitignore"
+      ]
+    },
     {
       "normalised": "readme.md",
       "paths": [
         "README.md",
+        "apps/ui/README.md",
         "apps/web/README.md"
       ]
     },
@@ -12,6 +28,7 @@
       "normalised": ".env.example",
       "paths": [
         "apps/api/.env.example",
+        "apps/web/.env.example",
         "examples/env/.env.example"
       ]
     },
@@ -26,6 +43,7 @@
       "normalised": "package.json",
       "paths": [
         "apps/api/package.json",
+        "apps/ui/package.json",
         "apps/web/package.json",
         "package.json"
       ]
@@ -54,9 +72,17 @@
       ]
     },
     {
+      "normalised": "scripts",
+      "paths": [
+        "apps/api/scripts",
+        "scripts"
+      ]
+    },
+    {
       "normalised": "src",
       "paths": [
         "apps/api/src",
+        "apps/ui/src",
         "apps/web/src"
       ]
     },
@@ -74,17 +100,110 @@
       "normalised": "tsconfig.json",
       "paths": [
         "apps/api/tsconfig.json",
+        "apps/ui/tsconfig.json",
         "apps/web/tsconfig.json"
+      ]
+    },
+    {
+      "normalised": "ui",
+      "paths": [
+        "apps/ui",
+        "packages/ui"
+      ]
+    },
+    {
+      "normalised": "eslint.config.js",
+      "paths": [
+        "apps/ui/eslint.config.js",
+        "apps/web/eslint.config.js"
+      ]
+    },
+    {
+      "normalised": "index.html",
+      "paths": [
+        "apps/ui/index.html",
+        "apps/web/index.html"
+      ]
+    },
+    {
+      "normalised": "public",
+      "paths": [
+        "apps/ui/public",
+        "apps/web/public"
+      ]
+    },
+    {
+      "normalised": "vite.svg",
+      "paths": [
+        "apps/ui/public/vite.svg",
+        "apps/web/public/vite.svg"
+      ]
+    },
+    {
+      "normalised": "app.css",
+      "paths": [
+        "apps/ui/src/App.css",
+        "apps/web/src/App.css"
+      ]
+    },
+    {
+      "normalised": "app.tsx",
+      "paths": [
+        "apps/ui/src/App.tsx",
+        "apps/web/src/App.tsx"
+      ]
+    },
+    {
+      "normalised": "assets",
+      "paths": [
+        "apps/ui/src/assets",
+        "apps/web/src/assets"
+      ]
+    },
+    {
+      "normalised": "react.svg",
+      "paths": [
+        "apps/ui/src/assets/react.svg",
+        "apps/web/src/assets/react.svg"
+      ]
+    },
+    {
+      "normalised": "index.css",
+      "paths": [
+        "apps/ui/src/index.css",
+        "apps/web/src/index.css"
+      ]
+    },
+    {
+      "normalised": "main.tsx",
+      "paths": [
+        "apps/ui/src/main.tsx",
+        "apps/web/src/main.tsx"
+      ]
+    },
+    {
+      "normalised": "tsconfig.app.json",
+      "paths": [
+        "apps/ui/tsconfig.app.json",
+        "apps/web/tsconfig.app.json"
+      ]
+    },
+    {
+      "normalised": "tsconfig.node.json",
+      "paths": [
+        "apps/ui/tsconfig.node.json",
+        "apps/web/tsconfig.node.json"
+      ]
+    },
+    {
+      "normalised": "vite.config.ts",
+      "paths": [
+        "apps/ui/vite.config.ts",
+        "apps/web/vite.config.ts"
       ]
     }
   ],
   "mislocated": [],
-  "orphanPackages": [
-    {
-      "file": "package.json",
-      "dependencies": 0,
-      "scripts": 7
-    }
-  ],
+  "orphanPackages": [],
   "tsconfigIssues": []
 }
