@@ -1,11 +1,12 @@
 {
-  "generatedAt": "2025-10-15T18:18:50.107Z",
+  "generatedAt": "2025-10-16T15:31:21.622Z",
   "collisions": [
     {
       "normalised": ".env",
       "paths": [
         ".env",
-        "apps/api/.env"
+        "apps/api/.env",
+        "apps/api/apps/api/.env"
       ]
     },
     {
@@ -22,6 +23,20 @@
         "README.md",
         "apps/ui/README.md",
         "apps/web/README.md"
+      ]
+    },
+    {
+      "normalised": "apps",
+      "paths": [
+        "apps",
+        "apps/api/apps"
+      ]
+    },
+    {
+      "normalised": "api",
+      "paths": [
+        "apps/api",
+        "apps/api/apps/api"
       ]
     },
     {
@@ -45,7 +60,10 @@
         "apps/api/package.json",
         "apps/ui/package.json",
         "apps/web/package.json",
-        "package.json"
+        "package.json",
+        "packages/config/package.json",
+        "packages/content/package.json",
+        "packages/ui/package.json"
       ]
     },
     {
@@ -204,6 +222,22 @@
     }
   ],
   "mislocated": [],
-  "orphanPackages": [],
+  "orphanPackages": [
+    {
+      "file": "packages/config/package.json",
+      "dependencies": 0,
+      "scripts": 0
+    },
+    {
+      "file": "packages/content/package.json",
+      "dependencies": 0,
+      "scripts": 0
+    },
+    {
+      "file": "packages/ui/package.json",
+      "dependencies": 0,
+      "scripts": 0
+    }
+  ],
   "tsconfigIssues": []
 }
