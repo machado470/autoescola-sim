@@ -1,72 +1,39 @@
-import { useCallback, useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import SchoolsPage from './SchoolsPage'
+import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import Layout from './components/Layout'
+import { useAuth } from './hooks/useAuth'
+import LoginPage from './pages/LoginPage'
+import DashboardPage from './pages/DashboardPage'
+import StudentsPage from './pages/StudentsPage'
+import InstructorsPage from './pages/InstructorsPage'
+import SchoolsPage from './pages/SchoolsPage'
+import LessonsPage from './pages/LessonsPage'
 
-type HealthResponse = {
-  status: string
+function ProtectedRoute() {
+  const { isAuthenticated } = useAuth()
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />
+  }
+
+  return <Outlet />
 }
 
 function App() {
-  const [status, setStatus] = useState<string>('unknown')
-  const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-
-  const fetchHealth = useCallback(async () => {
-    setIsLoading(true)
-    try {
-      const response = await fetch('/health')
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`)
-      }
-
-      const data: HealthResponse = await response.json()
-      setStatus(data.status)
-      setError(null)
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error'
-      setStatus('error')
-      setError(message)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    void fetchHealth()
-  }, [fetchHealth])
-
   return (
-    <div className="app">
-      <header className="app-header">
-        <div className="logos">
-          <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-            <img src={viteLogo} className="logo" alt="Vite logo" />
-          </a>
-          <a href="https://react.dev" target="_blank" rel="noreferrer">
-            <img src={reactLogo} className="logo react" alt="React logo" />
-          </a>
-        </div>
-        <h1>Autoescola UI</h1>
-      </header>
-
-      <section className="card">
-        <button type="button" onClick={() => void fetchHealth()} disabled={isLoading}>
-          {isLoading ? 'Checking…' : 'Recheck API health'}
-        </button>
-        <p>
-          API status: <strong>{status}</strong>
-        </p>
-        {error ? <p role="alert">Erro ao consultar API: {error}</p> : null}
-      </section>
-
-      <p className="read-the-docs">
-        A UI está configurada para usar a API local disponível em <code>http://localhost:3000</code>.
-      </p>
-
-      <SchoolsPage />
-    </div>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route element={<Layout />}>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/students" element={<StudentsPage />} />
+          <Route path="/instructors" element={<InstructorsPage />} />
+          <Route path="/schools" element={<SchoolsPage />} />
+          <Route path="/lessons" element={<LessonsPage />} />
+        </Route>
+      </Route>
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
   )
 }
 
