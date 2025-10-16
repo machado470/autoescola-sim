@@ -10,14 +10,20 @@ export class AlunosService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createAlunoDto: CreateAlunoDto) {
-    const { senha, ...data } = createAlunoDto
+    const { senha, dataNascimento, ...data } = createAlunoDto
     const senhaHash = await bcrypt.hash(senha, 10)
 
+    const alunoData: Prisma.AlunoCreateInput = {
+      ...data,
+      senhaHash,
+    }
+
+    if (dataNascimento) {
+      alunoData.dataNascimento = new Date(dataNascimento)
+    }
+
     return this.prisma.aluno.create({
-      data: {
-        ...data,
-        senhaHash,
-      },
+      data: alunoData,
     })
   }
 
@@ -44,11 +50,15 @@ export class AlunosService {
   async update(id: string, updateAlunoDto: UpdateAlunoDto) {
     await this.findOne(id)
 
-    const { senha, ...data } = updateAlunoDto
+    const { senha, dataNascimento, ...data } = updateAlunoDto
     const updateData: Prisma.AlunoUpdateInput = { ...data }
 
     if (senha) {
       updateData.senhaHash = await bcrypt.hash(senha, 10)
+    }
+
+    if (dataNascimento) {
+      updateData.dataNascimento = new Date(dataNascimento)
     }
 
     return this.prisma.aluno.update({
