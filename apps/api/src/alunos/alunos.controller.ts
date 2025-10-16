@@ -1,31 +1,10 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  Put,
-  UseGuards,
-} from '@nestjs/common'
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
+import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common'
 import { AlunosService } from './alunos.service'
-import { CreateAlunoDto } from './dto/create-aluno.dto'
-import { UpdateAlunoDto } from './dto/update-aluno.dto'
+import { CreateAlunoDto, UpdateAlunoDto } from './alunos.dto'
 
-@ApiTags('Alunos')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('alunos')
 export class AlunosController {
   constructor(private readonly alunosService: AlunosService) {}
-
-  @Post()
-  create(@Body() createAlunoDto: CreateAlunoDto) {
-    return this.alunosService.create(createAlunoDto)
-  }
 
   @Get()
   findAll() {
@@ -33,20 +12,22 @@ export class AlunosController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.alunosService.findOne(id)
+  findOne(@Param('id') id: string) {
+    return this.alunosService.findOne(Number(id))
+  }
+
+  @Post()
+  create(@Body() data: CreateAlunoDto) {
+    return this.alunosService.create(data)
   }
 
   @Put(':id')
-  update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateAlunoDto: UpdateAlunoDto,
-  ) {
-    return this.alunosService.update(id, updateAlunoDto)
+  update(@Param('id') id: string, @Body() data: UpdateAlunoDto) {
+    return this.alunosService.update(Number(id), data)
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.alunosService.remove(id)
+  remove(@Param('id') id: string) {
+    return this.alunosService.remove(Number(id))
   }
 }
