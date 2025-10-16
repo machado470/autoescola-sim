@@ -1,40 +1,39 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
-import { CreateSchoolDto } from './dto/create-school.dto'
-import { ListSchoolsDto } from './dto/list-schools.dto'
-import { UpdateSchoolDto } from './dto/update-school.dto'
+import { CreateInstructorDto } from './dto/create-instructor.dto'
+import { ListInstructorsDto } from './dto/list-instructors.dto'
+import { UpdateInstructorDto } from './dto/update-instructor.dto'
 
 @Injectable()
-export class SchoolsService {
+export class InstructorsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(createSchoolDto: CreateSchoolDto) {
-    return this.prisma.school.create({
-      data: createSchoolDto,
+  create(createInstructorDto: CreateInstructorDto) {
+    return this.prisma.instructor.create({
+      data: createInstructorDto,
     })
   }
 
-  async findAll({ page = 1, size = 20, q }: ListSchoolsDto) {
-    const where: Prisma.SchoolWhereInput | undefined = q
+  async findAll({ page = 1, size = 20, q }: ListInstructorsDto) {
+    const where: Prisma.InstructorWhereInput | undefined = q
       ? {
           OR: [
             { name: { contains: q, mode: 'insensitive' } },
-            { cnpj: { contains: q, mode: 'insensitive' } },
+            { email: { contains: q, mode: 'insensitive' } },
             { phone: { contains: q, mode: 'insensitive' } },
-            { address: { contains: q, mode: 'insensitive' } },
           ],
         }
       : undefined
 
     const [data, total] = await this.prisma.$transaction([
-      this.prisma.school.findMany({
+      this.prisma.instructor.findMany({
         where,
         orderBy: { createdAt: 'desc' },
         skip: (page - 1) * size,
         take: size,
       }),
-      this.prisma.school.count({ where }),
+      this.prisma.instructor.count({ where }),
     ])
 
     const totalPages = total === 0 ? 0 : Math.ceil(total / size)
@@ -51,30 +50,30 @@ export class SchoolsService {
   }
 
   async findOne(id: string) {
-    const school = await this.prisma.school.findUnique({
+    const instructor = await this.prisma.instructor.findUnique({
       where: { id },
     })
 
-    if (!school) {
-      throw new NotFoundException(`School with ID "${id}" not found`)
+    if (!instructor) {
+      throw new NotFoundException(`Instructor with ID "${id}" not found`)
     }
 
-    return school
+    return instructor
   }
 
-  async update(id: string, updateSchoolDto: UpdateSchoolDto) {
+  async update(id: string, updateInstructorDto: UpdateInstructorDto) {
     await this.findOne(id)
 
-    return this.prisma.school.update({
+    return this.prisma.instructor.update({
       where: { id },
-      data: updateSchoolDto,
+      data: updateInstructorDto,
     })
   }
 
   async remove(id: string) {
     await this.findOne(id)
 
-    return this.prisma.school.delete({
+    return this.prisma.instructor.delete({
       where: { id },
     })
   }

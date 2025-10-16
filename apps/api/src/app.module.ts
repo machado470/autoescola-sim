@@ -8,8 +8,11 @@ import { AppService } from './app.service'
 import { AuthGuard } from './auth/auth.guard'
 import { AuthModule } from './auth/auth.module'
 import { InstrutoresModule } from './instrutores/instrutores.module'
+import { InstructorsModule } from './instructors/instructors.module'
+import { LessonsModule } from './lessons/lessons.module'
 import { PrismaModule } from './prisma/prisma.module'
 import { SchoolsModule } from './schools/schools.module'
+import { StudentsModule } from './students/students.module'
 import { SimuladosModule } from './simulados/simulados.module'
 import { StatsModule } from './stats/stats.module'
 
@@ -26,6 +29,9 @@ import { StatsModule } from './stats/stats.module'
     AuthModule,
     AlunosModule,
     InstrutoresModule,
+    InstructorsModule,
+    LessonsModule,
+    StudentsModule,
     SimuladosModule,
     StatsModule,
     SchoolsModule,

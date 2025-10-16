@@ -7,7 +7,11 @@ export class CreateSchoolDto {
 
   @IsString()
   @IsNotEmpty()
-  city!: string
+  cnpj!: string
+
+  @IsString()
+  @IsNotEmpty()
+  address!: string
 
   @IsOptional()
   @IsString()
