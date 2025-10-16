@@ -1,4 +1,11 @@
-import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator'
+import {
+  IsDateString,
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches,
+} from 'class-validator'
 
 export class CreateAlunoDto {
   @IsString()
@@ -14,6 +21,14 @@ export class CreateAlunoDto {
 
   @IsEmail()
   email!: string
+
+  @IsString()
+  @IsOptional()
+  telefone?: string
+
+  @IsDateString()
+  @IsOptional()
+  dataNascimento?: string
 
   @IsString()
   @IsNotEmpty()
