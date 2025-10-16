@@ -25,6 +25,7 @@ model Aluno {
 model Instrutor {
   id        String   @id @default(uuid())
   nome      String
+  cpf       String   @unique
   email     String   @unique
   senhaHash String
   cnh       String?

@@ -13,11 +13,13 @@ async function main() {
     where: { email: 'admin@aes.com' },
     update: {
       nome: 'Administrador',
+      cpf: '00000000000',
       senhaHash: adminPasswordHash,
     },
     create: {
       nome: 'Administrador',
       email: 'admin@aes.com',
+      cpf: '00000000000',
       senhaHash: adminPasswordHash,
       cnh: null,
     },
@@ -46,12 +48,14 @@ async function main() {
     where: { email: 'instrutor.demo@aes.com' },
     update: {
       nome: 'Instrutor Demo',
+      cpf: '99988877700',
       senhaHash: instrutorPasswordHash,
       cnh: '99988877766',
     },
     create: {
       nome: 'Instrutor Demo',
       email: 'instrutor.demo@aes.com',
+      cpf: '99988877700',
       senhaHash: instrutorPasswordHash,
       cnh: '99988877766',
     },
