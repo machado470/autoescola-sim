@@ -25,13 +25,11 @@ export class InstrutoresService {
   }
 
   findAll() {
-    return this.prisma.instrutor.findMany({ include: { school: true } })
   }
 
   async findOne(id: string) {
     const instrutor = await this.prisma.instrutor.findUnique({
       where: { id },
-      include: { school: true },
     })
     if (!instrutor)
       throw new NotFoundException(`Instrutor '${id}' não encontrado`)
