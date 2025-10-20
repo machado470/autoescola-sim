@@ -1,67 +1,33 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
-import { Prisma } from '@prisma/client'
-import * as bcrypt from 'bcrypt'
-import { PrismaService } from '../prisma/prisma.service'
-import { CreateAlunoDto } from './dto/create-aluno.dto'
-import { UpdateAlunoDto } from './dto/update-aluno.dto'
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateAlunoDto, UpdateAlunoDto } from './alunos.dto';
 
 @Injectable()
 export class AlunosService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createAlunoDto: CreateAlunoDto) {
-    const { senha, ...data } = createAlunoDto
-    const senhaHash = await bcrypt.hash(senha, 10)
-
-    return this.prisma.aluno.create({
-      data: {
-        ...data,
-        senhaHash,
-      },
-    })
+  list() {
+    return this.prisma.aluno.findMany({ orderBy: { createdAt: 'desc' }});
   }
 
-  findAll() {
-    return this.prisma.aluno.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
+  async get(id: number) {
+    const aluno = await this.prisma.aluno.findUnique({ where: { id } });
+    if (!aluno) throw new NotFoundException('Aluno não encontrado');
+    return aluno;
   }
 
-  async findOne(id: string) {
-    const aluno = await this.prisma.aluno.findUnique({
-      where: { id },
-    })
-
-    if (!aluno) {
-      throw new NotFoundException(`Aluno with ID "${id}" not found`)
-    }
-
-    return aluno
+  create(data: CreateAlunoDto) {
+    return this.prisma.aluno.create({ data });
   }
 
-  async update(id: string, updateAlunoDto: UpdateAlunoDto) {
-    await this.findOne(id)
-
-    const { senha, ...data } = updateAlunoDto
-    const updateData: Prisma.AlunoUpdateInput = { ...data }
-
-    if (senha) {
-      updateData.senhaHash = await bcrypt.hash(senha, 10)
-    }
-
-    return this.prisma.aluno.update({
-      where: { id },
-      data: updateData,
-    })
+  async update(id: number, data: UpdateAlunoDto) {
+    await this.get(id);
+    return this.prisma.aluno.update({ where: { id }, data });
   }
 
-  async remove(id: string) {
-    await this.findOne(id)
-
-    return this.prisma.aluno.delete({
-      where: { id },
-    })
+  async remove(id: number) {
+    await this.get(id);
+    await this.prisma.aluno.delete({ where: { id } });
+    return { ok: true };
   }
 }

@@ -2,23 +2,13 @@
   "suggestions": [
     {
       "file": "apps/api/src/alunos/alunos.controller.ts",
-      "original": "../auth/guards/jwt-auth.guard",
-      "suggested": "../auth/guards/jwt-auth.guard.ts"
-    },
-    {
-      "file": "apps/api/src/alunos/alunos.controller.ts",
       "original": "./alunos.service",
       "suggested": "./alunos.service.ts"
     },
     {
       "file": "apps/api/src/alunos/alunos.controller.ts",
-      "original": "./dto/create-aluno.dto",
-      "suggested": "./dto/create-aluno.dto.ts"
-    },
-    {
-      "file": "apps/api/src/alunos/alunos.controller.ts",
-      "original": "./dto/update-aluno.dto",
-      "suggested": "./dto/update-aluno.dto.ts"
+      "original": "./alunos.dto",
+      "suggested": "./alunos.dto.ts"
     },
     {
       "file": "apps/api/src/alunos/alunos.module.ts",
@@ -31,19 +21,19 @@
       "suggested": "./alunos.service.ts"
     },
     {
+      "file": "apps/api/src/alunos/alunos.module.ts",
+      "original": "../prisma/prisma.module",
+      "suggested": "../prisma/prisma.module.ts"
+    },
+    {
       "file": "apps/api/src/alunos/alunos.service.ts",
       "original": "../prisma/prisma.service",
       "suggested": "../prisma/prisma.service.ts"
     },
     {
       "file": "apps/api/src/alunos/alunos.service.ts",
-      "original": "./dto/create-aluno.dto",
-      "suggested": "./dto/create-aluno.dto.ts"
-    },
-    {
-      "file": "apps/api/src/alunos/alunos.service.ts",
-      "original": "./dto/update-aluno.dto",
-      "suggested": "./dto/update-aluno.dto.ts"
+      "original": "./alunos.dto",
+      "suggested": "./alunos.dto.ts"
     },
     {
       "file": "apps/api/src/alunos/dto/update-aluno.dto.ts",
@@ -59,6 +49,11 @@
       "file": "apps/api/src/app.controller.ts",
       "original": "./auth/public.decorator",
       "suggested": "./auth/public.decorator.ts"
+    },
+    {
+      "file": "apps/api/src/app.module.ts",
+      "original": "./alunos/alunos.module",
+      "suggested": "./alunos/alunos.module.ts"
     },
     {
       "file": "apps/api/src/app.module.ts",

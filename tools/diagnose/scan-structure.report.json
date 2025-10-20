@@ -1,5 +1,8 @@
 {
+
   "generatedAt": "2025-10-20T20:34:12.528Z",
+
+  "generatedAt": "2025-10-16T16:53:36.473Z",
   "collisions": [
     {
       "normalised": ".env",
@@ -60,7 +63,10 @@
         "apps/api/package.json",
         "apps/ui/package.json",
         "apps/web/package.json",
-        "package.json"
+        "package.json",
+        "packages/config/package.json",
+        "packages/content/package.json",
+        "packages/ui/package.json"
       ]
     },
     {
@@ -219,6 +225,22 @@
     }
   ],
   "mislocated": [],
-  "orphanPackages": [],
+  "orphanPackages": [
+    {
+      "file": "packages/config/package.json",
+      "dependencies": 0,
+      "scripts": 0
+    },
+    {
+      "file": "packages/content/package.json",
+      "dependencies": 0,
+      "scripts": 0
+    },
+    {
+      "file": "packages/ui/package.json",
+      "dependencies": 0,
+      "scripts": 0
+    }
+  ],
   "tsconfigIssues": []
 }

@@ -54,6 +54,9 @@ importers:
       '@types/express':
         specifier: ^5.0.3
         version: 5.0.3
+      prisma:
+        specifier: ^5.22.0
+        version: 5.22.0
 
   apps/api:
     dependencies:
@@ -189,6 +192,12 @@ importers:
       vite:
         specifier: ^7.1.7
         version: 7.1.9(@types/node@24.7.2)
+
+  packages/config: {}
+
+  packages/content: {}
+
+  packages/ui: {}
 
 packages:
 
