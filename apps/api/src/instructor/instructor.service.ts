@@ -7,27 +7,25 @@ export class InstructorService {
   constructor(private prisma: PrismaService) {}
 
   findAll() {
-    return this.prisma.instructor.findMany({ include: { school: true } });
   }
 
   async findOne(id: string) {
-    const data = await this.prisma.instructor.findUnique({
+    const data = await this.prisma.instrutor.findUnique({
       where: { id },
-      include: { school: true },
     });
     if (!data) throw new NotFoundException('Instructor not found');
     return data;
   }
 
   create(data: CreateInstructorDto) {
-    return this.prisma.instructor.create({ data });
+    return this.prisma.instrutor.create({ data });
   }
 
   update(id: string, data: UpdateInstructorDto) {
-    return this.prisma.instructor.update({ where: { id }, data });
+    return this.prisma.instrutor.update({ where: { id }, data });
   }
 
   remove(id: string) {
-    return this.prisma.instructor.delete({ where: { id } });
+    return this.prisma.instrutor.delete({ where: { id } });
   }
 }

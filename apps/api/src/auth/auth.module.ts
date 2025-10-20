@@ -16,10 +16,10 @@ import { LocalStrategy } from './strategies/local.strategy'
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET') ?? 'supersecret_change_me',
+      useFactory: (config: ConfigService): JwtModuleOptions => ({
+        secret: config.get<string>('JWT_SECRET') ?? 'supersecret_change_me',
         signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRES_IN') ?? '1h',
+          expiresIn: Number(config.get('JWT_EXPIRES_IN') ?? 86400),
         },
       }),
     }),
