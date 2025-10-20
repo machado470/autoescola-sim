@@ -1,20 +1,36 @@
+version: "3.9"
+
 services:
-  db:
-    image: postgres:16
-    container_name: autoescola-sim-db
+  postgres:
+    image: postgres:15
+    container_name: autoescola_postgres
+    restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: autoescola
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d autoescola"]
-      interval: 3s
-      timeout: 2s
-      retries: 20
-    volumes:
-      - autoescola-sim_db_data:/var/lib/postgresql/data
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: autoescola_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@autoescola.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
-  autoescola-sim_db_data: {}
+  postgres_data:
