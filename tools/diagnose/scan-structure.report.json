@@ -1,11 +1,12 @@
 {
-  "generatedAt": "2025-10-15T18:18:50.107Z",
+  "generatedAt": "2025-10-20T20:34:12.528Z",
   "collisions": [
     {
       "normalised": ".env",
       "paths": [
         ".env",
-        "apps/api/.env"
+        "apps/api/.env",
+        "apps/api/apps/api/.env"
       ]
     },
     {
@@ -22,6 +23,20 @@
         "README.md",
         "apps/ui/README.md",
         "apps/web/README.md"
+      ]
+    },
+    {
+      "normalised": "apps",
+      "paths": [
+        "apps",
+        "apps/api/apps"
+      ]
+    },
+    {
+      "normalised": "api",
+      "paths": [
+        "apps/api",
+        "apps/api/apps/api"
       ]
     },
     {
