@@ -57,4 +57,4 @@ echo -e "${Y}▶ Prisma migrate (idempotente)...${N}"
 pnpm prisma migrate dev --name init
 
 echo -e "${Y}▶ Iniciando API (dev)...${N}"
-pnpm run dev
+pnpm run dev:api
