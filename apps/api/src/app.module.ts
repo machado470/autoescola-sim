@@ -4,12 +4,14 @@ import { PrismaModule } from './prisma/prisma.module';
 import { HealthController } from './health/health.controller';
 import { SchoolModule } from './school/school.module';
 import { InstructorModule } from './instructor/instructor.module';
+import { SimulatorModule } from './simulator/simulator.module';
 
 @Module({
   imports: [
     PrismaModule,
     SchoolModule,
     InstructorModule,
+    SimulatorModule,
   ],
   controllers: [HealthController],
   providers: [],
