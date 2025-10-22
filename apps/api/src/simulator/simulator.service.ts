@@ -1,26 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import { CreateSimulatorDto } from './dto/create-simulator.dto';
-import { UpdateSimulatorDto } from './dto/update-simulator.dto';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class SimulatorService {
-  create(createSimulatorDto: CreateSimulatorDto) {
-    return 'This action adds a new simulator';
+  constructor(private prisma: PrismaService) {}
+
+  create(data: any) {
+    return this.prisma.simulator.create({ data });
   }
 
   findAll() {
-    return `This action returns all simulator`;
+    return this.prisma.simulator.findMany();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} simulator`;
+    return this.prisma.simulator.findUnique({ where: { id } });
   }
 
-  update(id: number, updateSimulatorDto: UpdateSimulatorDto) {
-    return `This action updates a #${id} simulator`;
+  update(id: number, data: any) {
+    return this.prisma.simulator.update({ where: { id }, data });
   }
 
   remove(id: number) {
-    return `This action removes a #${id} simulator`;
+    return this.prisma.simulator.delete({ where: { id } });
   }
 }
