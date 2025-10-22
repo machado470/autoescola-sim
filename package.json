@@ -10,7 +10,10 @@
   },
   "packageManager": "pnpm@8.15.4+sha512.0bd3a9be9eb0e9a692676deec00a303ba218ba279d99241475616b398dbaeedd11146f92c2843458f557b1d127e09d4c171e105bdcd6b61002b39685a8016b9e",
   "devDependencies": {
-    "prisma": "5.22.0"
+    "@types/node": "^24.9.1",
+    "prisma": "5.22.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.6"
   },
   "dependencies": {
     "@prisma/client": "5.22.0"
