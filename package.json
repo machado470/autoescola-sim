@@ -16,6 +16,7 @@
     "tsx": "^4.20.6"
   },
   "dependencies": {
+    "@nestjs/mapped-types": "*",
     "@prisma/client": "5.22.0"
   }
 }
