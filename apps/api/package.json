@@ -2,6 +2,7 @@
   "name": "@autoescola/api",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/main.ts",
     "prisma": "prisma",
@@ -10,25 +11,26 @@
     "prisma:deploy": "prisma migrate deploy",
     "prisma:seed": "prisma db seed",
     "prisma:pull": "prisma db pull",
+    "prisma:push": "prisma db push",
     "prisma:studio": "prisma studio",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/main.js"
   },
   "dependencies": {
-    "@nestjs/common": "^11.1.6",
-    "@nestjs/core": "^11.1.6",
-    "@nestjs/platform-express": "^11.1.6",
-    "@prisma/client": "^5.22.0",
+    "@nestjs/common": "11.1.6",
+    "@nestjs/core": "11.1.6",
+    "@nestjs/platform-express": "11.1.6",
+    "@prisma/client": "5.22.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
-    "@types/node": "^20.19.21",
-    "prisma": "^5.22.0",
+    "@types/node": "^20.19.2",
+    "prisma": "5.22.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.4.0"
   }
 }

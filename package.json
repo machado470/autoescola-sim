@@ -1,42 +1,12 @@
 {
   "name": "autoescola-sim",
+  "version": "0.1.0",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "license": "MIT",
   "scripts": {
-    "dev": "pnpm -r --parallel --filter ./apps/* dev",
-    "build": "pnpm -r build",
-    "lint": "pnpm -r --if-present lint",
-    "typecheck": "pnpm -r --if-present typecheck",
-    "start": "pnpm -r --if-present start",
-    "test": "pnpm -r --if-present test",
-    "postinstall": "pnpm --filter @autoescola/api prisma:generate",
-    "dev:api": "pnpm --filter ./apps/api dev",
-    "dev:ui": "pnpm --filter ./apps/ui dev"
+    "dev:api": "pnpm -C apps/api dev",
+    "prisma:gen": "pnpm -C apps/api prisma generate",
+    "prisma:push": "pnpm -C apps/api prisma db push"
   },
-  "packageManager": "pnpm@8.15.4+sha512.0bd3a9be9eb0e9a692676deec00a303ba218ba279d99241475616b398dbaeedd11146f92c2843458f557b1d127e09d4c171e105bdcd6b61002b39685a8016b9e",
-  "dependencies": {
-    "@nestjs/config": "^4.0.2",
-    "@nestjs/jwt": "^11.0.1",
-    "@nestjs/mapped-types": "^2.1.0",
-    "@nestjs/passport": "^11.0.5",
-    "@nestjs/swagger": "^11.2.0",
-    "@prisma/client": "^5.22.0",
-    "@types/bcrypt": "^6.0.0",
-    "@types/passport": "^1.0.17",
-    "@types/passport-jwt": "^4.0.1",
-    "@types/passport-local": "^1.0.38",
-    "bcrypt": "^6.0.0",
-    "passport": "^0.7.0",
-    "passport-jwt": "^4.0.1",
-
-    "passport-local": "^1.0.0"
-  },
-  "devDependencies": {
-    "@types/express": "^5.0.3"
-    "passport-local": "^1.0.0",
-    "prisma": "^5.22.0"
-  }
+  "packageManager": "pnpm@8.15.4+sha512.0bd3a9be9eb0e9a692676deec00a303ba218ba279d99241475616b398dbaeedd11146f92c2843458f557b1d127e09d4c171e105bdcd6b61002b39685a8016b9e"
 }
