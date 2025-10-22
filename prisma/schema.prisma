@@ -7,10 +7,83 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Simulator {
-  id           Int      @id @default(autoincrement())
-  studentName  String
-  examDate     DateTime
-  score        Int
-  createdAt    DateTime @default(now())
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String?
+  attempts  Attempt[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Question {
+  id         String          @id @default(cuid())
+  statement  String
+  difficulty Difficulty      @default(MEDIUM)
+  imageUrl   String?
+  choices    Choice[]
+  exams      ExamQuestion[]
+  answers    AttemptAnswer[] // back-relation p/ AttemptAnswer
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+}
+
+model Choice {
+  id         String          @id @default(cuid())
+  text       String
+  isCorrect  Boolean         @default(false)
+  question   Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId String
+  answers    AttemptAnswer[] // back-relation p/ AttemptAnswer
+}
+
+model Exam {
+  id          String         @id @default(cuid())
+  title       String
+  durationMin Int            @default(30)
+  questions   ExamQuestion[]
+  attempts    Attempt[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model ExamQuestion {
+  id         String   @id @default(cuid())
+  exam       Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  examId     String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId String
+  order      Int      @default(0)
+
+  @@unique([examId, questionId])
+}
+
+model Attempt {
+  id          String          @id @default(cuid())
+  user        User            @relation(fields: [userId], references: [id])
+  userId      String
+  exam        Exam            @relation(fields: [examId], references: [id])
+  examId      String
+  startedAt   DateTime        @default(now())
+  submittedAt DateTime?
+  score       Int?
+  answers     AttemptAnswer[]
+}
+
+model AttemptAnswer {
+  id         String   @id @default(cuid())
+  attempt    Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  attemptId  String
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId String
+  choice     Choice   @relation(fields: [choiceId], references: [id])
+  choiceId   String
+
+  @@unique([attemptId, questionId])
 }
