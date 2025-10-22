@@ -1,0 +1,16 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Simulator {
+  id           Int      @id @default(autoincrement())
+  studentName  String
+  examDate     DateTime
+  score        Int
+  createdAt    DateTime @default(now())
+}

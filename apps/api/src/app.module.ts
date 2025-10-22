@@ -8,6 +8,7 @@ import { SimulatorModule } from './simulator/simulator.module';
 
 @Module({
   imports: [
+    SimulatorModule,
     PrismaModule,
     SchoolModule,
     InstructorModule,
