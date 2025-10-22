@@ -1,26 +1,56 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAttemptDto } from './dto/create-attempt.dto';
-import { UpdateAttemptDto } from './dto/update-attempt.dto';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common'
+import { PrismaService } from '../../prisma/prisma.service'
+
+type StartAttemptDto = { userId: string; examId: string }
+type SubmitAttemptDto = { answers: { questionId: string; choiceId: string }[] }
 
 @Injectable()
 export class AttemptService {
-  create(createAttemptDto: CreateAttemptDto) {
-    return 'This action adds a new attempt';
+  constructor(private prisma: PrismaService) {}
+
+  async start({ userId, examId }: StartAttemptDto) {
+    const exam = await this.prisma.exam.findUnique({
+      where: { id: examId },
+      include: { questions: { include: { question: true }, orderBy: { order: 'asc' } } },
+    })
+    if (!exam) throw new NotFoundException('Exam not found')
+
+    return this.prisma.attempt.create({
+      data: { userId, examId },
+      include: { exam: true },
+    })
   }
 
-  findAll() {
-    return `This action returns all attempt`;
-  }
+  async submit(attemptId: string, payload: SubmitAttemptDto) {
+    const attempt = await this.prisma.attempt.findUnique({
+      where: { id: attemptId },
+      include: { exam: { include: { questions: { include: { question: { include: { choices: true } } } } } } },
+    })
+    if (!attempt) throw new NotFoundException('Attempt not found')
+    if (attempt.submittedAt) throw new BadRequestException('Already submitted')
 
-  findOne(id: number) {
-    return `This action returns a #${id} attempt`;
-  }
+    // salvar respostas
+    for (const a of payload.answers) {
+      await this.prisma.attemptAnswer.upsert({
+        where: { attemptId_questionId: { attemptId, questionId: a.questionId } },
+        create: { attemptId, questionId: a.questionId, choiceId: a.choiceId },
+        update: { choiceId: a.choiceId },
+      })
+    }
 
-  update(id: number, updateAttemptDto: UpdateAttemptDto) {
-    return `This action updates a #${id} attempt`;
-  }
+    // calcular nota
+    const saved = await this.prisma.attemptAnswer.findMany({
+      where: { attemptId },
+      include: { choice: true },
+    })
+    const correct = saved.filter(s => s.choice.isCorrect).length
+    const total = attempt.exam.questions.length || 1
+    const score = Math.round((correct / total) * 100)
 
-  remove(id: number) {
-    return `This action removes a #${id} attempt`;
+    return this.prisma.attempt.update({
+      where: { id: attemptId },
+      data: { submittedAt: new Date(), score },
+      include: { answers: true },
+    })
   }
 }
