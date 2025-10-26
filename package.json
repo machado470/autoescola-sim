@@ -23,4 +23,8 @@
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   }
-}
+},
+  "scripts": {
+    "start:full": "./start-full.sh",
+    "stop:full": "./stop-full.sh"
+  }

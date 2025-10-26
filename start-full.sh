@@ -1,60 +1,60 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
-Y='\033[1;33m'; G='\033[0;32m'; R='\033[0;31m'; N='\033[0m'
+SESSION="autoescola"
+POSTGRES_CONTAINER="autoescola_postgres"
 
-echo -e "${Y}▶ Verificando Docker/Compose...${N}"
+log() { printf "\n\033[1;36m[%s]\033[0m %s\n" "$(date +%H:%M:%S)" "$*"; }
+
+# 0) docker ok?
 if ! docker version >/dev/null 2>&1; then
-  echo -e "${R}✗ Docker daemon indisponível. Rode ./check-docker.sh${N}"; exit 1
-fi
-if ! docker compose version >/dev/null 2>&1; then
-  echo -e "${R}✗ docker compose não encontrado. sudo apt install -y docker-compose-plugin${N}"; exit 1
+  echo "🚫 Docker não acessível no WSL. Abra o Docker Desktop e habilite WSL integration."
+  exit 1
 fi
 
-echo -e "${Y}▶ Subindo containers (Postgres/pgAdmin)...${N}"
-docker compose up -d
-
-# === Ajuste de DATABASE_URL para WSL (host: localhost) ===
-if [[ -f .env ]]; then
-  DBURL="$(grep -E '^DATABASE_URL=' .env | sed 's/^DATABASE_URL="//; s/"$//')"
-  if grep -qi 'microsoft' /proc/version 2>/dev/null; then
-    # WSL detectado
-    if echo "$DBURL" | grep -q '@postgres:5432'; then
-      echo -e "${Y}▶ Ajustando .env para WSL (postgres -> localhost)...${N}"
-      sed -i 's/@postgres:5432/@localhost:5432/g' .env
-      DBURL="$(grep -E '^DATABASE_URL=' .env | sed 's/^DATABASE_URL="//; s/"$//')"
-    fi
-  fi
-else
-  echo -e "${R}✗ .env não encontrado na raiz do projeto.${N}"; exit 1
+# 1) tmux (instala se faltar)
+if ! command -v tmux >/dev/null 2>&1; then
+  log "Instalando tmux..."
+  sudo apt-get update -qq && sudo apt-get install -y -qq tmux
 fi
 
-# Descobre host/porta atuais só para esperar corretamente
-DB_HOST="$(echo "$DBURL" | sed -E 's#.*@([^:/?]+):([0-9]+).*#\1#')"
-DB_PORT="$(echo "$DBURL" | sed -E 's#.*@([^:/?]+):([0-9]+).*#\2#')"
-DB_HOST="${DB_HOST:-localhost}"
-DB_PORT="${DB_PORT:-5432}"
+# 2) cria sessão tmux
+if tmux has-session -t "$SESSION" 2>/dev/null; then
+  log "Sessão tmux '$SESSION' já existe. Anexando..."
+  tmux attach -t "$SESSION"
+  exit 0
+fi
 
-echo -e "${Y}▶ Aguardando Postgres em ${DB_HOST}:${DB_PORT}...${N}"
-WAIT_OK=0
+log "Criando sessão tmux '$SESSION'..."
+tmux new-session -d -s "$SESSION" -n docker
+
+# janela 1: docker compose up
+tmux send-keys -t "$SESSION":docker 'echo "🚀 docker compose up -d --remove-orphans" && docker compose up -d --remove-orphans' C-m
+tmux send-keys -t "$SESSION":docker 'echo "⏳ aguardando Postgres ficar healthy..."' C-m
+tmux send-keys -t "$SESSION":docker '
 for i in {1..60}; do
-  if command -v nc >/dev/null 2>&1; then
-    nc -z "${DB_HOST}" "${DB_PORT}" && WAIT_OK=1 && break
-  else
-    (echo >"/dev/tcp/${DB_HOST}/${DB_PORT}") >/dev/null 2>&1 && WAIT_OK=1 && break || true
-  fi
+  STATUS=$(docker ps --filter name='"$POSTGRES_CONTAINER"' --format "{{.Status}}")
+  echo "status: $STATUS"
+  echo "$STATUS" | grep -qi healthy && break
   sleep 1
 done
-if [[ $WAIT_OK -ne 1 ]]; then
-  echo -e "${R}✗ Timeout esperando Postgres em ${DB_HOST}:${DB_PORT}.${N}"; exit 1
-fi
-echo -e "${G}✓ Postgres disponível.${N}"
+' C-m
 
-echo -e "${Y}▶ Prisma generate...${N}"
-pnpm prisma generate
+# janela 2: prisma studio
+tmux new-window -t "$SESSION" -n studio
+tmux send-keys  -t "$SESSION":studio 'echo "📊 prisma studio (porta 5555)"' C-m
+tmux send-keys  -t "$SESSION":studio 'pnpm -C apps/api prisma generate && pnpm -C apps/api prisma studio' C-m
 
-echo -e "${Y}▶ Prisma migrate (idempotente)...${N}"
-pnpm prisma migrate dev --name init
+# janela 3: api dev
+tmux new-window -t "$SESSION" -n api
+tmux send-keys  -t "$SESSION":api 'echo "�� iniciando API (Nest)..."' C-m
+tmux send-keys  -t "$SESSION":api 'pnpm dev:api' C-m
 
-echo -e "${Y}▶ Iniciando API (dev)...${N}"
-pnpm run dev:api
+log "Pronto! Janelas:
+  - docker  → containers e health
+  - studio  → Prisma Studio
+  - api     → servidor Nest (http://localhost:3000)
+"
+
+tmux select-window -t "$SESSION":api
+tmux attach -t "$SESSION"
