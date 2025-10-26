@@ -13,77 +13,75 @@ enum Difficulty {
   HARD
 }
 
-model User {
-  id        String    @id @default(cuid())
-  email     String    @unique
-  name      String?
-  attempts  Attempt[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+enum ExamStatus {
+  DRAFT
+  IN_PROGRESS
+  FINISHED
+  CANCELLED
 }
 
 model Question {
-  id         String          @id @default(cuid())
+  id         String    @id @default(cuid())
   statement  String
-  difficulty Difficulty      @default(MEDIUM)
+  difficulty Difficulty
   imageUrl   String?
+  tags       String[]
   choices    Choice[]
-  exams      ExamQuestion[]
-  answers    AttemptAnswer[] // back-relation p/ AttemptAnswer
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([difficulty])
 }
 
 model Choice {
-  id         String          @id @default(cuid())
-  text       String
-  isCorrect  Boolean         @default(false)
-  question   Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  questionId String
-  answers    AttemptAnswer[] // back-relation p/ AttemptAnswer
+  id          String   @id @default(cuid())
+  text        String
+  isCorrect   Boolean  @default(false)
+  question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId  String
+
+  // respostas que apontam para esta alternativa
+  answers     StudentAnswer[]
+
+  @@index([questionId])
 }
 
-model Exam {
-  id          String         @id @default(cuid())
-  title       String
-  durationMin Int            @default(30)
-  questions   ExamQuestion[]
-  attempts    Attempt[]
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+model ExamSession {
+  id              String          @id @default(cuid())
+  status          ExamStatus      @default(DRAFT)
+  startedAt       DateTime?       
+  finishedAt      DateTime?
+  totalQuestions  Int             @default(0)
+  correctAnswers  Int             @default(0)
+  score           Float?          // percentual (0–100) ou pontos
+  metadata        Json?           // livre: device, ip, etc.
+
+  answers         StudentAnswer[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
 }
 
-model ExamQuestion {
-  id         String   @id @default(cuid())
-  exam       Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
-  examId     String
-  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  questionId String
-  order      Int      @default(0)
+model StudentAnswer {
+  id            String       @id @default(cuid())
+  examSession   ExamSession  @relation(fields: [examSessionId], references: [id], onDelete: Cascade)
+  examSessionId String
 
-  @@unique([examId, questionId])
-}
+  question      Question     @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId    String
 
-model Attempt {
-  id          String          @id @default(cuid())
-  user        User            @relation(fields: [userId], references: [id])
-  userId      String
-  exam        Exam            @relation(fields: [examId], references: [id])
-  examId      String
-  startedAt   DateTime        @default(now())
-  submittedAt DateTime?
-  score       Int?
-  answers     AttemptAnswer[]
-}
+  choice        Choice?      @relation(fields: [choiceId], references: [id], onDelete: SetNull)
+  choiceId      String?
 
-model AttemptAnswer {
-  id         String   @id @default(cuid())
-  attempt    Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-  attemptId  String
-  question   Question @relation(fields: [questionId], references: [id])
-  questionId String
-  choice     Choice   @relation(fields: [choiceId], references: [id])
-  choiceId   String
+  isCorrect     Boolean      @default(false)
+  answeredAt    DateTime     @default(now())
 
-  @@unique([attemptId, questionId])
+  // Evita duas respostas para a MESMA questão na MESMA sessão
+  @@unique([examSessionId, questionId])
+
+  @@index([examSessionId])
+  @@index([questionId])
+  @@index([choiceId])
 }
