@@ -1,60 +1,63 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SESSION="autoescola"
-POSTGRES_CONTAINER="autoescola_postgres"
+SESSION="autoescola-sim"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$ROOT"
 
-log() { printf "\n\033[1;36m[%s]\033[0m %s\n" "$(date +%H:%M:%S)" "$*"; }
+say(){ printf "\n\033[1;36m[%s]\033[0m %s\n" "$SESSION" "$*"; }
+die(){ printf "\n\033[1;31m[ERRO]\033[0m %s\n" "$*"; exit 1; }
+need(){ command -v "$1" >/dev/null 2>&1 || die "Dependência faltando: $1"; }
 
-# 0) docker ok?
-if ! docker version >/dev/null 2>&1; then
-  echo "🚫 Docker não acessível no WSL. Abra o Docker Desktop e habilite WSL integration."
-  exit 1
-fi
+need tmux; need docker; need bash; need jq
 
-# 1) tmux (instala se faltar)
-if ! command -v tmux >/dev/null 2>&1; then
-  log "Instalando tmux..."
-  sudo apt-get update -qq && sudo apt-get install -y -qq tmux
-fi
+[ -f package.json ] || die "package.json não encontrado"
+jq . package.json >/dev/null || die "package.json inválido"
 
-# 2) cria sessão tmux
-if tmux has-session -t "$SESSION" 2>/dev/null; then
-  log "Sessão tmux '$SESSION' já existe. Anexando..."
-  tmux attach -t "$SESSION"
-  exit 0
-fi
+say "Subindo Postgres e PGAdmin (Docker)…"
+docker compose up -d postgres pgadmin || docker-compose up -d postgres pgadmin
 
-log "Criando sessão tmux '$SESSION'..."
-tmux new-session -d -s "$SESSION" -n docker
-
-# janela 1: docker compose up
-tmux send-keys -t "$SESSION":docker 'echo "🚀 docker compose up -d --remove-orphans" && docker compose up -d --remove-orphans' C-m
-tmux send-keys -t "$SESSION":docker 'echo "⏳ aguardando Postgres ficar healthy..."' C-m
-tmux send-keys -t "$SESSION":docker '
-for i in {1..60}; do
-  STATUS=$(docker ps --filter name='"$POSTGRES_CONTAINER"' --format "{{.Status}}")
-  echo "status: $STATUS"
-  echo "$STATUS" | grep -qi healthy && break
-  sleep 1
+say "Aguardando Postgres ficar healthy…"
+for i in {1..30}; do
+  docker ps --format '{{.Names}} {{.Status}}' | grep -q 'autoescola_postgres.*(healthy)' && break
+  sleep 2
 done
-' C-m
+docker ps --format '{{.Names}} {{.Status}}' | grep -q 'autoescola_postgres.*(healthy)' || die "Postgres não ficou healthy a tempo"
 
-# janela 2: prisma studio
-tmux new-window -t "$SESSION" -n studio
-tmux send-keys  -t "$SESSION":studio 'echo "📊 prisma studio (porta 5555)"' C-m
-tmux send-keys  -t "$SESSION":studio 'pnpm -C apps/api prisma generate && pnpm -C apps/api prisma studio' C-m
+if [ -d prisma ] && [ -f prisma/schema.prisma ]; then
+  say "Prisma generate…"
+  npx prisma generate --schema=prisma/schema.prisma
+  if [ -f .env ] && grep -q '^DATABASE_URL=' .env; then
+    say "Prisma migrate deploy…"
+    npx prisma migrate deploy --schema=prisma/schema.prisma || true
+  else
+    say "Sem DATABASE_URL no .env — pulando migrate (ok em dev)"
+  fi
+fi
 
-# janela 3: api dev
-tmux new-window -t "$SESSION" -n api
-tmux send-keys  -t "$SESSION":api 'echo "�� iniciando API (Nest)..."' C-m
-tmux send-keys  -t "$SESSION":api 'pnpm dev:api' C-m
+if tmux has-session -t "$SESSION" 2>/dev/null; then
+  say "tmux já existe — anexando"
+  exec tmux attach -t "$SESSION"
+fi
 
-log "Pronto! Janelas:
-  - docker  → containers e health
-  - studio  → Prisma Studio
-  - api     → servidor Nest (http://localhost:3000)
-"
+say "Criando sessão tmux…"
+tmux new-session -d -s "$SESSION" -n "docker" "docker compose logs -f postgres || docker-compose logs -f postgres"
 
-tmux select-window -t "$SESSION":api
-tmux attach -t "$SESSION"
+API_DIR="apps/api"
+if [ -d "$API_DIR" ]; then
+  tmux new-window -t "$SESSION:" -n "api" "cd '$API_DIR' && (command -v pnpm >/dev/null || npm i -g pnpm) && pnpm install && pnpm dev"
+else
+  tmux new-window -t "$SESSION:" -n "api" "echo 'apps/api não encontrado'; bash"
+fi
+
+if [ -f prisma/schema.prisma ]; then
+  tmux new-window -t "$SESSION:" -n "studio" "npx prisma studio --schema=prisma/schema.prisma"
+fi
+
+UI_DIR="apps/ui"
+[ -d "$UI_DIR" ] && tmux new-window -t "$SESSION:" -n "ui" "cd '$UI_DIR' && (command -v pnpm >/dev/null || npm i -g pnpm) && pnpm install && pnpm dev"
+
+tmux new-window -t "$SESSION:" -n "shell" "bash"
+
+say "Stack iniciada — anexando"
+exec tmux attach -t "$SESSION"
