@@ -6,23 +6,25 @@
   "scripts": {
     "dev:api": "pnpm -C apps/api dev",
     "prisma:gen": "pnpm -C apps/api prisma generate",
-    "prisma:push": "pnpm -C apps/api prisma db push",
-    "start:full": "./start-full.sh",
-    "stop:full": "./stop-full.sh"
+    "prisma:push": "pnpm -C apps/api prisma db push"
   },
-  "packageManager": "pnpm@8.15.4",
+  "packageManager": "pnpm@8.15.4+sha512.0bd3a9be9eb0e9a692676deec00a303ba218ba279d99241475616b398dbaeedd11146f92c2843458f557b1d127e09d4c171e105bdcd6b61002b39685a8016b9e",
   "devDependencies": {
-    "@types/node": "^20.9.1",
-    "prisma": "^5.22.0",
+    "@types/node": "^24.9.1",
+    "prisma": "5.22.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   },
   "dependencies": {
     "@nestjs/mapped-types": "*",
-    "@prisma/client": "^5.22.0"
+    "@prisma/client": "5.22.0"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   }
-}
+},
+  "scripts": {
+    "start:full": "./start-full.sh",
+    "stop:full": "./stop-full.sh"
+  }
