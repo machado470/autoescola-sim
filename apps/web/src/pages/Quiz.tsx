@@ -12,7 +12,7 @@ export default function Quiz(){
   const [lock,setLock]=useState(false)
   useEffect(()=>{(async()=>{
     const r=await getNextQuestion(sessionId!)
-    if(r.done){nav(\`/resultado/\${sessionId}\`);return}
+    if(r.done){nav(`/resultado/${sessionId}`);return}
     setQ(r.question!);setTotal(r.total)
   })()},[sessionId,i])
   async function choose(choiceId:string){
@@ -21,7 +21,7 @@ export default function Quiz(){
     await sendAnswer(sessionId!,{questionId:q.id,choiceId})
     if(i+1>=total){
       const res=await finishExam(sessionId!)
-      nav(\`/resultado/\${sessionId}\`,{state:res})
+      nav(`/resultado/${sessionId}`,{state:res})
     }else{setI(v=>v+1);setLock(false)}
   }
   if(!q)return<div className="p-6 text-center">Carregando…</div>
