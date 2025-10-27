@@ -54,7 +54,7 @@ if [ -f prisma/schema.prisma ]; then
   tmux new-window -t "$SESSION:" -n "studio" "npx prisma studio --schema=prisma/schema.prisma"
 fi
 
-UI_DIR="apps/ui"
+UI_DIR="apps/web"
 [ -d "$UI_DIR" ] && tmux new-window -t "$SESSION:" -n "ui" "cd '$UI_DIR' && (command -v pnpm >/dev/null || npm i -g pnpm) && pnpm install && pnpm dev"
 
 tmux new-window -t "$SESSION:" -n "shell" "bash"
