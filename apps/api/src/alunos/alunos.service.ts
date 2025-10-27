@@ -10,7 +10,7 @@ export class AlunosService {
     return this.prisma.aluno.findMany({ orderBy: { createdAt: 'desc' }});
   }
 
-  async get(id: number) {
+  async get(id: string) {
     const aluno = await this.prisma.aluno.findUnique({ where: { id } });
     if (!aluno) throw new NotFoundException('Aluno não encontrado');
     return aluno;
@@ -20,12 +20,12 @@ export class AlunosService {
     return this.prisma.aluno.create({ data });
   }
 
-  async update(id: number, data: UpdateAlunoDto) {
+  async update(id: string, data: UpdateAlunoDto) {
     await this.get(id);
     return this.prisma.aluno.update({ where: { id }, data });
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     await this.get(id);
     await this.prisma.aluno.delete({ where: { id } });
     return { ok: true };
