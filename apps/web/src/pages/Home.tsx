@@ -21,7 +21,7 @@ export default function Home(){
       <button onClick={()=>handleStart("mistao")} className="w-full py-3 rounded-2xl bg-blue-600 text-white font-semibold">Iniciar Simulado</button>
       <div className="grid grid-cols-3 gap-3">
         {CATS.map(c=>(
-          <button key={c.id} onClick={()=>handleStart(c.id)} className={\`h-28 rounded-2xl \${c.color} flex items-center justify-center text-center p-2\`}>
+          <button key={c.id} onClick={()=>handleStart(c.id)} className={`h-28 rounded-2xl ${c.color} flex items-center justify-center text-center p-2`}>
             <span className="font-semibold">{c.name}</span>
             {loading===c.id && <span className="ml-2 text-sm">…</span>}
           </button>
