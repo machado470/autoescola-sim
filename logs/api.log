@@ -1,0 +1,33 @@
+
+> @autoescola/api@0.1.0 dev /mnt/c/Projetos/autoescola-sim/apps/api
+> ts-node-dev --respawn --transpile-only src/main.ts
+
+[INFO] 00:24:22 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.3)
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPrismaModule dependencies initialized[39m[38;5;3m +62ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mSimulatorModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mInstructorModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mSchoolModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mHealthController {/health}:[39m[38;5;3m +13ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/health, GET} route[39m[38;5;3m +7ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mSimulatorController {/simulator}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/simulator, POST} route[39m[38;5;3m +8ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/simulator, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/simulator/:id, GET} route[39m[38;5;3m +3ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/simulator/:id, PUT} route[39m[38;5;3m +2ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/simulator/:id, DELETE} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mSchoolController {/schools}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/schools, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/schools/:id, GET} route[39m[38;5;3m +5ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/schools, POST} route[39m[38;5;3m +4ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/schools/:id, PUT} route[39m[38;5;3m +2ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/schools/:id, DELETE} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mInstructorController {/instructors}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/instructors, GET} route[39m[38;5;3m +2ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/instructors/:id, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/instructors, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/instructors/:id, PUT} route[39m[38;5;3m +7ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/instructors/:id, DELETE} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 88227  - [39m10/28/2025, 12:25:44 AM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +339ms[39m
+🚀 API running on http://localhost:3000
