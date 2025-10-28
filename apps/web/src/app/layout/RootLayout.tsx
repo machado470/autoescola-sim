@@ -1,40 +1,14 @@
 import { Outlet, NavLink } from "react-router-dom";
-import ThemeToggle from "../../components/ThemeToggle";
 
-export default function RootLayout() {
+export default function RootLayout(){
+  const link = { padding: 8, textDecoration: "none", border: "1px solid #ccc", borderRadius: 8, marginRight: 8 };
+  const bar  = { display: "flex", gap: 8, padding: 12, borderTop: "1px solid #eee", position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff" };
   return (
-    <div className="min-h-dvh flex flex-col bg-background text-foreground">
-      <header className="h-12 flex items-center justify-between px-4 border-b">
-        <span className="font-semibold">AutoEscola-Sim</span>
-        <div className="flex items-center gap-3">
-          <NavLink to="/perfil" className="text-sm underline">Perfil</NavLink>
-          <ThemeToggle />
-        </div>
-      </header>
-
-      <main className="flex-1 container mx-auto px-4 py-4">
-        <Outlet />
-      </main>
-
-      <nav className="h-14 border-t grid grid-cols-4">
-        {[
-          { to: "/", label: "Home" },
-          { to: "/treino", label: "Treino" },
-          { to: "/simulado", label: "Simulado" },
-          { to: "/progresso", label: "Progresso" },
-        ].map((i) => (
-          <NavLink
-            key={i.to}
-            to={i.to}
-            className={({ isActive }) =>
-              `flex items-center justify-center text-sm ${
-                isActive ? "font-semibold" : "text-muted-foreground"
-              }`
-            }
-          >
-            {i.label}
-          </NavLink>
-        ))}
+    <div style={{minHeight:"100dvh", display:"flex", flexDirection:"column"}}>
+      <header style={{padding:12, borderBottom:"1px solid #eee", fontWeight:600}}>AutoEscola-Sim</header>
+      <main style={{flex:1, padding:16}}><Outlet/></main>
+      <nav style={bar as any}>
+        <NavLink to="/" style={link as any}>Home</NavLink>
       </nav>
     </div>
   );
