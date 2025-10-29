@@ -1,58 +1,86 @@
 import { PrismaClient, Difficulty } from '@prisma/client'
 const prisma = new PrismaClient()
 
-type ChoiceData = { text: string; isCorrect: boolean }
-
-const QUESTION_1 = {
-  statement: 'O que significa a placa R-1 (Parada Obrigatória)?',
-  difficulty: Difficulty.EASY,
-}
-const CHOICES_1: ChoiceData[] = [
-  { text: 'O motorista deve reduzir a velocidade', isCorrect: false },
-  { text: 'O motorista deve parar o veículo',      isCorrect: true  },
-  { text: 'Proibido seguir em frente',             isCorrect: false },
-  { text: 'Preferência de passagem',               isCorrect: false },
-]
-
-async function insertChoices(questionId: number) {
-  // Tenta variações comuns de FK e nome do modelo
-  const fkCandidates = ['questionId', 'questionID', 'question_id']
-  const model = (prisma as any).choice // já vimos que existe prisma.choice no seu projeto
-
-  for (const fk of fkCandidates) {
-    try {
-      const data = CHOICES_1.map(c => ({ ...c, [fk]: questionId } as any))
-      await model.createMany({ data })
-      console.log(`✓ Choices inseridos usando FK "${fk}"`)
-      return
-    } catch (e) {
-      // tenta a próxima variação
-    }
-  }
-  throw new Error('Não foi possível inserir choices: nenhuma variação de FK funcionou (questionId/questionID/question_id).')
-}
-
 async function main() {
-  console.log('🌱 Iniciando seed do AutoEscola-Sim...')
+  // Apagar dados antigos
+  await prisma.choice.deleteMany()
+  await prisma.question.deleteMany()
+  await prisma.simulator.deleteMany()
+  await prisma.instructor.deleteMany()
+  await prisma.school.deleteMany()
 
-  // limpeza em ordem (filhos -> pai)
-  try { await (prisma as any).choice.deleteMany() } catch {}
-  try { await (prisma as any).question.deleteMany() } catch {}
-
-  // cria a questão SEM nested create (evita conflito de nome do relation field)
-  const q1 = await (prisma as any).question.create({
+  // Criar escola e instrutores
+  const school = await prisma.school.create({
     data: {
-      statement: QUESTION_1.statement,
-      difficulty: QUESTION_1.difficulty,
+      name: 'Auto Escola Machado',
+      city: 'Tijucas',
+      state: 'SC',
     },
   })
-  console.log(`✓ Pergunta criada (id=${q1.id})`)
 
-  await insertChoices(q1.id)
+  const instructor = await prisma.instructor.create({
+    data: {
+      name: 'Carlos Silva',
+      license: 'AB',
+      schoolId: school.id,
+    },
+  })
 
-  console.log('✅ Seed concluído com sucesso.')
+  // Criar questões de simulado
+  const q1 = await prisma.question.create({
+    data: {
+      statement: 'O que significa a placa R-1 (Parada Obrigatória)?',
+      difficulty: Difficulty.EASY,
+      choices: {
+        create: [
+          { text: 'Pare o veículo e siga somente quando for seguro', isCorrect: true },
+          { text: 'Proibido estacionar', isCorrect: false },
+          { text: 'Dê a preferência', isCorrect: false },
+          { text: 'Siga em frente com atenção', isCorrect: false },
+        ],
+      },
+    },
+  })
+
+  const q2 = await prisma.question.create({
+    data: {
+      statement: 'Qual é a velocidade máxima permitida em uma via urbana sem sinalização?',
+      difficulty: Difficulty.MEDIUM,
+      choices: {
+        create: [
+          { text: '50 km/h', isCorrect: true },
+          { text: '40 km/h', isCorrect: false },
+          { text: '60 km/h', isCorrect: false },
+          { text: '30 km/h', isCorrect: false },
+        ],
+      },
+    },
+  })
+
+  const q3 = await prisma.question.create({
+    data: {
+      statement: 'Qual documento o condutor deve portar obrigatoriamente ao dirigir?',
+      difficulty: Difficulty.EASY,
+      choices: {
+        create: [
+          { text: 'CNH (Carteira Nacional de Habilitação)', isCorrect: true },
+          { text: 'Título de eleitor', isCorrect: false },
+          { text: 'CPF', isCorrect: false },
+          { text: 'Carteira de trabalho', isCorrect: false },
+        ],
+      },
+    },
+  })
+
+  console.log('✅ Seed inserido com sucesso!')
 }
 
 main()
-  .catch((e) => { console.error('❌ Erro no seed:', e); process.exit(1) })
-  .finally(async () => { await prisma.$disconnect() })
+  .then(async () => {
+    await prisma.$disconnect()
+  })
+  .catch(async (e) => {
+    console.error(e)
+    await prisma.$disconnect()
+    process.exit(1)
+  })
