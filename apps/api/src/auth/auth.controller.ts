@@ -1,18 +1,34 @@
-import { Controller, Post, Request, UseGuards } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
-import { AuthService, AuthenticatedUser } from './auth.service'
-import { LocalAuthGuard } from './guards/local-auth.guard'
-import { Public } from './public.decorator'
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { JwtService } from '@nestjs/jwt';
 
-@ApiTags('Auth')
+class LoginDto {
+  email: string;
+  password: string;
+}
+
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly auth: AuthService,
+    private readonly jwt: JwtService,
+  ) {}
 
-  @Public()
-  @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req: { user: AuthenticatedUser }) {
-    return this.authService.login(req.user)
+  async login(@Body() body: LoginDto) {
+    const { email, password } = body;
+    return this.auth.login(email, password);
+  }
+
+  @Get('me')
+  async me(@Req() req: any) {
+    // versão simples: lê o bearer na mão
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) {
+      return { authenticated: false };
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const payload = await this.jwt.verifyAsync(token);
+    return { authenticated: true, user: payload };
   }
 }

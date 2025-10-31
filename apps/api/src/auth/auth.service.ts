@@ -1,81 +1,44 @@
-import { Injectable } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
-import { Prisma } from '@prisma/client'
-import { PrismaService } from '../prisma/prisma.service'
-import * as bcrypt from 'bcrypt'
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 
-export type UserRole = 'aluno' | 'instrutor'
-
-export interface AuthenticatedUser {
-  id: string
-  email: string
-  nome: string
-  role: UserRole
+interface UserPayload {
+  id: string;
+  email: string;
+  name: string;
 }
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService,
-  ) {}
+  constructor(private readonly jwt: JwtService) {}
 
-  async validateUser(email: string, senha: string): Promise<AuthenticatedUser | null> {
-    const alunoWhere: Prisma.AlunoWhereUniqueInput = { email }
-    const aluno = await this.prisma.aluno.findUnique({ where: alunoWhere })
-    if (
-      aluno?.email &&
-      aluno.senhaHash &&
-      (await bcrypt.compare(senha, aluno.senhaHash))
-    ) {
-      const { id, nome } = aluno
-      return { id, email: aluno.email, nome, role: 'aluno' }
+  // provisório: depois vamos buscar no banco
+  async validateUser(email: string, password: string) {
+    // TODO: trocar por prisma.user.findUnique
+    if (email === 'admin@aes.com' && password === '123456') {
+      return {
+        id: 'admin-1',
+        email,
+        name: 'Administrador',
+      };
     }
-
-    const instrutorWhere: Prisma.InstrutorWhereUniqueInput = { email }
-    const instrutor = await this.prisma.instrutor.findUnique({
-      where: instrutorWhere,
-    })
-    if (
-      instrutor?.email &&
-      instrutor.senhaHash &&
-      (await bcrypt.compare(senha, instrutor.senhaHash))
-    ) {
-      const { id, nome } = instrutor
-      return { id, email: instrutor.email, nome, role: 'instrutor' }
-    }
-
-    return null
+    throw new UnauthorizedException('Credenciais inválidas');
   }
 
-  async getUserById(id: string, role: UserRole): Promise<AuthenticatedUser | null> {
-    if (role === 'aluno') {
-      const aluno = await this.prisma.aluno.findUnique({ where: { id } })
-      if (!aluno || !aluno.email) {
-        return null
-      }
-      const { email, nome } = aluno
-      return { id: aluno.id, email, nome, role }
-    }
-
-    const instrutor = await this.prisma.instrutor.findUnique({ where: { id } })
-    if (!instrutor || !instrutor.email) {
-      return null
-    }
-    const { email, nome } = instrutor
-    return { id: instrutor.id, email, nome, role }
-  }
-
-  async login(user: AuthenticatedUser): Promise<{
-    access_token: string
-    user: AuthenticatedUser
-  }> {
-    const payload = { sub: user.id, email: user.email, role: user.role }
-    const accessToken = await this.jwtService.signAsync(payload)
-
+  async login(email: string, password: string) {
+    const user = await this.validateUser(email, password);
+    const payload: UserPayload = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    };
+    const token = await this.jwt.signAsync(payload);
     return {
-      access_token: accessToken,
+      access_token: token,
       user,
-    }
+    };
+  }
+
+  async me(tokenPayload: UserPayload) {
+    return tokenPayload;
   }
 }
