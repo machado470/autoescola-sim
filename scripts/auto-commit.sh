@@ -1,39 +1,36 @@
 #!/usr/bin/env bash
-set -euo pipefail
+# Script: auto-commit.sh
+# Executa setup, commit e push automático
 
-# Se nada staged, stage tudo
-if [ -z "$(git diff --cached --name-only)" ]; then
-  git add .
+set -e
+GREEN="\e[32m"; RED="\e[31m"; BLUE="\e[34m"; NC="\e[0m"
+
+echo -e "${BLUE}▶ Iniciando commit automatizado do projeto autoescola-sim...${NC}"
+
+# 1. preparar ambiente
+if [ -f "scripts/setup-env.sh" ]; then
+  echo -e "${BLUE}▶ Rodando setup-env.sh...${NC}"
+  ./scripts/setup-env.sh
+else
+  echo -e "${RED}❌ setup-env.sh não encontrado.${NC}"
+  exit 1
 fi
 
-CHANGED=$(git diff --cached --name-only || true)
+# 2. adicionar mudanças
+echo -e "${BLUE}▶ Adicionando mudanças...${NC}"
+git add .
 
-if [ -z "$CHANGED" ]; then
-  echo "Nada para commitar."
-  exit 0
+# 3. mensagem de commit
+MSG="$1"
+if [ -z "$MSG" ]; then
+  MSG="chore: atualização automática do ambiente e código"
 fi
 
-# Detecta scope
-SCOPE="repo"
-echo "$CHANGED" | grep -q '^apps/web/' && SCOPE="front"
-echo "$CHANGED" | grep -q '^apps/api/' && SCOPE="api"
-echo "$CHANGED" | grep -q '^prisma/' && SCOPE="db"
+echo -e "${BLUE}▶ Commitando com mensagem:${NC} '$MSG'"
+git commit -m "$MSG" || echo -e "${YELLOW}⚠ Nada novo para commitar.${NC}"
 
-# Detecta tipo básico
-TYPE="chore"
-echo "$CHANGED" | grep -E '\.(ts|tsx|js|jsx|css|json|yml|yaml)$' >/dev/null && TYPE="fix"
-git diff --cached --name-status | grep -q '^A\s' && TYPE="feat"
+# 4. push
+echo -e "${BLUE}▶ Enviando para o repositório remoto...${NC}"
+git push origin main
 
-# Resumo de dif (linhas + / -)
-DIFFSUM=$(git diff --cached --numstat | awk '{a+=$1;b+=$2} END{printf("+%s/-%s", a? a:0, b? b:0)}')
-
-# Primeira alteração como titulo
-TITLE=$(echo "$CHANGED" | head -n1 | sed 's|^apps/||; s|^prisma/||')
-
-MSG="$TYPE($SCOPE): update $TITLE $DIFFSUM"
-
-BR=$(git rev-parse --abbrev-ref HEAD)
-echo "Commit: $MSG"
-git commit -m "$MSG" || { echo "Nada novo para commitar."; exit 0; }
-git push -u origin "$BR"
-echo "✔ Enviado para $BR"
+echo -e "${GREEN}✅ Commit e push finalizados com sucesso.${NC}"
