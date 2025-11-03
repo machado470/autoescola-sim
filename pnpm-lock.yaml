@@ -22,7 +22,7 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0
       '@types/node':
-        specifier: ^20.9.1
+        specifier: ^20.19.21
         version: 20.19.21
       concurrently:
         specifier: ^9.2.1
