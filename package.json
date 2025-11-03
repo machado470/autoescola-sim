@@ -16,12 +16,15 @@
     "lint:web": "pnpm --filter ./apps/web lint || echo no-lint",
     "typecheck:web": "pnpm --filter ./apps/web typecheck || tsc -v >/dev/null || echo no-ts",
     "lint:api": "pnpm --filter ./apps/api lint || echo no-lint",
-    "prisma:studio": "pnpm --filter ./apps/api prisma studio"
+    "prisma:studio": "pnpm --filter ./apps/api prisma studio",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev --name init_questions",
+    "prisma:seed": "ts-node prisma/seed.ts"
   },
   "packageManager": "pnpm@8.15.4",
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",
-    "@types/node": "^20.9.1",
+    "@types/node": "^20.19.21",
     "concurrently": "^9.2.1",
     "prisma": "^5.22.0",
     "ts-node": "^10.9.2",

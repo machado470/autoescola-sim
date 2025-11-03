@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { questions } from "../data/questions";
 
 type Answer = { id: number; correct: boolean };
@@ -13,9 +13,22 @@ export function useQuiz() {
   const currentQuestion = questions[current];
   const correctCount = answers.filter(a => a.correct).length;
 
+  // 🔹 Restaurar progresso salvo
+  useEffect(() => {
+    const saved = localStorage.getItem("autosim_progress");
+    if (saved) {
+      const data = JSON.parse(saved);
+      setXp(data.xp || 0);
+    }
+  }, []);
+
+  // 🔹 Salvar progresso sempre que XP mudar
+  useEffect(() => {
+    localStorage.setItem("autosim_progress", JSON.stringify({ xp }));
+  }, [xp]);
+
   function answer(optionId: string) {
     if (finished) return;
-
     const correct = !!currentQuestion.options.find(o => o.id === optionId && o.correct);
     setAnswers(prev => [...prev, { id: currentQuestion.id, correct }]);
     if (correct) setXp(prev => prev + 80);
@@ -30,7 +43,6 @@ export function useQuiz() {
   function reset() {
     setCurrent(0);
     setAnswers([]);
-    setXp(0);
     setFinished(false);
   }
 
@@ -43,6 +55,6 @@ export function useQuiz() {
     xp,
     finished,
     answer,
-    reset,
+    reset
   };
 }
