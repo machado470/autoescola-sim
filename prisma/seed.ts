@@ -1,19 +1,23 @@
-import { PrismaClient, Difficulty } from '@prisma/client'
+import { PrismaClient, Difficulty } from '@prisma/client';
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 async function main() {
-  // limpa na ordem certa (filho -> pai)
-  await prisma.choice.deleteMany()
-  await prisma.question.deleteMany()
+  // 1) limpa respostas dependentes primeiro
+  await prisma.studentAnswer.deleteMany().catch(() => {});
 
-  // cria 1 questão de exemplo
+  // 2) limpa perguntas
+  await prisma.question.deleteMany();
+
+  // 3) cria uma pergunta de exemplo
   await prisma.question.create({
     data: {
       statement: 'Qual o procedimento correto ao se aproximar de uma faixa de pedestres?',
-      title: 'Comportamento na via',
+      imageUrl: null,
+      tags: ['comportamento', 'trânsito'],
+      // 👇 o campo que estava faltando
       difficulty: Difficulty.EASY,
-      choices: {
+      answers: {
         create: [
           {
             text: 'Reduzir a velocidade e dar preferência ao pedestre.',
@@ -28,21 +32,21 @@ async function main() {
             isCorrect: false,
           },
           {
-            text: 'Ignorar se estiver com pressa.',
+            text: 'Ignorar a faixa se não houver semáforo.',
             isCorrect: false,
           },
         ],
       },
     },
-  })
+  });
 }
 
 main()
   .then(async () => {
-    await prisma.$disconnect()
+    await prisma.$disconnect();
   })
   .catch(async (e) => {
-    console.error(e)
-    await prisma.$disconnect()
-    process.exit(1)
-  })
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });
