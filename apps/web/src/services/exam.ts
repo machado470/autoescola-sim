@@ -1,10 +1,9 @@
-import axios from 'axios';
+import axios from 'axios'
 
-const api = axios.create({
-  baseURL: 'http://localhost:3000/api', // troca a porta se teu back estiver em outra
-});
+// com o proxy do Vite, podemos chamar /api direto em dev
+const api = axios.create({ baseURL: '/api' })
 
 export async function fetchQuestions() {
-  const res = await api.get('/questions');
-  return res.data;
+  const res = await api.get('/questions')
+  return res.data
 }
