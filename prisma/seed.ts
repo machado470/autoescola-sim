@@ -19,6 +19,7 @@ async function main() {
   // Inserir dados iniciais
   await prisma.question.create({
     data: {
+      statement: "Exemplo de questão",
       title: 'Exemplo de questão',
       choices: {
         create: [
