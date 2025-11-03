@@ -1,77 +1,80 @@
 #!/usr/bin/env bash
+# ============================================
+# AutoEscola-Sim :: Setup de ambiente resiliente
+# ============================================
 
-# =======================
-# setup-env.sh
-# Script de preparação do ambiente do autoescola-sim
-# =======================
-
-set -e
-
+RED="\e[31m"
 GREEN="\e[32m"
 YELLOW="\e[33m"
-RED="\e[31m"
 BLUE="\e[34m"
 NC="\e[0m"
 
-echo -e "${BLUE}▶ Iniciando preparação do ambiente (autoescola-sim)...${NC}"
+echo -e "${BLUE}🚀 Iniciando preparação do ambiente (autoescola-sim)...${NC}"
 
-# 1. conferir se estamos na raiz do projeto
-if [ ! -f "package.json" ] || [ ! -d "prisma" ]; then
-  echo -e "${RED}❌ Parece que você não está na raiz do projeto (autoescola-sim).${NC}"
-  echo -e "${YELLOW}➡ Entre na pasta do projeto e rode de novo:${NC} cd ~/projects/autoescola-sim"
+# 1. garantir que está na raiz do projeto
+if [ ! -f "package.json" ]; then
+  echo -e "${RED}❌ Você não está na raiz do projeto.${NC}"
   exit 1
 fi
 
-# 2. verificar se docker está rodando
-echo -e "${BLUE}▶ Verificando Docker...${NC}"
-if ! docker info > /dev/null 2>&1; then
-  echo -e "${RED}❌ Docker não está acessível dentro do WSL.${NC}"
-  echo -e "${YELLOW}➡ Abra o Docker Desktop no Windows e rode de novo.${NC}"
+# 2. verificar Docker
+echo -e "${BLUE}🐋 Verificando Docker...${NC}"
+if ! docker info >/dev/null 2>&1; then
+  echo -e "${RED}❌ Docker não acessível.${NC}"
+  echo -e "${YELLOW}Abra o Docker Desktop e rode novamente.${NC}"
   exit 1
 fi
 echo -e "${GREEN}✅ Docker OK${NC}"
 
-# 3. subir containers (se existir docker-compose.yml)
+# 3. subir containers
 if [ -f "docker-compose.yml" ]; then
-  echo -e "${BLUE}▶ Subindo containers do projeto...${NC}"
+  echo -e "${BLUE}▶ Subindo containers...${NC}"
   docker compose up -d
-  echo -e "${GREEN}✅ Containers ativos${NC}"
 else
-  echo -e "${YELLOW}⚠ Nenhum docker-compose.yml encontrado. Pulando esta etapa.${NC}"
+  echo -e "${YELLOW}⚠ Nenhum docker-compose.yml encontrado, pulando etapa.${NC}"
 fi
 
-# 4. instalar deps se faltar node_modules
-if [ ! -d "node_modules" ]; then
-  echo -e "${BLUE}▶ Instalando dependências (pnpm)...${NC}"
-  if command -v pnpm >/dev/null 2>&1; then
-    pnpm install
+# 4. localizar e esperar Postgres
+PG_CONTAINER=$(docker ps --filter "name=postgres" --format '{{.Names}}' | head -n1)
+if [ -z "$PG_CONTAINER" ]; then
+  echo -e "${RED}❌ Nenhum container Postgres detectado.${NC}"
+  exit 1
+fi
+
+echo -e "${BLUE}🔍 Aguardando Postgres iniciar...${NC}"
+for i in {1..20}; do
+  if docker exec "$PG_CONTAINER" pg_isready -U postgres >/dev/null 2>&1; then
+    echo -e "${GREEN}✅ Postgres pronto${NC}"
+    break
   else
-    echo -e "${RED}❌ pnpm não encontrado.${NC}"
-    echo -e "${YELLOW}➡ Instale com:${NC} npm install -g pnpm"
-    exit 1
+    echo -e "${YELLOW}⏳ Esperando... ($i/20)${NC}"
+    sleep 2
   fi
-  echo -e "${GREEN}✅ Dependências instaladas${NC}"
-fi
+done
 
-# 5. prisma generate
-echo -e "${BLUE}▶ Gerando cliente Prisma...${NC}"
+PG_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$PG_CONTAINER")
+echo -e "${BLUE}📡 Postgres ativo em: ${PG_IP}${NC}"
+
+# 5. preparar Prisma Client e migrations
+echo -e "${BLUE}🧩 Gerando Prisma Client...${NC}"
 pnpm prisma generate
-echo -e "${GREEN}✅ Prisma generate OK${NC}"
+echo -e "${GREEN}✅ Prisma Client OK${NC}"
 
-# 6. prisma migrate
-echo -e "${BLUE}▶ Aplicando migrations...${NC}"
-pnpm prisma migrate deploy || pnpm prisma migrate dev --name init
+echo -e "${BLUE}📚 Aplicando migrations...${NC}"
+DATABASE_URL="postgresql://postgres:postgres@${PG_IP}:5432/autoescola?schema=public" pnpm prisma migrate deploy
 echo -e "${GREEN}✅ Migrations aplicadas${NC}"
 
-# 7. prisma seed (se existir)
-if grep -q "prisma db seed" package.json; then
-  echo -e "${BLUE}▶ Executando seed do banco...${NC}"
-  pnpm prisma db seed
-  echo -e "${GREEN}✅ Seed executado${NC}"
-else
-  echo -e "${YELLOW}⚠ Nenhum seed configurado no package.json. Pulando.${NC}"
-fi
+# 6. aplicar seed com retry
+echo -e "${BLUE}🌱 Aplicando seed (com retry)...${NC}"
+MAX_RETRIES=5
+SLEEP_SECONDS=3
+for i in $(seq 1 $MAX_RETRIES); do
+  DATABASE_URL="postgresql://postgres:postgres@${PG_IP}:5432/autoescola?schema=public" pnpm prisma db seed && {
+    echo -e "${GREEN}✅ Seed executado com sucesso${NC}"
+    break
+  }
+  echo -e "${YELLOW}⚠ Seed falhou (tentativa $i/${MAX_RETRIES}). Tentando novamente...${NC}"
+  sleep $SLEEP_SECONDS
+done
 
-echo -e "${GREEN}✅ Ambiente preparado com sucesso!${NC}"
-echo -e "${BLUE}▶ Agora você pode rodar o app normalmente.${NC}"
-echo -e "${BLUE}▶ Exemplo:${NC} pnpm run dev   (no front) / pnpm run start:dev   (no back)"
+echo -e "${GREEN}✨ Ambiente preparado com sucesso!${NC}"
