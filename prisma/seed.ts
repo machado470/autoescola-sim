@@ -17,8 +17,8 @@ async function main() {
   await prisma.question.deleteMany()
 
   // Inserir dados iniciais
-  await prisma.question.create({
-    data: {
+  await prisma.question.create({  data: {    statement: 'Exemplo de questão',    title: 'Exemplo de questão',    difficulty: 'EASY',
+    data: {    statement: 'Exemplo de questão',    title: 'Exemplo de questão',    difficulty: 'EASY',
       statement: "Exemplo de questão",
       title: 'Exemplo de questão',
       choices: {
