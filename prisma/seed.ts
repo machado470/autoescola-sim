@@ -13,7 +13,7 @@ const prisma = new PrismaClient({
 
 async function main() {
   // Apagar dados antigos
-  await prisma.choice.deleteMany()
+  await prisma.Choice.deleteMany()
   await prisma.question.deleteMany()
 
   // Inserir dados iniciais
