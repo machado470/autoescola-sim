@@ -1,16 +1,11 @@
+import Result from "./Result";
 import { useQuiz } from "../../hooks/useQuiz";
 
 export default function SimuladoPage() {
-  const { currentQuestion, currentIndex, total, answer, finished, xp } = useQuiz();
+  const { currentQuestion, currentIndex, total, answer, finished, xp, correctCount, reset } = useQuiz();
 
   if (finished) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <h1 className="text-2xl font-bold mb-4">Simulado Finalizado 🎉</h1>
-        <p className="text-lg mb-2">Você ganhou {xp} XP!</p>
-        <a href="/" className="text-blue-600 underline">Voltar para Home</a>
-      </div>
-    );
+    return <Result xp={xp} correct={correctCount} total={total} />;
   }
 
   return (
@@ -18,14 +13,17 @@ export default function SimuladoPage() {
       <p className="text-sm text-gray-500 mb-4">
         Pergunta {currentIndex} de {total}
       </p>
-      {currentQuestion.image && (
+
+      {currentQuestion?.image && (
         <img src={currentQuestion.image} alt="Sinal" className="w-40 mb-6" />
       )}
+
       <h2 className="text-xl font-bold mb-6 text-center">
-        {currentQuestion.question}
+        {currentQuestion?.question}
       </h2>
+
       <div className="grid gap-3 w-64">
-        {currentQuestion.options.map(opt => (
+        {currentQuestion?.options.map(opt => (
           <button
             key={opt.id}
             onClick={() => answer(opt.id)}
@@ -35,6 +33,14 @@ export default function SimuladoPage() {
           </button>
         ))}
       </div>
+
+      <button
+        onClick={reset}
+        className="mt-8 text-xs text-gray-400 underline hover:text-gray-600"
+        title="Reiniciar simulado"
+      >
+        Reiniciar
+      </button>
     </div>
   );
 }
