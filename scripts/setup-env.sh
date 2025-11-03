@@ -61,7 +61,7 @@ pnpm prisma generate
 echo -e "${GREEN}✅ Prisma Client OK${NC}"
 
 echo -e "${BLUE}📚 Aplicando migrations...${NC}"
-DATABASE_URL="postgresql://postgres:postgres@${PG_IP}:5432/autoescola?schema=public" pnpm prisma migrate deploy
+DATABASE_URL="postgresql://postgres:postgres@localhost:5433/autoescola?schema=public" pnpm prisma migrate deploy
 echo -e "${GREEN}✅ Migrations aplicadas${NC}"
 
 # 6. aplicar seed com retry
@@ -69,7 +69,7 @@ echo -e "${BLUE}🌱 Aplicando seed (com retry)...${NC}"
 MAX_RETRIES=5
 SLEEP_SECONDS=3
 for i in $(seq 1 $MAX_RETRIES); do
-  DATABASE_URL="postgresql://postgres:postgres@${PG_IP}:5432/autoescola?schema=public" pnpm prisma db seed && {
+  DATABASE_URL="postgresql://postgres:postgres@localhost:5433/autoescola?schema=public" pnpm prisma db seed && {
     echo -e "${GREEN}✅ Seed executado com sucesso${NC}"
     break
   }
