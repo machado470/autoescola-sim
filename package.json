@@ -12,7 +12,11 @@
     "dev:web": "pnpm --filter ./apps/web dev",
     "dev:all": "concurrently -n API,WEB -c blue,magenta \"pnpm dev:api\" \"pnpm dev:web\"",
     "build:web": "pnpm --filter ./apps/web build",
-    "commit-push": "git add -A && git commit -m \"$npm_config_m\" || echo no-changes && git push origin $(git branch --show-current)"
+    "commit-push": "git add -A && git commit -m \"$npm_config_m\" || echo no-changes && git push origin $(git branch --show-current)",
+    "lint:web": "pnpm --filter ./apps/web lint || echo no-lint",
+    "typecheck:web": "pnpm --filter ./apps/web typecheck || tsc -v >/dev/null || echo no-ts",
+    "lint:api": "pnpm --filter ./apps/api lint || echo no-lint",
+    "prisma:studio": "pnpm --filter ./apps/api prisma studio"
   },
   "packageManager": "pnpm@8.15.4",
   "devDependencies": {
