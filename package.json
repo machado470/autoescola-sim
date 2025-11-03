@@ -10,7 +10,9 @@
     "start:full": "./start-full.sh",
     "stop:full": "./stop-full.sh",
     "dev:web": "pnpm --filter ./apps/web dev",
-    "dev:all": "concurrently -n API,WEB -c blue,magenta \"pnpm dev:api\" \"pnpm dev:web\""
+    "dev:all": "concurrently -n API,WEB -c blue,magenta \"pnpm dev:api\" \"pnpm dev:web\"",
+    "build:web": "pnpm --filter ./apps/web build",
+    "commit-push": "git add -A && git commit -m \"$npm_config_m\" || echo no-changes && git push origin $(git branch --show-current)"
   },
   "packageManager": "pnpm@8.15.4",
   "devDependencies": {
