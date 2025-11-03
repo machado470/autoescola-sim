@@ -4,16 +4,19 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "dev:api": "pnpm -C apps/api dev",
+    "dev:api": "pnpm --filter ./apps/api dev",
     "prisma:gen": "pnpm -C apps/api prisma generate",
     "prisma:push": "pnpm -C apps/api prisma db push",
     "start:full": "./start-full.sh",
-    "stop:full": "./stop-full.sh"
+    "stop:full": "./stop-full.sh",
+    "dev:web": "pnpm --filter ./apps/web dev",
+    "dev:all": "concurrently -n API,WEB -c blue,magenta \"pnpm dev:api\" \"pnpm dev:web\""
   },
   "packageManager": "pnpm@8.15.4",
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",
     "@types/node": "^20.9.1",
+    "concurrently": "^9.2.1",
     "prisma": "^5.22.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.6",

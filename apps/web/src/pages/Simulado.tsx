@@ -1,115 +1,95 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import Stop from '../assets/ui/icons/stop.svg';
+import { ProgressBar } from '../components/ui/ProgressBar';
+import { QuizOption } from '../components/ui/QuizOption';
 import { fetchQuestions } from '../services/exam';
 
-type Choice = {
-  id: string;
-  text: string;
-  isCorrect: boolean;
-};
-
-type Question = {
-  id: string;
-  statement: string;
-  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
-  tags: string[];
-  choices: Choice[];
-};
+type Choice = { id: string; text: string; isCorrect: boolean; };
+type Question = { id: string; statement: string; imageUrl?: string | null; tags: string[]; choices: Choice[]; };
 
 export default function Simulado() {
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [current, setCurrent] = useState(0);
+  const [idx, setIdx] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
+  const [status, setStatus] = useState<'idle' | 'correct' | 'wrong'>('idle');
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const data = await fetchQuestions();
+    (async () => {
+      const data = await fetchQuestions();
+      // fallback exemplo se API vier vazia
+      if (!data?.length) {
+        setQuestions([{
+          id: 'q1',
+          statement: 'O que esse sinal indica?',
+          imageUrl: undefined,
+          tags: ['EASY','comportamento','trânsito'],
+          choices: [
+            { id: 'c1', text: 'Parada obrigatória', isCorrect: true },
+            { id: 'c2', text: 'Travessia de pedestres', isCorrect: false },
+            { id: 'c3', text: 'Siga em frente', isCorrect: false }
+          ]
+        }]);
+      } else {
         setQuestions(data);
-      } catch (error) {
-        console.error('Erro ao buscar perguntas:', error);
-      } finally {
-        setLoading(false);
       }
-    };
-    load();
+    })();
   }, []);
 
-  const question = questions[current];
-  const handleSelect = (id: string) => setSelected(id);
+  const q = questions[idx];
+  const total = questions.length || 1;
+  const progress = useMemo(() => Math.round(((idx) / total) * 100), [idx, total]);
 
-  const isCorrect =
-    question && selected
-      ? question.choices.find((c) => c.id === selected)?.isCorrect ?? null
-      : null;
+  function handleSelect(choice: Choice) {
+    if (selected) return;
+    setSelected(choice.id);
+    const ok = choice.isCorrect;
+    setStatus(ok ? 'correct' : 'wrong');
+    // avança após pequeno delay
+    setTimeout(() => {
+      setSelected(null);
+      setStatus('idle');
+      setIdx((p) => (p + 1 < total ? p + 1 : 0));
+    }, 900);
+  }
 
   return (
-    <div style={{ maxWidth: 720, margin: '0 auto', padding: '1.5rem' }}>
-      <h1>Simulado</h1>
-      {loading && <p>Carregando perguntas...</p>}
-      {!loading && !question && <p>Sem perguntas. Rode o seed. 😅</p>}
+    <div className="container-app py-8 md:py-10">
+      <div className="mb-6">
+        <div className="text-sm font-semibold text-blue-700">Pergunta {Math.min(idx+1,total)} de {total}</div>
+        <ProgressBar value={progress} className="mt-2" />
+      </div>
 
-      {question && (
-        <>
-          <p style={{ marginTop: '1rem', fontSize: '1.1rem' }}>{question.statement}</p>
+      <div className="grid place-items-center my-6">
+        <img src={q?.imageUrl || Stop} alt="Sinal" className="w-40 h-40 md:w-52 md:h-52" />
+      </div>
 
-          <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem' }}>
-            <span style={{
-              background: '#eef2ff',
-              padding: '0.2rem 0.6rem',
-              borderRadius: '999px',
-              fontSize: '0.7rem'
-            }}>
-              {question.difficulty}
-            </span>
-            {question.tags.map((tag) => (
-              <span key={tag} style={{
-                background: '#e2e8f0',
-                padding: '0.2rem 0.6rem',
-                borderRadius: '999px',
-                fontSize: '0.7rem'
-              }}>
-                {tag}
-              </span>
-            ))}
-          </div>
+      <h1 className="h2 text-center mb-6">{
+        q?.statement || 'O que esse sinal indica?'
+      }</h1>
 
-          <div style={{
-            marginTop: '1rem',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.6rem'
-          }}>
-            {question.choices.map((choice) => {
-              const selectedThis = selected === choice.id;
-              let bg = 'white';
-              if (selectedThis && isCorrect === true) bg = '#dcfce7';
-              if (selectedThis && isCorrect === false) bg = '#fee2e2';
+      {/* tags */}
+      <div className="flex gap-2 justify-center mb-6">
+        {(q?.tags ?? []).map(t => (
+          <span key={t} className="px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-xs font-semibold text-gray-700 dark:text-gray-300">{t}</span>
+        ))}
+      </div>
 
-              return (
-                <button
-                  key={choice.id}
-                  onClick={() => handleSelect(choice.id)}
-                  style={{
-                    textAlign: 'left',
-                    background: bg,
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '0.5rem',
-                    padding: '0.6rem 0.75rem',
-                    cursor: 'pointer'
-                  }}
-                >
-                  {choice.text}
-                </button>
-              );
-            })}
-          </div>
+      <div className="space-y-3">
+        {(q?.choices ?? []).map((c) => {
+          let state: 'idle' | 'correct' | 'wrong' | 'disabled' = 'idle';
+          if (selected) {
+            if (c.id === selected) state = status;
+            else state = 'disabled';
+          }
+          return (
+            <QuizOption key={c.id} text={c.text} state={state} onClick={() => handleSelect(c)} />
+          );
+        })}
+      </div>
 
-          <p style={{ marginTop: '1rem', fontSize: '0.8rem', color: '#94a3b8' }}>
-            Pergunta {current + 1} de {questions.length}
-          </p>
-        </>
-      )}
+      <div className="mt-10 text-center">
+        <span className="subtle">Pergunta {Math.min(idx+1,total)} de {total}</span>
+      </div>
     </div>
   );
 }
