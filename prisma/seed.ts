@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 
-const databaseUrl = process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/autoescola?schema=public'
+const databaseUrl = process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5433/autoescola?schema=public'
 console.log('🌱 Seed conectando a:', databaseUrl)
 
 const prisma = new PrismaClient({
