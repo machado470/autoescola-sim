@@ -4,7 +4,7 @@ import axios from 'axios'
 const api = axios.create({ baseURL: '/api' })
 
 export async function fetchQuestions() {
-  const res = await api.get('/questions/random')
+  const res = await api.get('/questions/random?includeAnswers=true')
   return res.data
 }
 
