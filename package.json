@@ -21,7 +21,8 @@
     "prisma:migrate": "prisma migrate dev --name init_questions",
     "prisma:seed": "ts-node prisma/seed.ts",
     "import:questions": "tsx scripts/import-questions.ts",
-    "db:seed": "pnpm prisma:generate && pnpm prisma:push && pnpm import:questions"
+    "db:seed": "pnpm prisma:generate && pnpm prisma:push && pnpm import:questions",
+    "prestart:full": "bash tools/check-docker.sh"
   },
   "packageManager": "pnpm@8.15.4",
   "devDependencies": {
