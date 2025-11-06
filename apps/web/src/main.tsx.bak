@@ -1,0 +1,45 @@
+import './index.css';
+// DEBUG RUNTIME LISTENERS
+
+if (typeof window !== "undefined") {
+
+  window.addEventListener("error", (e) => {
+
+    const box = document.createElement("pre");
+
+    box.style.cssText = "position:fixed;top:40px;right:8px;z-index:99999;background:#300;color:#fff;padding:8px;max-width:50vw;max-height:60vh;overflow:auto;border:1px solid #f55;border-radius:6px;font:12px/1.3 ui-monospace,monospace";
+
+    box.textContent = "Runtime error:\n" + (e.error?.stack || e.message);
+
+    document.body.appendChild(box);
+
+    console.error("Runtime error", e.error || e.message);
+
+  });
+
+  window.addEventListener("unhandledrejection", (e) => {
+
+    const box = document.createElement("pre");
+
+    box.style.cssText = "position:fixed;top:120px;right:8px;z-index:99999;background:#300;color:#fff;padding:8px;max-width:50vw;max-height:60vh;overflow:auto;border:1px solid #f55;border-radius:6px;font:12px/1.3 ui-monospace,monospace";
+
+    box.textContent = "Unhandled rejection:\n" + (e.reason?.stack || String(e.reason));
+
+    document.body.appendChild(box);
+
+    console.error("Unhandled rejection", e.reason);
+
+  });
+
+}
+
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.tsx'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)

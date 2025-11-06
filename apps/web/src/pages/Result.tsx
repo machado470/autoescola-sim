@@ -1,4 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom"
+import { recordAttempt } from "../lib/recordAttempt";
 import { useEffect, useMemo } from "react";
 import { useProgressStore } from "../store/progress";
 
