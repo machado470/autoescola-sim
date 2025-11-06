@@ -82,3 +82,9 @@ button:focus-visible {
 .animate-xp-burst{ animation: xp-burst .9s ease-out forwards; }
 @keyframes shake{10%,90%{transform:translateX(-1px)} 20%,80%{transform:translateX(2px)} 30%,50%,70%{transform:translateX(-4px)} 40%,60%{transform:translateX(4px)} }
 .animate-shake{ animation: shake .4s; }
+
+/* === App background + route transitions === */
+html, body, #root { height: 100%; }
+.app-bg{ background: radial-gradient(1200px 700px at 50% -200px, #eaf1ff 0%, transparent 60%), linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);}
+@keyframes routeIn { 0%{opacity:0; transform:translateY(6px)} 100%{opacity:1; transform:translateY(0)} }
+.route-enter{ animation: routeIn .28s ease-out; }

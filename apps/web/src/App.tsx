@@ -1,35 +1,39 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import Home from "./pages/Home";
+import Category from "./pages/Category";
+import Quiz from "./pages/Quiz";
+import Result from "./pages/Result";
+import RouteTransition from "./ui/RouteTransition";
+import ConeMascot from "./ui/ConeMascot";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+export default function App() {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <BrowserRouter>
+      <div className="min-h-dvh app-bg">
+        <div className="mx-auto max-w-md px-4 pb-20 pt-6">
+          <header className="mb-4 flex items-center justify-between">
+            <Link to="/" className="text-2xl font-black tracking-tight">AutoEscola-Sim</Link>
+            <nav className="text-sm text-slate-600">
+              <Link to="/" className="hover:text-slate-900">Início</Link>
+            </nav>
+          </header>
 
-export default App
+          <main>
+            <RouteTransition>
+              <Routes>
+                <Route path="/" element={<Home/>} />
+                <Route path="/categoria/:slug" element={<Category/>} />
+                <Route path="/quiz/:slug" element={<Quiz/>} />
+                <Route path="/result" element={<Result/>} />
+              </Routes>
+            </RouteTransition>
+          </main>
+
+          <footer className="text-center text-xs text-slate-500 mt-10">MV1 • AutoEscola-Sim</footer>
+        </div>
+
+        <ConeMascot/>
+      </div>
+    </BrowserRouter>
+  );
+}
