@@ -1,65 +1,35 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "./pages/Login";
-import { ProtectedRoute } from "./components/ProtectedRoute";
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
 
-function Home() {
-  return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-2">Home</h1>
-      <p className="text-slate-600">Se você está vendo isso, o Router está OK.</p>
-    </div>
-  );
-}
-
-function AppLayout() {
-  const userJson = typeof window !== "undefined" ? localStorage.getItem("aes_user") : null;
-  const user = userJson ? JSON.parse(userJson) : null;
+function App() {
+  const [count, setCount] = useState(0)
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="h-14 border-b flex items-center justify-between px-6 bg-white">
-        <h1 className="font-semibold text-slate-900">AutoEscola-Sim</h1>
-        <div className="text-sm text-slate-500">
-          {user ? `Olá, ${user.name}` : "Aluno"}
-        </div>
-      </header>
-      <main className="flex-1 p-6 bg-slate-50">
-        <h2 className="text-xl font-semibold mb-4">Simulados disponíveis</h2>
-        <p className="text-slate-600 text-sm mb-4">
-          Aqui vai entrar a lista vinda de <code>/simulator</code>.
+    <>
+      <div>
+        <a href="https://vite.dev" target="_blank">
+          <img src={viteLogo} className="logo" alt="Vite logo" />
+        </a>
+        <a href="https://react.dev" target="_blank">
+          <img src={reactLogo} className="logo react" alt="React logo" />
+        </a>
+      </div>
+      <h1>Vite + React</h1>
+      <div className="card">
+        <button onClick={() => setCount((count) => count + 1)}>
+          count is {count}
+        </button>
+        <p>
+          Edit <code>src/App.tsx</code> and save to test HMR
         </p>
-        <div className="grid gap-3 grid-cols-1 md:grid-cols-3">
-          <div className="bg-white border rounded-lg p-4 shadow-sm">
-            <h3 className="font-semibold mb-2">Simulado de placas</h3>
-            <p className="text-sm text-slate-500 mb-3">20 questões</p>
-            <button className="px-3 py-1 rounded bg-purple-600 text-white text-sm">
-              Iniciar
-            </button>
-          </div>
-        </div>
-      </main>
-      <footer className="h-10 flex items-center justify-center text-xs text-slate-400 bg-white">
-        AutoEscola-Sim • MV2
-      </footer>
-    </div>
-  );
+      </div>
+      <p className="read-the-docs">
+        Click on the Vite and React logos to learn more
+      </p>
+    </>
+  )
 }
 
-export default function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route
-          path="/app"
-          element={
-            <ProtectedRoute>
-              <AppLayout />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/" element={<Navigate to="/login" replace />} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
+export default App
