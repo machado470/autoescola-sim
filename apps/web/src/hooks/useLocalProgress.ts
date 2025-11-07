@@ -1,26 +1,45 @@
-import { useCallback } from "react";
+import { useEffect, useState } from 'react';
 
 export type Attempt = {
-  when: string;             // ISO string
-  category: string;
+  id: string;
+  category: 'Sinalização' | 'Direção Defensiva' | 'Mecânica';
   correct: number;
   total: number;
-  gainedXp: number;
+  startedAt: string;   // ISO
+  finishedAt?: string; // ISO
 };
 
-const KEY = "aesim_history_v1";
+const KEY = 'aesim:attempts';
+
+export function loadAttempts(): Attempt[] {
+  try {
+    const raw = localStorage.getItem(KEY);
+    return raw ? (JSON.parse(raw) as Attempt[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveAttempt(a: Attempt) {
+  const list = [a, ...loadAttempts()].slice(0, 50);
+  localStorage.setItem(KEY, JSON.stringify(list));
+}
+
+export function clearAttempts() {
+  localStorage.removeItem(KEY);
+}
 
 export function useLocalProgress() {
-  const read = useCallback((): Attempt[] => {
-    try { return JSON.parse(localStorage.getItem(KEY) || "[]"); }
-    catch { return []; }
+  const [attempts, setAttempts] = useState<Attempt[]>([]);
+
+  useEffect(() => {
+    setAttempts(loadAttempts());
   }, []);
 
-  const push = useCallback((a: Attempt) => {
-    const data = read();
-    data.unshift(a);
-    localStorage.setItem(KEY, JSON.stringify(data.slice(0, 50)));
-  }, [read]);
+  const addAttempt = (a: Attempt) => {
+    saveAttempt(a);
+    setAttempts((prev) => [a, ...prev].slice(0, 50));
+  };
 
-  return { read, push };
+  return { attempts, addAttempt, clearAttempts };
 }

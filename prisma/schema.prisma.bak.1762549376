@@ -10,59 +10,59 @@ datasource db {
 model Category {
   id        Int        @id @default(autoincrement())
   name      String
+  questions Question[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-  questions Question[]
 }
 
 model Question {
-  id         Int      @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())
   statement  String
   image      String?
   categoryId Int
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  category   Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   answers    Answer[]
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 }
 
 model Answer {
   id         Int      @id @default(autoincrement())
   text       String
-  questionId Int
-  createdAt  DateTime @default(now())
   isCorrect  Boolean  @default(false)
-  updatedAt  DateTime @updatedAt
+  questionId Int
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model School {
-  id          Int          @id @default(autoincrement())
-  name        String
-  cnpj        String?      @unique
-  city        String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id         Int          @id @default(autoincrement())
+  name       String
+  cnpj       String?      @unique
+  city       String?
   instructors Instructor[]
   students    Student[]
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
 }
 
 model Instructor {
-  id        Int      @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   name      String
   license   String?
   schoolId  Int
+  school    School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 }
 
 model Student {
-  id        Int      @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   name      String
-  email     String?  @unique
+  email     String? @unique
   schoolId  Int
+  school    School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 }

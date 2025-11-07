@@ -20,10 +20,10 @@ async function seedCategory(catId: number, catName: string) {
         // relacionamento correto no schema
         answers: {
           create: [
-            { text: 'Alternativa A', correct: true  },
-            { text: 'Alternativa B', correct: false },
-            { text: 'Alternativa C', correct: false },
-            { text: 'Alternativa D', correct: false },
+            { text: 'Alternativa A', isCorrect: true  },
+            { text: 'Alternativa B', isCorrect: false },
+            { text: 'Alternativa C', isCorrect: false },
+            { text: 'Alternativa D', isCorrect: false },
           ],
         },
       },
