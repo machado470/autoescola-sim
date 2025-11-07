@@ -4,15 +4,15 @@ import {
   Delete,
   Get,
   Param,
-  ParseUUIDPipe,
+  ParseIntPipe,
   Post,
   Put,
   UseGuards,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
-import { CreateSimuladoDto } from './dto/create-simulado.dto'
-import { UpdateSimuladoDto } from './dto/update-simulado.dto'
+import { CreateQuestionDto } from './dto/create-question.dto'
+import { UpdateQuestionDto } from './dto/update-question.dto'
 import { SimuladosService } from './simulados.service'
 
 @ApiTags('Simulados')
@@ -23,8 +23,8 @@ export class SimuladosController {
   constructor(private readonly simuladosService: SimuladosService) {}
 
   @Post()
-  create(@Body() createSimuladoDto: CreateSimuladoDto) {
-    return this.simuladosService.create(createSimuladoDto)
+  create(@Body() createQuestionDto: CreateQuestionDto) {
+    return this.simuladosService.create(createQuestionDto)
   }
 
   @Get()
@@ -33,20 +33,20 @@ export class SimuladosController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
+  findOne(@Param('id', ParseIntPipe) id: string) {
     return this.simuladosService.findOne(id)
   }
 
   @Put(':id')
   update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateSimuladoDto: UpdateSimuladoDto,
+    @Param('id', ParseIntPipe) id: string,
+    @Body() updateQuestionDto: UpdateQuestionDto,
   ) {
-    return this.simuladosService.update(id, updateSimuladoDto)
+    return this.simuladosService.update(id, updateQuestionDto)
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
+  remove(@Param('id', ParseIntPipe) id: string) {
     return this.simuladosService.remove(id)
   }
 }

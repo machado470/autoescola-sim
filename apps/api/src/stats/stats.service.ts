@@ -13,9 +13,9 @@ export class StatsService {
 
   async getStats(): Promise<StatsResponse> {
     const [alunos, instrutores, simulados] = await Promise.all([
-      this.prisma.aluno.count(),
-      this.prisma.instrutor.count(),
-      this.prisma.simulado.count(),
+      this.prisma.category.count(),
+      this.prisma.category.count(),
+      this.prisma.question.count(),
     ])
 
     return {
