@@ -1,83 +1,37 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
-import { Simulado } from '@prisma/client'
-import { PrismaService } from '../prisma/prisma.service'
-import { CreateSimuladoDto } from './dto/create-simulado.dto'
-import { UpdateSimuladoDto } from './dto/update-simulado.dto'
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateQuestionDto } from './dto/create-question.dto';
+import { UpdateQuestionDto } from './dto/update-question.dto';
 
 @Injectable()
 export class SimuladosService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private async ensureExists(id: string): Promise<Simulado> {
-    const simulado = await this.prisma.simulado.findUnique({
+  async create(data: CreateQuestionDto) {
+    return this.prisma.question.create({ data });
+  }
+
+  async findAll() {
+    return this.prisma.question.findMany({
+      include: { category: true, answers: true },
+    });
+  }
+
+  async findOne(id: number) {
+    const q = await this.prisma.question.findUnique({
       where: { id },
-    })
-
-    if (!simulado) {
-      throw new NotFoundException(`Simulado with ID "${id}" not found`)
-    }
-
-    return simulado
+      include: { category: true, answers: true },
+    });
+    if (!q) throw new NotFoundException(`Question ${id} not found`);
+    return q;
   }
 
-  create(createSimuladoDto: CreateSimuladoDto) {
-    const { data, ...rest } = createSimuladoDto
-
-    return this.prisma.simulado.create({
-      data: {
-        ...rest,
-        ...(data ? { data } : {}),
-      },
-      include: {
-        aluno: true,
-      },
-    })
+  async update(id: number, data: UpdateQuestionDto) {
+    return this.prisma.question.update({ where: { id }, data });
   }
 
-  findAll() {
-    return this.prisma.simulado.findMany({
-      orderBy: {
-        data: 'desc',
-      },
-      include: {
-        aluno: true,
-      },
-    })
-  }
-
-  async findOne(id: string) {
-    await this.ensureExists(id)
-
-    return this.prisma.simulado.findUnique({
-      where: { id },
-      include: {
-        aluno: true,
-      },
-    })
-  }
-
-  async update(id: string, updateSimuladoDto: UpdateSimuladoDto) {
-    await this.ensureExists(id)
-
-    const { data, ...rest } = updateSimuladoDto
-
-    return this.prisma.simulado.update({
-      where: { id },
-      data: {
-        ...rest,
-        ...(data ? { data } : {}),
-      },
-      include: {
-        aluno: true,
-      },
-    })
-  }
-
-  async remove(id: string) {
-    await this.ensureExists(id)
-
-    return this.prisma.simulado.delete({
-      where: { id },
-    })
+  async remove(id: number) {
+    return this.prisma.question.delete({ where: { id } });
   }
 }

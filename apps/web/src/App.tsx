@@ -26,7 +26,6 @@ export default function App() {
             <Link to="/quiz/demo">Quiz</Link>
             <Link to="/result">Result</Link>
             <Link to="/progresso">Progresso</Link>
-            <Link to="/debug">/debug</Link>
           </nav>
         </header>
 
@@ -41,8 +40,6 @@ export default function App() {
                 <Route path="/quiz/:slug" element={<SafeRoute><Quiz/></SafeRoute>} />
                 <Route path="/result" element={<SafeRoute><Result/></SafeRoute>} />
                 <Route path="/progresso" element={<SafeRoute><Progresso/></SafeRoute>} />
-                <Route path="/debug" element={<SafeRoute><DebugHub/></SafeRoute>} />
-                <Route path="/debug/raw" element={<Debug/>} />
                 <Route path="*" element={<div style={{padding:16}}>404</div>} />
               </Routes>
             </Suspense>

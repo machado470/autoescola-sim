@@ -6,22 +6,22 @@ export class SimulatorService {
   constructor(private prisma: PrismaService) {}
 
   create(data: any) {
-    return this.prisma.simulado.create({ data });
+    return this.prisma.question.create({ data });
   }
 
   findAll() {
-    return this.prisma.simulado.findMany();
+    return this.prisma.question.findMany();
   }
 
   findOne(id: number) {
-    return this.prisma.simulado.findUnique({ where: { id } });
+    return this.prisma.question.findUnique({ where: { id } });
   }
 
   update(id: number, data: any) {
-    return this.prisma.simulado.update({ where: { id }, data });
+    return this.prisma.question.update({ where: { id }, data });
   }
 
   remove(id: number) {
-    return this.prisma.simulado.delete({ where: { id } });
+    return this.prisma.question.delete({ where: { id } });
   }
 }

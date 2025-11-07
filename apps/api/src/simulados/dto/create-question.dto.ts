@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer'
 import { IsDate, IsInt, IsNotEmpty, IsOptional, IsUUID, Min } from 'class-validator'
 
-export class CreateSimuladoDto {
+export class CreateQuestionDto {
   @IsUUID()
   @IsNotEmpty()
   alunoId!: string
