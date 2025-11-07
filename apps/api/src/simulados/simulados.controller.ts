@@ -1,52 +1,28 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  Put,
-  UseGuards,
-} from '@nestjs/common'
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
-import { CreateQuestionDto } from './dto/create-question.dto'
-import { UpdateQuestionDto } from './dto/update-question.dto'
-import { SimuladosService } from './simulados.service'
+import { Controller, Get, Post, Body, Param, Patch, Delete, ParseIntPipe } from '@nestjs/common';
+import { SimuladosService } from './simulados.service';
+import { CreateQuestionDto, UpdateQuestionDto } from './dto';
 
-@ApiTags('Simulados')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('simulados')
 export class SimuladosController {
-  constructor(private readonly simuladosService: SimuladosService) {}
+  constructor(private readonly service: SimuladosService) {}
 
   @Post()
-  create(@Body() createQuestionDto: CreateQuestionDto) {
-    return this.simuladosService.create(createQuestionDto)
-  }
-
-  @Get()
-  findAll() {
-    return this.simuladosService.findAll()
+  create(@Body() dto: CreateQuestionDto) {
+    return this.service.create(dto);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: string) {
-    return this.simuladosService.findOne(id)
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.service.findOne(id);
   }
 
-  @Put(':id')
-  update(
-    @Param('id', ParseIntPipe) id: string,
-    @Body() updateQuestionDto: UpdateQuestionDto,
-  ) {
-    return this.simuladosService.update(id, updateQuestionDto)
+  @Patch(':id')
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateQuestionDto) {
+    return this.service.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: string) {
-    return this.simuladosService.remove(id)
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.service.remove(id);
   }
 }

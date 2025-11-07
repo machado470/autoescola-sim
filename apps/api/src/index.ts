@@ -14,7 +14,7 @@ app.get('/api/health', (_req, res) => res.json({ ok: true }))
 app.get('/api/questions', async (_req, res) => {
   try {
     const questions = await prisma.question.findMany({
-      include: { choices: true },
+      
       orderBy: { createdAt: 'asc' }
     })
     res.json(questions)

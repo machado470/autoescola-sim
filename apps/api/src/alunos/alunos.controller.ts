@@ -10,16 +10,16 @@ export class AlunosController {
   list() { return this.service.list(); }
 
   @Get(':id')
-  get(@Param('id', ParseIntPipe) id: number) { return this.service.get(id); }
+  get(@Param('id') id: string) { return this.service.get(id); }
 
   @Post()
   create(@Body() dto: CreateAlunoDto) { return this.service.create(dto); }
 
   @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateAlunoDto) {
+  update(@Param('id') id: string, @Body() dto: UpdateAlunoDto) {
     return this.service.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) { return this.service.remove(id); }
+  remove(@Param('id') id: string) { return this.service.remove(id); }
 }

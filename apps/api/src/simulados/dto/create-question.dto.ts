@@ -1,21 +1,30 @@
-import { Type } from 'class-transformer'
-import { IsDate, IsInt, IsNotEmpty, IsOptional, IsUUID, Min } from 'class-validator'
+import { IsArray, IsBoolean, IsEnum, IsInt, IsOptional, IsString, IsUrl, Min } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export enum QuestionLevel { FACIL='FACIL', MEDIO='MEDIO', DIFICIL='DIFICIL' }
 
 export class CreateQuestionDto {
-  @IsUUID()
-  @IsNotEmpty()
-  alunoId!: string
+  @IsString()
+  enunciado!: string;
 
-  @IsInt()
-  @Min(0)
-  acertos!: number
+  @IsArray()
+  alternativas!: string[];
 
-  @IsInt()
-  @Min(1)
-  totalQuestoes!: number
+  @IsInt() @Min(0) @Type(() => Number)
+  alternativaCorreta!: number;
 
-  @IsOptional()
-  @Type(() => Date)
-  @IsDate()
-  data?: Date
+  @IsEnum(QuestionLevel)
+  nivel: QuestionLevel = QuestionLevel.FACIL;
+
+  @IsOptional() @IsString()
+  explicacao?: string;
+
+  @IsOptional() @IsUrl()
+  imagemUrl?: string;
+
+  @IsOptional() @IsBoolean() @Type(() => Boolean)
+  isActive?: boolean;
+
+  @IsOptional() @IsInt() @Type(() => Number)
+  categoriaId?: number;
 }
