@@ -22,7 +22,9 @@
     "prisma:seed": "ts-node prisma/seed.ts",
     "import:questions": "tsx scripts/import-questions.ts",
     "db:seed": "pnpm prisma:generate && pnpm prisma:push && pnpm import:questions",
-    "prestart:full": "bash tools/check-docker.sh"
+    "prestart:full": "bash tools/check-docker.sh",
+    "free": "bash ./scripts/free-port.sh 3000",
+    "clean-start": "bash ./scripts/free-port.sh 3000 && pnpm run dev:api"
   },
   "packageManager": "pnpm@8.15.4",
   "devDependencies": {
