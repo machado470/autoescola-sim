@@ -1,3 +1,4 @@
+import { AuthModule } from './auth/auth.module';
 
 import { AlunosModule } from './alunos/alunos.module';
 import { Module } from '@nestjs/common';
@@ -9,7 +10,7 @@ import { SimulatorModule } from './simulator/simulator.module';
 import { QuizModule } from './quiz/quiz.module';
 
 @Module({
-  imports: [ QuizModule, SimulatorModule, PrismaModule, SchoolModule, InstructorModule ],
+  imports: [ AuthModule,  QuizModule, SimulatorModule, PrismaModule, SchoolModule, InstructorModule ],
   controllers: [HealthController],
   providers: [],
 })

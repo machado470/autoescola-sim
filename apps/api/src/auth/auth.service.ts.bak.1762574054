@@ -1,0 +1,45 @@
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
+
+
+@Injectable()
+@Injectable()
+export class AuthService {
+export class AuthService {
+  constructor(private readonly jwt: JwtService) {}
+  constructor(private readonly jwt: JwtService) {}
+
+
+  async login(email: string, password: string) {
+    console.log("[AuthService] login payload:", body);
+  async login(email: string, password: string) {
+    const envEmail = process.env.AUTH_EMAIL || 'demo@local.test';
+    const envEmail = process.env.AUTH_EMAIL || 'demo@local.test';
+    const envPass  = process.env.AUTH_PASSWORD || 'demo123';
+    const envPass  = process.env.AUTH_PASSWORD || 'demo123';
+    if (email !== envEmail || password !== envPass) {
+    if (email !== envEmail || password !== envPass) {
+      throw new UnauthorizedException('Credenciais inválidas');
+      throw new UnauthorizedException('Credenciais inválidas');
+    }
+    }
+    const payload = { sub: 'env-user', email };
+    const payload = { sub: 'env-user', email };
+    const access_token = await this.jwt.signAsync(payload);
+    const access_token = await this.jwt.signAsync(payload);
+    return { access_token };
+    return { access_token };
+  }
+  }
+
+
+  async me(tokenPayload: any) {
+  async me(tokenPayload: any) {
+    return { email: tokenPayload?.email, sub: tokenPayload?.sub };
+    return { email: tokenPayload?.email, sub: tokenPayload?.sub };
+  }
+  }
+}
+}

@@ -1,122 +1,126 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useMemo, useRef, useState } from "react";
-import ProgressBar from "../ui/ProgressBar";
-import { useProgressStore } from "../store/progress";
-import FloatXp from "../ui/FloatXp";
-import { beep } from "../ui/sfx";
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { getRandomByCategory } from '../lib/api';
+import type { Question } from '../lib/api';
+import { saveAttempt } from '../hooks/useLocalProgress';
 
-type Question = { id: string; image?: string; text: string; options: string[]; answer: number; };
-
-const PER_QUESTION_TIME = 20; // segundos
-const XP_PER_HIT = 20;
-
-export default function Quiz() {
-  const { slug = "sinalizacao" } = useParams();
+export default function QuizPage() {
   const nav = useNavigate();
-  const { incXP, setProgress, progress } = useProgressStore();
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const loc = useLocation();
+const { slug } = useParams();
+const catMap = { sinalizacao: 'Sinalização', 'direcao-defensiva': 'Direção Defensiva', mecanica: 'Mecânica' } as const;
+const category = (params.get('cat') as Question['category']) ?? (slug ? catMap[slug as keyof typeof catMap] : undefined);
+
+  const [loading, setLoading] = useState(true);
+  const [qs, setQs] = useState<Question[]>([]);
   const [i, setI] = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
-  const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(PER_QUESTION_TIME);
-  const [showXP, setShowXP] = useState(false);
-  const timerRef = useRef<number | null>(null);
+  const [answers, setAnswers] = useState<Record<number,string>>({});
+  const [t0] = useState(Date.now());
 
   useEffect(() => {
-    import(`../questions/${slug}.json`)
-      .then((mod) => setQuestions(mod.default))
-      .catch(() => setQuestions([]));
-  }, [slug]);
+    (async () => {
+      setLoading(true);
+      try {
+    console.debug('quiz> category:', category);
+    console.debug('quiz> category:', category);
+        const { questions } = await getRandomByCategory(category);
+      // fallback 1: tentar sem acento
+      if ((questions?.length ?? 0) === 0 && category) {
+        const noAccent = category.normalize('NFD').replace(/p{Diacritic}/gu, '');
+        try {
+          const fb1 = await getRandomByCategory(noAccent as any);
+          if ((fb1.questions?.length ?? 0) > 0) {
+            setQs(fb1.questions);
+            setLoading(false);
+            return;
+          }
+        } catch {}
+      }
+      // fallback 2: sem categoria
+      if ((questions?.length ?? 0) === 0) {
+        const fb2 = await getRandomByCategory(undefined);
+        setQs(fb2.questions ?? []);
+        setLoading(false);
+        return;
+      }
+        setQs(questions);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [category]);
 
-  useEffect(() => {
-    if (!questions.length) return;
-    setTimeLeft(PER_QUESTION_TIME);
-    if (timerRef.current) window.clearInterval(timerRef.current);
-    timerRef.current = window.setInterval(() => {
-      setTimeLeft((t) => {
-        if (t <= 1) {
-          window.clearInterval(timerRef.current!);
-          handleAnswer(-1);
-          return PER_QUESTION_TIME;
-        }
-        return t - 1;
-      });
-    }, 1000);
-    return () => { if (timerRef.current) window.clearInterval(timerRef.current); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [i, questions.length]);
+  const q = qs[i];
+  const progress = useMemo(() => ({
+    total: qs.length, current: i+1, done: Object.keys(answers).length
+  }), [qs.length, i, answers]);
 
-  const q = questions[i];
-  const total = questions.length;
-  const quizPct = useMemo(() => Math.round(((i + 1) / Math.max(1,total)) * 100), [i,total]);
-  const timePct = useMemo(() => Math.round((timeLeft / PER_QUESTION_TIME) * 100), [timeLeft]);
-
-  if (!questions.length) return <p className="p-4 text-center">Carregando perguntas...</p>;
-
-  function handleAnswer(optIndex: number) {
-    if (selected !== null) return;
-
-    const right = optIndex === q.answer;
-    setSelected(optIndex);
-
-    if (right) {
-      setScore((s) => s + 1);
-      incXP(XP_PER_HIT);
-      setShowXP(true);
-      setTimeout(() => setShowXP(false), 900);
-      const current = progress[slug as any] ?? 0;
-      setProgress(slug as any, Math.min(100, current + Math.round(100 / total)));
-      beep(true);
-    } else {
-      beep(false);
-    }
-
-    setTimeout(() => {
-      setSelected(null);
-      if (i + 1 < total) setI(i + 1);
-      else nav("/result", { state: { correct: score + (right ? 1 : 0), total, gained: (score + (right ? 1 : 0)) * XP_PER_HIT } });
-    }, 700);
+  function select(altId: string) {
+    if (!q) return;
+    if (answers[q.id]) return; // trava dupla resposta
+    setAnswers(prev => ({ ...prev, [q.id]: altId }));
   }
 
-  return (
-    <div className="mx-auto max-w-md space-y-6">
-      <FloatXp show={showXP} amount={XP_PER_HIT} />
+  function next(){ setI(s => Math.min(s+1, Math.max(0, qs.length-1))); }
+  function prev(){ setI(s => Math.max(s-1, 0)); }
 
-      <header className="flex items-center gap-3">
-        <div className="text-3xl">🟧</div>
-        <h2 className="text-2xl font-extrabold capitalize">{slug}</h2>
+  function finish() {
+    // score
+    let correct = 0;
+    for (const quest of qs) {
+      const sel = answers[quest.id];
+      const hit = quest.alternatives.find(a => a.id === sel)?.isCorrect === true;
+      if (hit) correct++;
+    }
+    const attempt = {
+      id: crypto.randomUUID(),
+      category: (qs[0]?.category ?? (category as any)) || 'Sinalização',
+      correct,
+      total: qs.length || 50,
+      startedAt: new Date(t0).toISOString(),
+      finishedAt: new Date().toISOString(),
+    };
+    saveAttempt(attempt);
+    nav('/result', { state: attempt });
+  }
+
+  if (loading) return <div className="p-8">Carregando questões…</div>;
+  if (!qs.length) return <div className="p-8">Sem questões.</div>;
+
+  return (
+    <div className="max-w-3xl mx-auto p-6 space-y-6">
+      <header className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold">Simulado — {qs[0]?.category}</h1>
+          <p className="text-sm text-gray-500">{progress.current}/{progress.total} • respondidas {progress.done}</p>
+        </div>
+        <button onClick={finish} className="px-4 py-2 rounded bg-blue-600 text-white">Finalizar</button>
       </header>
 
-      <ProgressBar value={quizPct} label={`Pergunta ${i + 1} de ${total}`} />
-      <div className="mt-2">
-        <ProgressBar value={timePct} animated label={`Tempo: ${timeLeft}s`} />
-      </div>
+      <article>
+        <h2 className="text-lg font-medium mb-3">{q.text}</h2>
+        <ul className="space-y-2">
+          {q.alternatives.map(a => {
+            const selected = answers[q.id] === a.id;
+            return (
+              <li key={a.id}>
+                <button
+                  onClick={() => select(a.id)}
+                  disabled={Boolean(answers[q.id])}
+                  className={`w-full text-left p-3 rounded border ${selected ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'} disabled:opacity-70`}
+                >
+                  {a.text}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </article>
 
-      <div className="flex justify-center text-6xl mt-2">{q.image}</div>
-      <h3 className="text-xl font-bold text-center">{q.text}</h3>
-
-      <div className="space-y-3">
-        {q.options.map((opt, idx) => {
-          const isSel = selected === idx;
-          const isRight = selected !== null && idx === q.answer;
-          const isWrongSel = selected !== null && isSel && !isRight;
-
-          let state = "border-slate-200 bg-white";
-          if (isRight && selected !== null) state = "border-green-500 bg-green-50";
-          if (isWrongSel) state = "border-red-500 bg-red-50";
-
-          return (
-            <button
-              key={idx}
-              onClick={() => handleAnswer(idx)}
-              className={`w-full border rounded-2xl px-4 py-3 text-left transition ${state} ${isWrongSel ? "animate-shake" : ""}`}
-              disabled={selected !== null}
-            >
-              {opt}
-            </button>
-          );
-        })}
-      </div>
+      <footer className="flex gap-3">
+        <button onClick={prev} className="px-3 py-2 rounded border">Anterior</button>
+        <button onClick={next} className="px-3 py-2 rounded border">Próxima</button>
+      </footer>
     </div>
   );
 }

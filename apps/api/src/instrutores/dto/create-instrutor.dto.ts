@@ -3,7 +3,7 @@ import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches } from 'class-valida
 export class CreateInstrutorDto {
   @IsString()
   @IsNotEmpty()
-  nome: string
+  nome!: string;
 
   @IsEmail()
   email!: string

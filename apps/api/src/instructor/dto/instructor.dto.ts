@@ -3,13 +3,13 @@ import { IsString, Length } from 'class-validator';
 export class CreateInstructorDto {
   @IsString()
   @Length(2, 100)
-  name: string;
+  name!: string;
 
   @IsString()
-  license: string;
+  license!: string;
 
   @IsString()
-  schoolId: string;
+  schoolId!: string;
 }
 
 export class UpdateInstructorDto {

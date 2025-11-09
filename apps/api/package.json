@@ -9,7 +9,8 @@
     "start": "node --enable-source-maps dist/main.js",
     "start:dev": "nest start --watch",
     "smoke:quiz": "bash ../../scripts/smoke-quiz.sh",
-    "smoke:quiz:loop": "bash ../../scripts/smoke-quiz-loop.sh 5"
+    "smoke:quiz:loop": "bash ../../scripts/smoke-quiz-loop.sh 5",
+    "smoke:auth": "cd ../../ && /usr/bin/bash scripts/smoke-auth.sh"
   },
   "dependencies": {
     "@nestjs/common": "11.1.6",
@@ -25,6 +26,7 @@
     "class-validator": "^0.14.2",
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",

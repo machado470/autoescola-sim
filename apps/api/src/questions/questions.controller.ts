@@ -15,8 +15,6 @@ export class QuestionsController {
     return this.service.getRandom({
       limit,
       difficulty,
-      excludeIds: query.excludeIds,
-      includeAnswers: query.includeAnswers,
     });
   }
 }
