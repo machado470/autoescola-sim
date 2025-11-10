@@ -1,17 +1,5 @@
-import './ui/theme.css';
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./index.css";
-import App from "./App";
-
-const root = document.getElementById("root");
-if (!root) {
-  document.body.innerHTML = "<pre>root não encontrado no index.html</pre>";
-  throw new Error("Elemento #root não existe");
-}
-
-ReactDOM.createRoot(root).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+function App(){ return <div style={{padding:24,fontFamily:"sans-serif"}}>OK — Web carregado</div>; }
+const root = document.getElementById("root")!;
+ReactDOM.createRoot(root).render(<App />);

@@ -37,9 +37,9 @@ export default function Quiz() {
       try {
         setLoading(true);
         const id = slugToCategoryId(slug);
-        let url = ;
+  let url = `${import.meta.env.VITE_API_URL}/quiz/random-by-category?categoryId=${categoryId}        let url = ;take=${take}`;
         if (id > 0) {
-          url = ;
+    url = `${import.meta.env.VITE_API_URL ?? "http://localhost:3000"}/quiz/random-by-category?categoryId=${categoryId}          url = ;take=${take}`;
         }
         const res = await fetch(url);
         if (!res.ok) throw new Error();

@@ -57,7 +57,7 @@ async function main() {
     const cat = await upsertCategory(q.category);
     const answers = q.options.map((text, idx) => ({
       text,
-      correct: idx === q.correctIndex,
+      isCorrect: idx === q.correctIndex,
     }));
     await prisma.question.create({
       data: {
