@@ -1,126 +1,117 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { getRandomByCategory } from '../lib/api';
-import type { Question } from '../lib/api';
-import { saveAttempt } from '../hooks/useLocalProgress';
+import React, { useEffect, useMemo, useState } from "react";
+import ProgressBar from "../ui/ProgressBar";
+import ConeMascot from "../ui/ConeMascot";
+import RouteTransition from "../ui/RouteTransition";
 
-export default function QuizPage() {
-  const nav = useNavigate();
-  const loc = useLocation();
-const { slug } = useParams();
-const catMap = { sinalizacao: 'Sinalização', 'direcao-defensiva': 'Direção Defensiva', mecanica: 'Mecânica' } as const;
-const category = (params.get('cat') as Question['category']) ?? (slug ? catMap[slug as keyof typeof catMap] : undefined);
+type Question = {
+  id: number;
+  statement: string;
+  image?: string | null;
+  categoryId: number;
+};
 
-  const [loading, setLoading] = useState(true);
+const slugToCategoryId = (slug: string | null) => {
+  if (!slug) return 0;
+  const s = slug.toLowerCase();
+  if (s.includes("sinaliz")) return 1;
+  if (s.includes("dire")) return 2;         // direcao-defensiva
+  if (s.includes("mec")) return 3;          // mecanica
+  return 0;
+};
+
+export default function Quiz() {
   const [qs, setQs] = useState<Question[]>([]);
-  const [i, setI] = useState(0);
-  const [answers, setAnswers] = useState<Record<number,string>>({});
-  const [t0] = useState(Date.now());
+  const [step, setStep] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  const slug = useMemo(() => {
+    const parts = window.location.pathname.split("/").filter(Boolean);
+    // /quiz  |  /quiz/sinalizacao
+    return parts.length >= 2 ? parts[1] : null;
+  }, []);
+
+  const total = 5; // como no mock das imagens
 
   useEffect(() => {
     (async () => {
-      setLoading(true);
       try {
-    console.debug('quiz> category:', category);
-    console.debug('quiz> category:', category);
-        const { questions } = await getRandomByCategory(category);
-      // fallback 1: tentar sem acento
-      if ((questions?.length ?? 0) === 0 && category) {
-        const noAccent = category.normalize('NFD').replace(/p{Diacritic}/gu, '');
-        try {
-          const fb1 = await getRandomByCategory(noAccent as any);
-          if ((fb1.questions?.length ?? 0) > 0) {
-            setQs(fb1.questions);
-            setLoading(false);
-            return;
-          }
-        } catch {}
-      }
-      // fallback 2: sem categoria
-      if ((questions?.length ?? 0) === 0) {
-        const fb2 = await getRandomByCategory(undefined);
-        setQs(fb2.questions ?? []);
-        setLoading(false);
-        return;
-      }
-        setQs(questions);
+        setLoading(true);
+        const id = slugToCategoryId(slug);
+        let url = ;
+        if (id > 0) {
+          url = ;
+        }
+        const res = await fetch(url);
+        if (!res.ok) throw new Error();
+        const data: Question[] = await res.json();
+        setQs(Array.isArray(data) ? data.slice(0, total) : []);
+        setStep(0);
+      } catch (e) {
+        console.error(e);
+        setQs([]);
       } finally {
         setLoading(false);
       }
     })();
-  }, [category]);
+  }, [slug]);
 
-  const q = qs[i];
-  const progress = useMemo(() => ({
-    total: qs.length, current: i+1, done: Object.keys(answers).length
-  }), [qs.length, i, answers]);
-
-  function select(altId: string) {
-    if (!q) return;
-    if (answers[q.id]) return; // trava dupla resposta
-    setAnswers(prev => ({ ...prev, [q.id]: altId }));
-  }
-
-  function next(){ setI(s => Math.min(s+1, Math.max(0, qs.length-1))); }
-  function prev(){ setI(s => Math.max(s-1, 0)); }
-
-  function finish() {
-    // score
-    let correct = 0;
-    for (const quest of qs) {
-      const sel = answers[quest.id];
-      const hit = quest.alternatives.find(a => a.id === sel)?.isCorrect === true;
-      if (hit) correct++;
-    }
-    const attempt = {
-      id: crypto.randomUUID(),
-      category: (qs[0]?.category ?? (category as any)) || 'Sinalização',
-      correct,
-      total: qs.length || 50,
-      startedAt: new Date(t0).toISOString(),
-      finishedAt: new Date().toISOString(),
-    };
-    saveAttempt(attempt);
-    nav('/result', { state: attempt });
-  }
-
-  if (loading) return <div className="p-8">Carregando questões…</div>;
-  if (!qs.length) return <div className="p-8">Sem questões.</div>;
+  const current = qs[step];
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
-      <header className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold">Simulado — {qs[0]?.category}</h1>
-          <p className="text-sm text-gray-500">{progress.current}/{progress.total} • respondidas {progress.done}</p>
-        </div>
-        <button onClick={finish} className="px-4 py-2 rounded bg-blue-600 text-white">Finalizar</button>
-      </header>
+    <RouteTransition>
+      <div className="screen">
+        <header className="screen-header">
+          <div className="brand">
+            <ConeMascot size={72} />
+            <h1 className="title">Quiz</h1>
+          </div>
+          <div className="progress-wrap">
+            <div className="subtitle">Pergunta {Math.min(step + 1, total)} de {total}</div>
+            <ProgressBar value={((step + 1) / total) * 100} />
+          </div>
+        </header>
 
-      <article>
-        <h2 className="text-lg font-medium mb-3">{q.text}</h2>
-        <ul className="space-y-2">
-          {q.alternatives.map(a => {
-            const selected = answers[q.id] === a.id;
-            return (
-              <li key={a.id}>
-                <button
-                  onClick={() => select(a.id)}
-                  disabled={Boolean(answers[q.id])}
-                  className={`w-full text-left p-3 rounded border ${selected ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'} disabled:opacity-70`}
-                >
-                  {a.text}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </article>
+        <main className="card vstack" style={{ gap: 16, alignItems: "center" }}>
+          {/* imagem central (mock STOP) quando não vier image da API */}
+          <div style={{
+            width: 260, height: 260, display: "grid", placeItems: "center",
+            background: "#fff7ed", borderRadius: 28
+          }}>
+            {current?.image
+              ? <img src={current.image} alt="ilustração" style={{ maxWidth: "80%", maxHeight: "80%" }} />
+              : <span style={{ fontSize: 120 }}>🛑</span>}
+          </div>
 
-      <footer className="flex gap-3">
-        <button onClick={prev} className="px-3 py-2 rounded border">Anterior</button>
-        <button onClick={next} className="px-3 py-2 rounded border">Próxima</button>
-      </footer>
-    </div>
+          <div className="quiz-qtitle" style={{ textAlign: "center" }}>
+            {current?.statement ?? "O que esse sinal indica?"}
+          </div>
+
+          {/* Alternativas — nas imagens são 3 botões grandes */}
+          <div className="vstack" style={{ gap: 14, width: "100%" }}>
+            <button className="answer">Parada obrigatória</button>
+            <button className="answer">Travessia de pedestres</button>
+            <button className="answer">Siga em frente</button>
+          </div>
+
+          {loading && <div className="subtitle" style={{ marginTop: 12 }}>Carregando…</div>}
+        </main>
+
+        <footer className="screen-footer">
+          <div className="hstack" style={{ gap: 12, justifyContent: "space-between" }}>
+            <button className="btn secondary" onClick={() => setStep((s) => Math.max(0, s - 1))}>Voltar</button>
+            <button
+              className="btn primary"
+              onClick={() => setStep((s) => Math.min(total - 1, s + 1))}
+            >
+              Próxima
+            </button>
+          </div>
+        </footer>
+      </div>
+    </RouteTransition>
   );
 }
+TSX
+
+# 3) Sobe o front
+pnpm --filter web run dev

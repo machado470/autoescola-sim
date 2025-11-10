@@ -1,0 +1,20 @@
+/* App theme (placeholder) */
+:root{
+  --brand:#27e28a;
+  --bg:#0b0b10;
+  --fg:#e9eef3;
+  --muted:#a8b0b8;
+}
+html,body,#root{height:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--fg);
+  font-family: Inter, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+a{color:var(--brand); text-decoration:none}
+button{
+  border:0; border-radius:12px; padding:10px 16px; cursor:pointer;
+  background:var(--brand); color:#0b0b10; font-weight:600;
+}
+.container{max-width:1080px; margin:0 auto; padding:16px}

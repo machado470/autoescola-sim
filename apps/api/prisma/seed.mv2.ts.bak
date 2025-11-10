@@ -1,0 +1,32 @@
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
+
+async function main() {
+  console.log("🌱 Seed MV2 iniciado...");
+
+  // Categorias
+  await prisma.category.createMany({
+    data: [
+      { id: 1, name: "Sinalizacao" },
+      { id: 2, name: "Direcao Defensiva" },
+      { id: 3, name: "Mecanica" }
+    ],
+    skipDuplicates: true
+  });
+
+  // Perguntas: somente statement + categoryId
+  await prisma.question.createMany({
+    data: [
+      { statement: "Qual cor indica parada obrigatória?", categoryId: 1 },
+      { statement: "Manter distância de segurança reduz o quê?", categoryId: 2 },
+      { statement: "Quando revisar o sistema de freios do veículo?", categoryId: 3 }
+    ],
+    skipDuplicates: true
+  });
+
+  console.log("✅ Seed concluído.");
+}
+
+main()
+  .catch((e) => { console.error("❌ Erro no seed:", e); process.exit(1); })
+  .finally(async () => { await prisma.$disconnect(); });

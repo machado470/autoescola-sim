@@ -1,0 +1,35 @@
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
+
+async function main() {
+  // Categorias (id é a chave única no seu schema)
+  await prisma.category.createMany({
+    data: [
+      { id: 1, name: "Sinalizacao" },
+      { id: 2, name: "Direcao Defensiva" },
+      { id: 3, name: "Mecanica" }
+    ],
+    skipDuplicates: true
+  });
+
+  // Perguntas (usa "statement", não "question")
+  await prisma.question.createMany({
+    data: [
+      {
+        statement: "Qual cor indica parada obrigatória?",
+        options: ["Vermelho", "Verde", "Azul", "Amarelo"],
+        correctAnswer: "Vermelho",
+        categoryId: 1
+      },
+      {
+        statement: "Manter distância de segurança reduz o quê?",
+        options: ["Risco de colisão", "Consumo", "Confiança", "Velocidade"],
+        correctAnswer: "Risco de colisão",
+        categoryId: 2
+      }
+    ],
+    skipDuplicates: true
+  });
+}
+
+main().finally(() => prisma.$disconnect());
