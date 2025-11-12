@@ -1,8 +1,8 @@
 import { Prisma } from '@prisma/client';
 import { CreateQuestionDto, UpdateQuestionDto } from '../dto';
 
-export function mapCreateDtoToPrisma(data: CreateQuestionDto): Prisma.QuestionCreateInput {
-  const base: Prisma.QuestionCreateInput = {
+export function mapCreateDtoToPrisma(data: CreateQuestionDto): any {
+  const base: any = {
     enunciado: data.enunciado,
     alternativas: data.alternativas as any,
     alternativaCorreta: data.alternativaCorreta,
@@ -25,8 +25,8 @@ export function mapCreateDtoToPrisma(data: CreateQuestionDto): Prisma.QuestionCr
   return base;
 }
 
-export function mapUpdateDtoToPrisma(data: UpdateQuestionDto): Prisma.QuestionUpdateInput {
-  const upd: Prisma.QuestionUpdateInput = {} as any;
+export function mapUpdateDtoToPrisma(data: UpdateQuestionDto): any {
+  const upd: any = {} as any;
 
   if (data.enunciado !== undefined) (upd as any).enunciado = data.enunciado;
   if (data.alternativas !== undefined) (upd as any).alternativas = data.alternativas as any;

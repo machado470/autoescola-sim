@@ -1,22 +1,28 @@
 import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  const password = await bcrypt.hash('admin', 10);
-
+  // Usuário admin
   const admin = await prisma.user.upsert({
     where: { email: 'admin@local' },
     update: {},
     create: {
-      name: 'Administrador',
       email: 'admin@local',
-      password,
-      role: 'ADMIN',
+      password: 'admin',
+      name: 'Administrador',
     },
   });
 
-  console.log('✅ Usuário admin criado ou existente:', admin.email);
+  // 50 perguntas de teste
+  const questions = Array.from({ length: 50 }).map((_, i) => ({
+    enunciado: `Pergunta ${i + 1}: o que significa o sinal número ${i + 1}?`,
+    alternativas: ['A', 'B', 'C', 'D'].map((letra) => `${letra}) alternativa ${letra}`),
+    correta: 'A',
+    categoriaId: 1,
+  }));
+
+  await prisma.question.createMany({ data: questions });
+  console.log(`✅ Seed concluído com ${questions.length} perguntas e usuário ${admin.email}`);
 }
 
 main()
@@ -24,4 +30,4 @@ main()
     console.error(e);
     process.exit(1);
   })
-  .finally(() => prisma.$disconnect());
+  .finally(async () => await prisma.$disconnect());

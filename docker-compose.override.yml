@@ -1,38 +1,16 @@
 services:
-  api:
-    container_name: autoescola_api
-    build:
-      context: .
-      dockerfile: infra/api.Dockerfile
-    restart: unless-stopped
-    environment:
-      NODE_ENV: development
-      PORT: 3000
-      DATABASE_URL: postgresql://postgres:postgres@autoescola_postgres:5432/autoescola?schema=public
-      TS_NODE_TRANSPILE_ONLY: "1"
-      NODE_OPTIONS: "--enable-source-maps"
-    depends_on:
-      autoescola_postgres:
-        condition: service_healthy
-    ports:
-      - "3000:3000"
-    working_dir: /app
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/apps/api/node_modules
-    command: >
-      sh -lc "
-        corepack enable && corepack prepare pnpm@9.0.0 --activate &&
-        pnpm install --silent &&
-        pnpm prisma generate &&
-        pnpm prisma migrate deploy &&
-        cd apps/api &&
-        pnpm install --silent &&
-        pnpm nest start --watch
-      "
+  postgres:
+    # Se o serviço no seu compose tiver outro nome, troque aqui para o mesmo nome.
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
+      test: ["CMD-SHELL","pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  api:
+    environment:
+      # Use SEMPRE o nome do serviço como host (aqui: 'postgres')
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/autoescola
+    depends_on:
+      postgres:
+        condition: service_healthy

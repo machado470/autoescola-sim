@@ -5,15 +5,15 @@ import { AuthService } from '../auth.service';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly authService: AuthService) {
-    super({ usernameField: 'email', passwordField: 'senha' });
+  constructor(private authService: AuthService) {
+    super({ usernameField: 'email' }); // 👈 força uso de "email" no corpo
   }
 
-  // retorna o usuário autenticado; nada de validateUser
-  async validate(email: string, senha: string) {
-    const result: any = await this.authService.login(email, senha);
-    const user = result?.user || result?.usuario || result?.data || null;
-    if (!user) throw new UnauthorizedException();
+  async validate(email: string, password: string): Promise<any> {
+    console.log('📩 LocalStrategy.validate =>', { email, password });
+    const user = await this.authService.validateUser(email, password);
+    console.log('🔍 Resultado validateUser =>', user);
+    if (!user) throw new UnauthorizedException('Credenciais inválidas');
     return user;
   }
 }

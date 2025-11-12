@@ -1,0 +1,20 @@
+services:
+  api:
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # ajuste usuario/senha/db se os teus forem outros
+      DATABASE_URL: postgresql://postgres:postgres@autoescola_postgres:5432/autoescola
+      JWT_SECRET: devsecret
+    depends_on:
+      autoescola_postgres:
+        condition: service_healthy
+    command: >
+      sh -lc "
+        echo '[api] esperando Postgres...'; 
+        until nc -z autoescola_postgres 5432; do sleep 0.5; done;
+        echo '[api] aplicando migrations...';
+        npx prisma migrate deploy || npx prisma db push;
+        echo '[api] iniciando...';
+        node dist/main.js
+      "

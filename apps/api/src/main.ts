@@ -11,7 +11,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   app.getHttpAdapter().get('/', (req, res) => res.json({ service: 'autoescola-api', status: 'ok' }));
-  await app.listen(parseInt(process.env.PORT||'3000',10));
+  await app.listen(parseInt(process.env.PORT ?? "3000"), "0.0.0.0");
   console.log('🚀 API running on http://localhost:3000');
 }
 bootstrap();
