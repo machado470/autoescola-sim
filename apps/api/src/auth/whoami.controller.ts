@@ -1,11 +1,11 @@
-import { Controller, Get, Request, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { Controller, Get, Req, UseGuards } from "@nestjs/common";
+import { JwtAuthGuard } from "./jwt-auth.guard";
 
-@Controller('auth')
-export class WhoamiController {
+@Controller("auth")
+export class WhoAmIController {
   @UseGuards(JwtAuthGuard)
-  @Get('whoami')
-  whoami(@Request() req: any) {
+  @Get("whoami")
+  whoAmI(@Req() req: any) {
     return req.user;
   }
 }

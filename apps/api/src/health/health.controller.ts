@@ -1,10 +1,12 @@
 import { Controller, Get } from '@nestjs/common';
 
-@Controller('health')
+@Controller()
 export class HealthController {
-  @Get()
-  check() {
-    // Simples resposta de status sem depender do banco
-    return { status: 'ok', timestamp: new Date().toISOString() };
+  @Get('health')
+  getHealth() {
+    return {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+    };
   }
 }

@@ -1,4 +1,3 @@
-version: "3.9"
 
 services:
   postgres:
@@ -9,15 +8,10 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: autoescola
-    ports:
-      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d autoescola || exit 1"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+    ports:
+      - "5432:5432"
 
   api:
     build:
@@ -25,15 +19,16 @@ services:
       dockerfile: Dockerfile
     container_name: autoescola_api
     depends_on:
-      postgres:
-        condition: service_healthy
-    restart: always
+      - postgres
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/autoescola
       NODE_ENV: development
     ports:
       - "3000:3000"
-    # sem volumes aqui pra NÃO sobrescrever o dist dentro da imagem
+    command: ["node", "apps/api/dist/main.js"]
+    volumes:
+      - .:/app
+      - /app/node_modules
 
 volumes:
   pgdata:

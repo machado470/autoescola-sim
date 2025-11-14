@@ -1,37 +1,30 @@
-FROM node:20-bookworm-slim AS deps
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
-WORKDIR /app
+FROM node:20-bookworm-slim AS base
 
-RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
+RUN apt-get update && apt-get install -y openssl libssl3 \
+  && corepack enable && corepack prepare pnpm@9.12.3 --activate
+
+WORKDIR /app
 
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/api/package.json apps/api/package.json
+COPY apps/api/prisma apps/api/prisma
 
-RUN pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm-store,target=/root/.pnpm-store pnpm install --frozen-lockfile
+
+FROM base AS build
 
 COPY . .
+COPY --from=base /app/node_modules /app/node_modules
 
-RUN pnpm -C apps/api prisma generate || true
-RUN pnpm -C apps/api build
+RUN npx prisma generate --schema=apps/api/prisma/schema.prisma \
+  && pnpm --filter ./apps/api build
 
-# --- runtime ---
-FROM node:20-bookworm-slim AS runner
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+FROM base AS runtime
+
+COPY --from=build /app/apps/api/dist /app/apps/api/dist
+COPY --from=build /app/apps/api/prisma /app/apps/api/prisma
+COPY --from=build /app/node_modules /app/node_modules
+
 WORKDIR /app
-ENV NODE_ENV=production
-ENV PORT=3000
 
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/api/dist ./apps/api/dist
-COPY --from=deps /app/apps/api/package.json ./apps/api/package.json
-
-# garante prisma client no runtime (caso schema mude)
-RUN npx prisma generate || true
-
-EXPOSE 3000
 CMD ["node", "apps/api/dist/main.js"]
