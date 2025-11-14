@@ -1,2 +1,7 @@
-import AppRoutes from "./routes";
-export default function App() { return <AppRoutes />; }
+import { LoginPage } from "./pages/Login";
+
+function App() {
+  return <LoginPage />;
+}
+
+export default App;
