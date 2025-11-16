@@ -1,55 +1,43 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-
-type FindParams = { q?: string; categoryId?: number; limit?: number; offset?: number };
-type RandomParams = { categoryId?: number; limit?: number 
-  difficulty?: any;
-};
+import { CreateQuestionDto } from './dto/create-question.dto';
+import { UpdateQuestionDto } from './dto/update-question.dto';
 
 @Injectable()
 export class QuestionsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async find(params: FindParams = {}) {
-    const take = typeof params.limit === 'number' ? params.limit : undefined;
-    const skip = typeof params.offset === 'number' ? params.offset : undefined;
-
-    let rows: any[] = [];
-    try {
-      rows = await (this.prisma as any).question.findMany({
-        where: {
-          ...(params.q ? { statement: { contains: params.q, mode: 'insensitive' } } : {}),
-          ...(params.categoryId ? { categoryId: params.categoryId } : {}),
-        },
-        orderBy: { createdAt: 'desc' },
-        take,
-        skip,
-      });
-    } catch {
-      rows = [];
-    }
-
-    return (rows || []).map((q: any) => ({
-      id: q?.id,
-      statement: q?.statement ?? q?.enunciado ?? '',
-      image: q?.image ?? q?.imagemUrl ?? null,
-      categoryId: q?.categoryId ?? q?.categoriaId ?? null,
-      difficulty: undefined,
-      choices: [],
-    }));
+  create(dto: CreateQuestionDto) {
+    return this.prisma.question.create({ data: dto });
   }
 
-  async getRandom(params: RandomParams = {}) {
-    const limit = typeof params.limit === 'number' && params.limit > 0 ? params.limit : 10;
-    const all = await this.find({ categoryId: params.categoryId, limit: undefined, offset: undefined });
+  findAll() {
+    return this.prisma.question.findMany({
+      orderBy: { id: 'asc' },
+    });
+  }
 
-    // shuffle simples e take
-    const shuffled = [...all]
-      .map((v: any) => [Math.random(), v] as const)
-      .sort((a, b) => a[0] - b[0])
-      .map(([, v]) => v)
-      .slice(0, limit);
+  findOne(id: number) {
+    return this.prisma.question.findUnique({ where: { id } });
+  }
 
-    return shuffled;
+  update(id: number, dto: UpdateQuestionDto) {
+    return this.prisma.question.update({
+      where: { id },
+      data: dto,
+    });
+  }
+
+  remove(id: number) {
+    return this.prisma.question.delete({ where: { id } });
+  }
+
+  async randomExam(size = 30) {
+    const total = await this.prisma.question.count();
+    const take = Math.min(size, total);
+    return this.prisma.question.findMany({
+      take,
+      orderBy: { id: 'asc' },
+    });
   }
 }

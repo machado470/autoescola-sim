@@ -8,23 +8,24 @@ generator client {
 }
 
 model Category {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
   questions Question[]
+  students  Student[]
+  instructors Instructor[]
 }
 
-
 model Question {
-  id           Int      @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   statement    String
   image        String?
   alternatives String[]
   correct      String
   categoryId   Int
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
   answers      Answer[]
-  category     Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category     Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 }
 
 model Answer {
@@ -56,13 +57,4 @@ model Instructor {
   name      String   @unique
   schoolId  Int
   school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-}
-
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
