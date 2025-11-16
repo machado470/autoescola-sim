@@ -1,38 +1,17 @@
-const API_URL = "http://127.0.0.1:3000";
+import axios from "axios";
+import { getToken } from "./auth";
 
-export type LoginResponse = {
-  access_token: string;
-};
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000",
+});
 
-export type WhoAmIResponse = {
-  id: number;
-  email: string;
-};
-
-export async function login(email: string, password: string): Promise<LoginResponse> {
-  const res = await fetch(`${API_URL}/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`Login falhou (${res.status}): ${body}`);
+api.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) {
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${token}`;
   }
+  return config;
+});
 
-  return res.json();
-}
-
-export async function whoAmI(token: string): Promise<WhoAmIResponse> {
-  const res = await fetch(`${API_URL}/auth/whoami`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`whoami falhou (${res.status}): ${body}`);
-  }
-
-  return res.json();
-}
+export default api;
