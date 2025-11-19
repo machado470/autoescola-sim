@@ -1,26 +1,15 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Home from "./pages/Home";
 import Login from "./pages/Login";
-import ProtectedRoute from "./pages/ProtectedRoute";
-import Dashboard from "./pages/Dashboard";
-import Simulados from "./pages/Simulados";
-import Questoes from "./pages/Questoes";
-import Alunos from "./pages/Alunos";
-import Relatorios from "./pages/Relatorios";
+import Simulado from "./pages/Simulado";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-
-        <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/simulados" element={<Simulados />} />
-          <Route path="/questoes" element={<Questoes />} />
-          <Route path="/alunos" element={<Alunos />} />
-          <Route path="/relatorios" element={<Relatorios />} />
-        </Route>
-
+        <Route path="/simulado" element={<Simulado />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
