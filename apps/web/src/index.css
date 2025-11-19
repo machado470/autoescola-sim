@@ -1,7 +1,10 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@layer base {
-  html, body, #root { height: 100%; }
-  body { @apply bg-white text-slate-900 antialiased; }
-  a { @apply hover:underline; }
+@import "./design/index.css";
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
 }

@@ -10,7 +10,7 @@ export class QuizService {
     const chosen = ids.map(i => i.id).sort(() => Math.random() - 0.5).slice(0, limit);
     return this.prisma.question.findMany({
       where: { id: { in: chosen } },
-      include: { answers: { select: { id: true, text: true, isCorrect: true } } },
+      include: { answers: { select: { id: true, text: true, correct: true } } },
       orderBy: { id: 'asc' },
     });
   }
@@ -23,7 +23,7 @@ export class QuizService {
     const chosen = ids.map(i => i.id).sort(() => Math.random() - 0.5).slice(0, limit);
     return this.prisma.question.findMany({
       where: { id: { in: chosen }, categoryId },
-      include: { answers: { select: { id: true, text: true, isCorrect: true } } },
+      include: { answers: { select: { id: true, text: true, correct: true } } },
       orderBy: { id: 'asc' },
     });
   }

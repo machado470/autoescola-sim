@@ -1,0 +1,13 @@
+:root[data-theme="dark"] {
+  --color-bg: #030712;
+  --color-surface: #0a0f1c;
+
+  --color-text: #f8fafc;
+  --color-text-secondary: #94a3b8;
+
+  --color-card: #0d1527;
+  --color-border: #1e293b;
+
+  --color-primary: #22c55e;
+  --color-primary-hover: #16a34a;
+}
