@@ -22,7 +22,6 @@ export function getUser(): AuthUser | null {
   if (typeof window === "undefined") return null;
   const raw = localStorage.getItem(USER_KEY);
   if (!raw) return null;
-
   try {
     return JSON.parse(raw) as AuthUser;
   } catch {
@@ -30,7 +29,7 @@ export function getUser(): AuthUser | null {
   }
 }
 
-export function clearAuth() {
+export function logout() {
   if (typeof window === "undefined") return;
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);

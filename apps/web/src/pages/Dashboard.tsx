@@ -1,142 +1,48 @@
-import { useNavigate, NavLink } from "react-router-dom";
-
-type AuthUser = {
-  id: number;
-  email: string;
-  name?: string | null;
-};
-
-function getUser(): AuthUser | null {
-  try {
-    const raw = localStorage.getItem("autoescola_user");
-    if (!raw) return null;
-    return JSON.parse(raw) as AuthUser;
-  } catch {
-    return null;
-  }
-}
+import { getUser, getToken } from "../lib/auth";
+import { Navigate } from "react-router-dom";
 
 export default function Dashboard() {
-  const navigate = useNavigate();
   const user = getUser();
+  const token = getToken();
 
-  function handleLogout() {
-    localStorage.removeItem("autoescola_token");
-    localStorage.removeItem("autoescola_user");
-    navigate("/login");
-  }
-
-  const menuItems = [
-    { label: "Visão geral", to: "/" },
-    { label: "Simulados", to: "/simulados" },
-    { label: "Questões", to: "/questoes" },
-    { label: "Alunos", to: "/alunos" },
-    { label: "Relatórios", to: "/relatorios" },
-  ];
+  if (!user || !token) return <Navigate to="/login" replace />;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50 flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col">
-        <div className="px-5 py-4 border-b border-slate-800">
-          <h1 className="text-xl font-bold tracking-tight">
-            AutoEscola <span className="text-emerald-400">Sim</span>
-          </h1>
-          <p className="text-xs text-slate-400 mt-1">Painel de controle</p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-[#030712] text-white px-4">
+      <div className="w-full max-w-md bg-[#0A0F1C] p-10 rounded-3xl shadow-[0_0_40px_#00112277]">
 
-        <nav className="flex-1 px-3 py-4 space-y-1 text-sm">
-          {menuItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === "/"}
-              className={({ isActive }) =>
-                [
-                  "block px-3 py-2 rounded-lg transition",
-                  isActive
-                    ? "bg-emerald-500/10 text-emerald-300 font-medium"
-                    : "text-slate-200 hover:bg-slate-800/70",
-                ].join(" ")
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
+        <h2 className="text-sm tracking-widest text-green-400 mb-2">
+          ÁREA DO ALUNO
+        </h2>
 
-        <div className="px-4 py-4 border-t border-slate-800 text-xs text-slate-400">
-          <div className="mb-2">
-            <p className="font-medium text-slate-200 text-sm">
-              {user?.name || "Administrador"}
-            </p>
-            <p className="truncate">{user?.email}</p>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="w-full rounded-lg border border-slate-600 px-3 py-1.5 text-xs hover:bg-slate-800"
-          >
-            Sair
-          </button>
-        </div>
-      </aside>
+        <h1 className="text-3xl font-bold mb-4 leading-tight">
+          Olá, <br /> {user.email}
+        </h1>
 
-      {/* Main */}
-      <main className="flex-1 p-6 space-y-4">
-        <header className="flex items-center justify-between mb-2">
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight">
-              Visão geral
-            </h2>
-            <p className="text-sm text-slate-400">
-              Resumo rápido do desempenho da autoescola.
-            </p>
-          </div>
-        </header>
+        <p className="text-gray-400 mb-6">
+          Bem-vindo à sua área de treino da prova teórica.
+        </p>
 
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
-            <p className="text-xs text-slate-400 uppercase mb-1">
-              Simulados hoje
-            </p>
-            <p className="text-3xl font-bold text-emerald-400">0</p>
-            <p className="text-xs text-slate-500 mt-1">
-              Depois ligamos isso na API.
-            </p>
-          </div>
+        <a
+          href="/simulado"
+          className="block w-full text-center bg-green-500 hover:bg-green-600 text-black font-semibold py-3 rounded-full transition mb-4"
+        >
+          Iniciar simulado
+        </a>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
-            <p className="text-xs text-slate-400 uppercase mb-1">
-              Alunos ativos
-            </p>
-            <p className="text-3xl font-bold text-sky-400">0</p>
-            <p className="text-xs text-slate-500 mt-1">
-              Dados virão do módulo de alunos.
-            </p>
-          </div>
+        <a
+          href="/"
+          onClick={() => localStorage.clear()}
+          className="block w-full text-center bg-[#131a2a] hover:bg-[#1c2439] text-white font-semibold py-3 rounded-full transition"
+        >
+          Sair
+        </a>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
-            <p className="text-xs text-slate-400 uppercase mb-1">
-              Taxa de acerto média
-            </p>
-            <p className="text-3xl font-bold text-amber-400">0%</p>
-            <p className="text-xs text-slate-500 mt-1">
-              Vai ser calculada pelos resultados dos simulados.
-            </p>
-          </div>
-        </section>
+        <a href="/" className="block text-center mt-6 text-gray-400 text-sm hover:text-gray-300">
+          Voltar para a página inicial
+        </a>
 
-        <section className="bg-slate-900 border border-slate-800 rounded-xl p-4 mt-2">
-          <h3 className="text-sm font-semibold mb-2">
-            Próximos passos do painel
-          </h3>
-          <ul className="text-xs text-slate-300 list-disc list-inside space-y-1">
-            <li>Conectar cards aos endpoints reais (simulados, alunos, etc.).</li>
-            <li>Criar tela de gerenciamento de simulados.</li>
-            <li>Criar tela de alunos e progresso.</li>
-          </ul>
-        </section>
-      </main>
+      </div>
     </div>
   );
 }
