@@ -1,7 +1,167 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap";
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
-  @apply bg-slate-900 text-slate-50;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #020617; /* quase preto */
+  color: #e2e8f0;
+}
+
+/* Links */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Layout geral */
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+/* Card principal */
+.card {
+  width: 100%;
+  max-width: 900px;
+  background: radial-gradient(circle at top, #0f172a, #020617 55%);
+  border-radius: 1.5rem;
+  border: 1px solid #1e293b;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.9);
+  padding: 1.75rem 2rem 2rem;
+}
+
+.card-center {
+  max-width: 420px;
+}
+
+/* Cabeçalho do card */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.card-title,
+.page-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.card-subtitle,
+.page-subtitle {
+  font-size: 0.95rem;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(16, 185, 129, 0.12);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+/* Área principal do card */
+.card-body {
+  margin-top: 0.5rem;
+}
+
+/* Layout Home/Login */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+/* Botões genéricos */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.2rem;
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease-out;
+  white-space: nowrap;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #22c55e, #2dd4bf);
+  color: #022c22;
+  border-color: rgba(16, 185, 129, 0.8);
+  box-shadow: 0 12px 35px rgba(16, 185, 129, 0.45);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #0f172a;
+  color: #e2e8f0;
+  border-color: #1f2937;
+}
+
+.btn-secondary:hover {
+  background: #020617;
+  border-color: #38bdf8;
+}
+
+/* Inputs (login) */
+input {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.7rem;
+  border: 1px solid #1f2937;
+  background: rgba(15, 23, 42, 0.95);
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  outline: none;
+  margin-bottom: 0.6rem;
+}
+
+input:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.4);
+}
+
+/* Responsivo */
+@media (max-width: 640px) {
+  .card,
+  .card-center {
+    padding: 1.5rem 1.25rem 1.75rem;
+    border-radius: 1.25rem;
+  }
+
+  .card-title,
+  .page-title {
+    font-size: 1.5rem;
+  }
 }

@@ -1,13 +1,32 @@
-import { useState, FormEvent } from "react";
+import { FormEvent, useState } from "react";
+import api from "../lib/api";
+import { saveAuth } from "../lib/auth";
 
 export default function Login() {
   const [email, setEmail] = useState("admin@autoescola.com");
-  const [password, setPassword] = useState("123456");
+  const [senha, setSenha] = useState("123456");
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    console.log("LOGIN FAKE:", { email, password });
-    alert("Login de teste enviado (sem chamar API ainda).");
+    if (loading) return;
+
+    setLoading(true);
+    try {
+      const res = await api.post("/auth/login", {
+        email,
+        password: senha,
+      });
+
+      saveAuth(res.data.access_token, res.data.user);
+      alert("Login REAL realizado com sucesso!");
+      // aqui depois a gente redireciona para /dashboard
+    } catch (err) {
+      console.error(err);
+      alert("Falha no login. Confira email/senha ou se a API está rodando.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -15,29 +34,50 @@ export default function Login() {
       <div className="card card-center">
         <div className="card-header">
           <div>
-            <p className="badge">Área do aluno</p>
-            <h1 className="page-title">Login</h1>
+            <p className="badge">ÁREA DO ALUNO</p>
+            <h1 className="card-title">Login</h1>
+            <p className="card-subtitle">
+              Use o email de teste admin@autoescola.com e senha 123456.
+            </p>
           </div>
         </div>
 
         <div className="card-body">
-          <form onSubmit={handleSubmit} className="stack">
-            <input
-              type="email"
-              className="input"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
-            />
-            <input
-              type="password"
-              className="input"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Senha"
-            />
-            <button type="submit" className="btn btn-primary btn-block">
-              Entrar (fake)
+          <form className="stack" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label className="label" htmlFor="email">
+                Email
+              </label>
+              <input
+                id="email"
+                className="input"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="label" htmlFor="password">
+                Senha
+              </label>
+              <input
+                id="password"
+                className="input"
+                type="password"
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                autoComplete="current-password"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-primary btn-block"
+              disabled={loading}
+            >
+              {loading ? "Entrando..." : "Entrar"}
             </button>
           </form>
         </div>
