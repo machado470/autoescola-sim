@@ -14,7 +14,7 @@ export default function Login() {
       setLoading(true);
       const res = await api.post("/auth/login", { email, password });
       saveAuth(res.data.access_token, { id: 1, email });
-      window.location.href = "/"; 
+      window.location.href = "/dashboard"; 
     } catch (err) {
       alert("Erro ao fazer login.");
     } finally {

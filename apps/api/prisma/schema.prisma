@@ -1,30 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+model User {
+  id       Int       @id @default(autoincrement())
+  email    String    @unique
+  password String
+  phases   UserPhaseProgress[]
+  sessions ExamSession[]
 }
 
-model Category {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
+model Phase {
+  id        Int       @id @default(autoincrement())
+  title     String
+  order     Int
   questions Question[]
+  progresses UserPhaseProgress[]
 }
-
 
 model Question {
-  id           Int      @id @default(autoincrement())
-  statement    String
-  image        String?
-  alternatives String[]
-  correct      String
-  categoryId   Int
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  answers      Answer[]
-  category     Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  id        Int      @id @default(autoincrement())
+  statement String
+  image     String?
+  category  String
+  difficulty Int
+  phaseId   Int?
+  phase     Phase?   @relation(fields: [phaseId], references: [id])
+  answers   Answer[]
 }
 
 model Answer {
@@ -32,37 +39,34 @@ model Answer {
   text       String
   correct    Boolean
   questionId Int
-  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  question   Question @relation(fields: [questionId], references: [id])
 }
 
-model Student {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  email     String   @unique
-  schoolId  Int
-  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+model UserPhaseProgress {
+  id       Int    @id @default(autoincrement())
+  userId   Int
+  user     User   @relation(fields: [userId], references: [id])
+  phaseId  Int
+  phase    Phase  @relation(fields: [phaseId], references: [id])
+  progress Int    @default(0)
+  done     Boolean @default(false)
 }
 
-model School {
-  id        Int        @id @default(autoincrement())
-  name      String     @unique
-  cnpj      String     @unique
-  students  Student[]
-  instructors Instructor[]
+model ExamSession {
+  id       Int          @id @default(autoincrement())
+  userId   Int
+  user     User         @relation(fields: [userId], references: [id])
+  startAt  DateTime     @default(now())
+  endAt    DateTime?
+  score    Int?
+  answers  ExamAnswer[]
 }
 
-model Instructor {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  schoolId  Int
-  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-}
-
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model ExamAnswer {
+  id         Int         @id @default(autoincrement())
+  questionId Int
+  answerId   Int
+  correct    Boolean
+  sessionId  Int
+  session    ExamSession @relation(fields: [sessionId], references: [id])
 }

@@ -1,27 +1,17 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export type ProgressData = {
-  xp: number;
-  level: number;
-  nextLevelXp: number;
+  correct: number;
+  wrong: number;
+  total: number;
 };
 
-export function useProgress() {
-  const [progress, setProgress] = useState<ProgressData>({
-    xp: 120,
-    level: 2,
-    nextLevelXp: 300,
+export default function useProgress() {
+  const [progress] = useState<ProgressData>({
+    correct: 0,
+    wrong: 0,
+    total: 0,
   });
 
-  useEffect(() => {
-    // Futuramente: buscar no backend
-    // fetch("/api/progress").then(...)
-  }, []);
-
-  const percentage = Math.min(
-    100,
-    (progress.xp / progress.nextLevelXp) * 100
-  );
-
-  return { progress, percentage };
+  return { progress };
 }

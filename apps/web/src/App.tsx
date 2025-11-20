@@ -3,14 +3,20 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Simulado from "./pages/Simulado";
 import Dashboard from "./pages/Dashboard";
+import Placas from "./pages/Placas";
+import PrivateRoute from "./components/PrivateRoute";
 
 export default function App() {
   return (
     <Routes>
+      <Route path="/placas" element={<Placas />} />
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/simulado" element={<Simulado />} />
-      <Route path="/dashboard" element={<Dashboard />} />
+      <Route
+        path="/dashboard"
+        element={<PrivateRoute element={<Dashboard />} />}
+      />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

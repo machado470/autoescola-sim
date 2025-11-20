@@ -1,62 +1,65 @@
 import { useEffect, useState } from "react";
-import axios from "../lib/api";
+import api from "../lib/api";
+
+type Questao = {
+  id: number;
+  pergunta: string;
+  respostaA: string;
+  respostaB: string;
+  respostaC: string;
+  respostaD: string;
+  correta: string;
+};
 
 export default function Simulado() {
-  const [questions, setQuestions] = useState([]);
+  const [questoes, setQuestoes] = useState<Questao[]>([]);
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    axios.get("/questions").then((res) => {
-      setQuestions(res.data);
+    api.get("/questions").then((res) => {
+      setQuestoes(res.data);
     });
   }, []);
 
-  if (!questions.length) return null;
-
-  const q = questions[index];
-
-  function next() {
-    if (index < questions.length - 1) {
-      setIndex(index + 1);
-    }
+  if (questoes.length === 0) {
+    return (
+      <div className="p-10 text-center text-xl text-text">
+        Carregando questões...
+      </div>
+    );
   }
 
+  const q = questoes[index];
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#030712] text-white px-4">
-      <div className="w-full max-w-md bg-[#0A0F1C] p-10 rounded-3xl shadow-[0_0_40px_#00112277]">
-        
-        <h2 className="text-sm tracking-widest text-green-400 mb-2">
-          SIMULADO
-        </h2>
+    <div className="p-10 text-text">
+      <h1 className="text-3xl font-bold mb-6">Simulado</h1>
 
-        <p className="text-gray-400 text-sm mb-4">
-          Questão {index + 1} / {questions.length}
-        </p>
-
-        <h1 className="text-xl font-semibold mb-6">
-          {q.statement}
-        </h1>
+      <div className="bg-surface p-6 rounded-xl border border-border mb-6">
+        <p className="text-xl font-semibold mb-4">{q.pergunta}</p>
 
         <div className="space-y-3">
-          {["A", "B", "C", "D"].map((alt) => (
-            <button
-              key={alt}
-              onClick={next}
-              className="w-full bg-[#111827] hover:bg-[#1f2937] text-left p-3 rounded-xl transition"
-            >
-              <b>{alt}</b> — {q["resposta" + alt]}
-            </button>
-          ))}
+          <button className="w-full p-3 bg-bg rounded border border-border">
+            {q.respostaA}
+          </button>
+          <button className="w-full p-3 bg-bg rounded border border-border">
+            {q.respostaB}
+          </button>
+          <button className="w-full p-3 bg-bg rounded border border-border">
+            {q.respostaC}
+          </button>
+          <button className="w-full p-3 bg-bg rounded border border-border">
+            {q.respostaD}
+          </button>
         </div>
-
-        <button
-          onClick={() => setIndex(0)}
-          className="mt-6 block w-full text-center bg-green-500 hover:bg-green-600 text-black font-semibold py-3 rounded-full transition"
-        >
-          Refazer
-        </button>
-
       </div>
+
+      <button
+        onClick={() => setIndex((prev) => (prev + 1) % questoes.length)}
+        className="px-6 py-3 bg-primary hover:bg-primaryHover text-black rounded font-semibold"
+      >
+        Próxima
+      </button>
     </div>
   );
 }
