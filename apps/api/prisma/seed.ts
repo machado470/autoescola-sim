@@ -2,296 +2,64 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🔥 Limpando tabelas...");
+  console.log(">> Limpando tabelas...");
+
   await prisma.examAnswer.deleteMany();
   await prisma.examSession.deleteMany();
-  await prisma.userPhaseProgress.deleteMany();
+  await prisma.simuladoAnswer.deleteMany();
+  await prisma.simuladoSession.deleteMany();
   await prisma.answer.deleteMany();
   await prisma.question.deleteMany();
   await prisma.phase.deleteMany();
 
-  console.log("🔥 Criando fases...");
-  await prisma.phase.createMany({
-    data: [
-      { id: 1, title: "Fase 1 – Fundamentos", order: 1 },
-      { id: 2, title: "Fase 2 – Direção Defensiva", order: 2 },
-      { id: 3, title: "Fase 3 – Placas de Trânsito", order: 3 },
-      { id: 4, title: "Fase 4 – Meio Ambiente", order: 4 },
-      { id: 5, title: "Fase 5 – Primeiros Socorros", order: 5 },
-      { id: 6, title: "Fase 6 – Infrações & Penalidades", order: 6 },
-      { id: 7, title: "Fase 7 – Cidadania", order: 7 },
-      { id: 8, title: "Fase 8 – Revisão Final", order: 8 },
-    ],
+  console.log(">> Criando phase padrão...");
+  const phase1 = await prisma.phase.create({
+    data: {
+      name: "Fase 1",
+      order: 1
+    }
   });
 
-  console.log("🔥 Inserindo Fase 1...");
-
-  // QUESTÃO 1
+  console.log(">> Criando questões...");
   await prisma.question.create({
     data: {
-      statement: "A sinalização de trânsito tem como principal objetivo:",
-      category: "Fundamentos",
-      difficulty: 1,
-      phaseId: 1,
+      statement: "Qual a velocidade máxima permitida em vias urbanas, salvo sinalização em contrário?",
+      difficulty: "easy",
+      category: "legislacao",
+      phaseId: phase1.id,
       answers: {
         create: [
-          { text: "Decorado impedir acidentes", correct: false },
-          { text: "Organizar e orientar o fluxo de veículos e pedestres", correct: true },
-          { text: "Servir apenas como indicação visual", correct: false },
-          { text: "Alertar somente sobre obras na via", correct: false },
-        ],
-      },
-    },
+          { text: "30 km/h", correct: false },
+          { text: "40 km/h", correct: false },
+          { text: "50 km/h", correct: true },
+          { text: "60 km/h", correct: false }
+        ]
+      }
+    }
   });
 
-  // QUESTÃO 2
   await prisma.question.create({
     data: {
-      statement: "O trânsito é definido pelo CTB como:",
-      category: "Fundamentos",
-      difficulty: 1,
-      phaseId: 1,
+      statement: "O uso do cinto de segurança é obrigatório para:",
+      difficulty: "easy",
+      category: "legislacao",
+      phaseId: phase1.id,
       answers: {
         create: [
-          { text: "Movimentação exclusiva de veículos automotores", correct: false },
-          { text: "Movimentação e imobilização de pessoas, animais e veículos", correct: true },
-          { text: "Deslocamento apenas de veículos", correct: false },
-          { text: "Movimentação apenas em rodovias", correct: false },
-        ],
-      },
-    },
+          { text: "Somente motorista", correct: false },
+          { text: "Motorista e passageiros", correct: true },
+          { text: "Apenas passageiros do banco traseiro", correct: false },
+          { text: "Apenas passageiros do banco dianteiro", correct: false }
+        ]
+      }
+    }
   });
-
-  // QUESTÃO 3
-  await prisma.question.create({
-    data: {
-      statement: "A educação para o trânsito é responsabilidade:",
-      category: "Fundamentos",
-      difficulty: 1,
-      phaseId: 1,
-      answers: {
-        create: [
-          { text: "Somente do CONTRAN", correct: false },
-          { text: "Exclusivamente das autoescolas", correct: false },
-          { text: "De todos os órgãos do Sistema Nacional de Trânsito", correct: true },
-          { text: "Apenas das prefeituras", correct: false },
-        ],
-      },
-    },
-  });
-
-  // QUESTÃO 4
-  await prisma.question.create({
-    data: {
-      statement: "O condutor defensivo costuma:",
-      category: "Fundamentos",
-      difficulty: 2,
-      phaseId: 1,
-      answers: {
-        create: [
-          { text: "Dirigir sempre acima da velocidade mínima", correct: false },
-          { text: "Prever situações de risco e agir antes que aconteçam", correct: true },
-          { text: "Confiar totalmente nas habilidades de outros condutores", correct: false },
-          { text: "Dirigir apenas olhando para frente", correct: false },
-        ],
-      },
-    },
-  });
-
-  // QUESTÃO 5
-  await prisma.question.create({
-    data: {
-      statement: "O conceito de circulação segura está baseado em:",
-      category: "Fundamentos",
-      difficulty: 2,
-      phaseId: 1,
-      answers: {
-        create: [
-          { text: "Velocidade, habilidade e agressividade", correct: false },
-          { text: "Atenção, cuidado e respeito às normas", correct: true },
-          { text: "Experiência e rapidez nas manobras", correct: false },
-          { text: "Ultrapassagens frequentes", correct: false },
-        ],
-      },
-    },
-  });
-
-  console.log("🔥 Inserindo questões compactas da Fase 1...");
-
-  const fase1QuestoesCompactas = [
-    ["O CTB é aplicado em todo:", "território nacional"],
-    ["Quem tem prioridade no trânsito?", "pedestre"],
-    ["O que significa direção consciente?", "respeitar normas e prever riscos"],
-    ["Qual ação reduz acidentes?", "manter distância segura"],
-    ["O que é infração?", "violação de norma do CTB"],
-    ["Quem fiscaliza o trânsito urbano?", "municípios"],
-    ["A sinalização horizontal inclui:", "marcas no pavimento"],
-    ["A sinalização vertical inclui:", "placas"],
-    ["O condutor deve observar:", "via, clima e fluxo"],
-    ["O trânsito é composto por:", "pessoas, veículos e animais"],
-    ["O que significa via de trânsito rápido?", "acesso limitado"],
-    ["Qual o papel do CONTRAN?", "normatização"],
-    ["O que é veículo automotor?", "movido por energia própria"],
-  ];
-
-  for (const [statement, correta] of fase1QuestoesCompactas) {
-    await prisma.question.create({
-      data: {
-        statement,
-        category: "Fundamentos",
-        difficulty: 1,
-        phaseId: 1,
-        answers: {
-          create: [
-            { text: correta, correct: true },
-            { text: "Opção incorreta", correct: false },
-            { text: "Outra opção incorreta", correct: false },
-            { text: "Mais uma incorreta", correct: false },
-          ],
-        },
-      },
-    });
-  }
-
-  console.log("🔥 Fase 1 finalizada!");
 }
 
 main()
-  .catch((e) => {
-    console.error(e);
+  .then(() => prisma.$disconnect())
+  .catch((err) => {
+    console.error(err);
+    prisma.$disconnect();
     process.exit(1);
-  })
-  .finally(() => prisma.$disconnect());
-
-  console.log("🔥 Inserindo Fase 2 – Direção Defensiva...");
-
-  // QUESTÃO 1
-  await prisma.question.create({
-    data: {
-      statement: "Dirigir defensivamente significa:",
-      category: "Direção Defensiva",
-      difficulty: 1,
-      phaseId: 2,
-      answers: {
-        create: [
-          { text: "Evitar sempre dirigir à noite", correct: false },
-          { text: "Prever riscos e agir de forma preventiva", correct: true },
-          { text: "Confiar na habilidade dos outros motoristas", correct: false },
-          { text: "Usar buzina sempre para se impor no trânsito", correct: false },
-        ],
-      },
-    },
   });
-
-  // QUESTÃO 2
-  await prisma.question.create({
-    data: {
-      statement: "O que é 'ponto cego' do veículo?",
-      category: "Direção Defensiva",
-      difficulty: 1,
-      phaseId: 2,
-      answers: {
-        create: [
-          { text: "Área visível apenas com farol alto", correct: false },
-          { text: "Área ao redor do veículo que o motorista não consegue ver", correct: true },
-          { text: "Parte traseira iluminada pela lanterna", correct: false },
-          { text: "Reflexo causado pelo sol no para-brisa", correct: false },
-        ],
-      },
-    },
-  });
-
-  // QUESTÃO 3
-  await prisma.question.create({
-    data: {
-      statement: "Qual atitude reduz o risco de colisão traseira?",
-      category: "Direção Defensiva",
-      difficulty: 2,
-      phaseId: 2,
-      answers: {
-        create: [
-          { text: "Manter distância de segurança do veículo à frente", correct: true },
-          { text: "Dirigir o mais próximo possível do carro da frente", correct: false },
-          { text: "Frear de forma brusca quando necessário", correct: false },
-          { text: "Usar farol alto em vias urbanas", correct: false },
-        ],
-      },
-    },
-  });
-
-  // QUESTÃO 4
-  await prisma.question.create({
-    data: {
-      statement: "Em condições de chuva, o condutor deve:",
-      category: "Direção Defensiva",
-      difficulty: 1,
-      phaseId: 2,
-      answers: {
-        create: [
-          { text: "Aumentar a velocidade para evitar aquaplanagem", correct: false },
-          { text: "Reduzir a velocidade e aumentar a distância de segurança", correct: true },
-          { text: "Desligar o limpador de para-brisa", correct: false },
-          { text: "Manter a mesma velocidade", correct: false },
-        ],
-      },
-    },
-  });
-
-  // QUESTÃO 5
-  await prisma.question.create({
-    data: {
-      statement: "O que é aquaplanagem?",
-      category: "Direção Defensiva",
-      difficulty: 2,
-      phaseId: 2,
-      answers: {
-        create: [
-          { text: "Perda de tração causada por excesso de peso", correct: false },
-          { text: "Deslizamento do veículo sobre uma película de água", correct: true },
-          { text: "Falha no sistema de freios", correct: false },
-          { text: "Perda de visibilidade por chuva intensa", correct: false },
-        ],
-      },
-    },
-  });
-
-  // QUESTÕES DIDÁTICAS EXTRA (ajuda o aluno a fixar)
-  const fase2Didaticas = [
-    ["O que reduz acidentes com motociclistas?", "olhar duas vezes antes de mudar de faixa"],
-    ["O que indica motorista agressivo?", "ultrapassagens constantes e desnecessárias"],
-    ["Qual atitude evita colisões?", "antecipar movimentos de outros motoristas"],
-    ["Em neblina, o que fazer?", "usar faróis baixos"],
-    ["Velocidade segura depende de:", "condições da via e visibilidade"],
-    ["O que fazer ao ver um pedestre indeciso?", "reduzir e aguardar"],
-    ["Como agir em rodovias?", "manter distância e sinalizar com antecedência"],
-    ["Como evitar acidente ao abrir a porta?", "método holandês: abrir com a mão oposta"],
-    ["Como evitar fadiga ao volante?", "parar a cada 2 horas"],
-    ["Qual atitude evita derrapagens?", "dirigir suavemente e sem movimentos bruscos"],
-    ["O maior erro de motoristas iniciantes:", "excesso de confiança"],
-    ["Em curva, o condutor deve:", "reduzir antes de entrar"],
-    ["Ao usar o celular:", "parar o veículo antes, nunca usar em movimento"],
-    ["Quando usar farol alto?", "somente em vias sem iluminação e sem outros veículos"],
-    ["Como evitar colisões laterais?", "sinalizar e verificar pontos cegos"],
-  ];
-
-  for (const [statement, correta] of fase2Didaticas) {
-    await prisma.question.create({
-      data: {
-        statement,
-        category: "Direção Defensiva",
-        difficulty: 1,
-        phaseId: 2,
-        answers: {
-          create: [
-            { text: correta, correct: true },
-            { text: "Opção incorreta", correct: false },
-            { text: "Outra opção incorreta", correct: false },
-            { text: "Mais uma incorreta", correct: false },
-          ],
-        },
-      },
-    });
-  }
-
-  console.log("🔥 Fase 2 finalizada!");
-

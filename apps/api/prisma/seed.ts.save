@@ -1,0 +1,62 @@
+
+
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
+
+async function main() {
+  console.log("Seeding banco completo...");
+
+  // --- Fases ---
+  const fase1 = await prisma.phase.create({
+    data: {
+      name: "Simulado Geral",
+      order: 1
+    }
+  });
+
+  // --- Categorias ---
+  const catSinalizacao = await prisma.category.create({
+    data: {
+      name: "Sinalização",
+    }
+  });
+
+  const catRegras = await prisma.category.create({
+    data: {
+      name: "Regras de Circulação",
+    }
+  });
+
+  // --- Perguntas base ---
+  await prisma.question.create({
+    data: {
+      statement: "O que significa a placa A-1 (Curva acentuada à direita)?",
+      respostaA: "Entrada proibida",
+      respostaB: "Curva acentuada à direita",
+      respostaC: "Pista escorregadia",
+      respostaD: "Conversão obrigatória",
+      correta: "B",
+      phaseId: fase1.id,
+      categoryId: catSinalizacao.id
+    }
+  });
+
+  await prisma.question.create({
+    data: {
+      statement: "Qual a velocidade máxima em vias urbanas (sem sinalização)?",
+      respostaA: "30 km/h",
+      respostaB: "40 km/h",
+      respostaC: "50 km/h",
+      respostaD: "60 km/h",
+      correta: "C",
+      phaseId: fase1.id,
+      categoryId: catRegras.id
+    }
+  });
+
+  console.log("Seed finalizado!");
+}
+
+main()
+  .catch(e => console.error(e))
+  .finally(() => prisma.$disconnect());

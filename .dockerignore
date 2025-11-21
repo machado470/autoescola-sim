@@ -1,8 +1,23 @@
-node_modules
-.pnpm-store
+# Node modules
+**/node_modules
+
+# git
 .git
 .gitignore
+
+# editor
 .vscode
-dist
-apps/**/dist
+
+# logs
 **/*.log
+
+# env
+.env
+.env.*
+
+# local OS junk
+.DS_Store
+Thumbs.db
+
+# keep dist! (important for Docker build)
+# DO NOT IGNORE dist — Nest needs it inside container.

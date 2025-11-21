@@ -6,5 +6,5 @@
     "incremental": false,
     "tsBuildInfoFile": "./dist/.tsbuildinfo"
   },
-  "include": ["src/**/*"]
+  "include": ["../prisma/seed.ts","src/**/*"]
 }

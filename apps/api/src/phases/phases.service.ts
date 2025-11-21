@@ -5,10 +5,22 @@ import { PrismaService } from "../prisma/prisma.service";
 export class PhasesService {
   constructor(private prisma: PrismaService) {}
 
-  list() {
+  findAll() {
     return this.prisma.phase.findMany({
-      include: { questions: true },
-      orderBy: { order: "asc" },
+      include: {
+        questions: {
+          include: { answers: true }
+        }
+      }
+    });
+  }
+
+  findOne(id: number) {
+    return this.prisma.phase.findUnique({
+      where: { id },
+      include: {
+        questions: { include: { answers: true } }
+      }
     });
   }
 }
