@@ -1,84 +1,75 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-interface Question {
-  category: string;
-  statement: string;
-  options: string[];
-  correctIndex: number;
-  image?: string;
-}
-
-const questions: Question[] = [
-  {
-    category: 'Sinalização',
-    statement: 'Qual cor indica placa de atenção?',
-    options: ['Amarela', 'Vermelha', 'Verde', 'Azul'],
-    correctIndex: 0,
-    image: '/icons/attention.svg',
-  },
-  {
-    category: 'Direção Defensiva',
-    statement: 'Qual a distância segura em estrada?',
-    options: ['1 segundo', '2 segundos', '5 segundos', '0,5 segundo'],
-    correctIndex: 1,
-  },
-  {
-    category: 'Mecânica',
-    statement: 'O que indica a luz de óleo no painel?',
-    options: ['Falta de óleo', 'Porta aberta', 'Farol ligado', 'Cinto desprendido'],
-    correctIndex: 0,
-  },
-  {
-    category: 'Legislação',
-    statement: 'Quantos pontos suspendem a CNH?',
-    options: ['10 pontos', '20 pontos', '40 pontos', '60 pontos'],
-    correctIndex: 2,
-  },
-  {
-    category: 'Primeiros Socorros',
-    statement: 'Qual o número de emergência para acidentes?',
-    options: ['192', '190', '193', '191'],
-    correctIndex: 0,
-  },
-];
-
-async function upsertCategory(name: string) {
-  return prisma.category.upsert({
-    where: { name },
-    update: {},
-    create: { name },
-  });
-}
-
 async function main() {
+  console.log(">> Importando categorias e questões...");
+
+  const categories = [
+    "Sinalização",
+    "Infrações",
+    "Direção defensiva",
+    "Primeiros socorros",
+  ];
+
+  const categoryMap: Record<string, number> = {};
+
+  for (const name of categories) {
+    const cat = await prisma.category.upsert({
+      where: { name },
+      update: {},
+      create: { name },
+    });
+    categoryMap[name] = cat.id;
+    console.log(`Categoria OK -> ${name} (id ${cat.id})`);
+  }
+
+  const questions = [
+    {
+      statement: "Qual cor indica placa de atenção?",
+      image: "/icons/attention.svg",
+      category: "Sinalização",
+      answers: [
+        { text: "Amarela", isCorrect: true },
+        { text: "Vermelha", isCorrect: false },
+        { text: "Azul", isCorrect: false },
+        { text: "Verde", isCorrect: false },
+      ],
+    },
+    {
+      statement: "Placa vermelha indica?",
+      image: "/icons/stop.svg",
+      category: "Sinalização",
+      answers: [
+        { text: "Advertência", isCorrect: false },
+        { text: "Regulamentação", isCorrect: true },
+        { text: "Indicação", isCorrect: false },
+        { text: "Orientação", isCorrect: false },
+      ],
+    },
+  ];
+
   for (const q of questions) {
-    const cat = await upsertCategory(q.category);
-    const answers = q.options.map((text, idx) => ({
-      text,
-      isCorrect: idx === q.correctIndex,
-    }));
     await prisma.question.create({
       data: {
         statement: q.statement,
-        image: q.image ?? null,
-        categoryId: cat.id,
+        image: q.image,
+        categoryId: categoryMap[q.category],
         answers: {
-          create: answers,
+          create: q.answers.map(a => ({
+            text: a.text,
+            isCorrect: a.isCorrect,
+          })),
         },
       },
     });
-    console.log(`Inserida pergunta: ${q.statement}`);
+
+    console.log(`Questão OK -> ${q.statement}`);
   }
-  console.log('Importação concluída.');
+
+  console.log(">> Import finalizado.");
 }
 
 main()
-  .catch((err) => {
-    console.error(err);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+  .catch((e) => console.error(e))
+  .finally(() => prisma.$disconnect());
