@@ -1,61 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model Category {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   questions Question[]
 }
 
-
 model Question {
-  id           Int      @id @default(autoincrement())
-  statement    String
-  image        String?
-  alternatives String[]
-  correct      String
-  categoryId   Int
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  answers      Answer[]
-  category     Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  id          Int        @id @default(autoincrement())
+  statement   String
+  category    Category   @relation(fields: [categoryId], references: [id])
+  categoryId  Int
+  answers     Answer[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Answer {
   id         Int      @id @default(autoincrement())
   text       String
-  correct    Boolean
+  correct    Boolean  @default(false)
+  question   Question @relation(fields: [questionId], references: [id])
   questionId Int
-  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-}
-
-model Student {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  email     String   @unique
-  schoolId  Int
-  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-}
-
-model School {
-  id        Int        @id @default(autoincrement())
-  name      String     @unique
-  cnpj      String     @unique
-  students  Student[]
-  instructors Instructor[]
-}
-
-model Instructor {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  schoolId  Int
-  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model User {
@@ -63,6 +40,7 @@ model User {
   email     String   @unique
   password  String
   name      String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
