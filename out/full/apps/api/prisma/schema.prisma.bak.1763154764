@@ -1,0 +1,60 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Category {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  questions Question[]
+  students  Student[]
+  instructors Instructor[]
+}
+
+model Question {
+  id           Int        @id @default(autoincrement())
+  statement    String
+  image        String?
+  alternatives String[]
+  correct      String
+  categoryId   Int
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  answers      Answer[]
+  category     Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+}
+
+model Answer {
+  id         Int      @id @default(autoincrement())
+  text       String
+  correct    Boolean
+  questionId Int
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model Student {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  email     String   @unique
+  schoolId  Int
+  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+}
+
+model School {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  cnpj      String     @unique
+  students  Student[]
+  instructors Instructor[]
+}
+
+model Instructor {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  schoolId  Int
+  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+}
