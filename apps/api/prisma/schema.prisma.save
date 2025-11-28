@@ -13,6 +13,7 @@ datasource db {
 
 model Category {
   id        Int       @id @default(autoincrement())
+nano apps/api/prisma/schema.prisma
   name      String    @unique
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -47,15 +48,14 @@ model Phase {
 //////////////////////
 
 model Question {
-  id         Int      @id @default(autoincrement())
-  statement  String
-  answerA    String
-  answerB    String
-  answerC    String
-  answerD    String
-  correct    String
-  chosen     String   @default("")
-  image      String?
+  id        Int      @id @default(autoincrement())
+  statement String
+  answerA   String
+  answerB   String
+  answerC   String
+  answerD   String
+  correct   String
+  image     String?
 
   phase      Phase    @relation(fields: [phaseId], references: [id])
   phaseId    Int

@@ -3,17 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
+
   "scripts": {
     "dev": "tsx watch src/main.ts",
     "build": "tsc -p tsconfig.build.json",
-    "start": "node --enable-source-maps dist/main.js",
+    "start": "node dist/main.js",
     "start:dev": "nest start --watch",
     "start:prod": "node dist/main.js",
 
+    "format": "prettier --write .",
+    "lint": "eslint . --ext .ts",
+
     "prisma:generate": "prisma generate --schema apps/api/prisma/schema.prisma",
     "prisma:push": "prisma db push --schema apps/api/prisma/schema.prisma",
+    "prisma:migrate": "prisma migrate dev --schema apps/api/prisma/schema.prisma --name init",
 
-    "db:seed": "pnpm prisma:generate && pnpm prisma:push && pnpm import:questions",
+    "db:seed": "pnpm prisma:generate && pnpm prisma:push && tsx apps/api/prisma/seed.ts",
     "import:questions": "ts-node apps/api/prisma/seed.ts"
   },
 
@@ -21,38 +26,49 @@
     "@nestjs/common": "11.1.6",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "11.1.6",
-    "@nestjs/jwt": "^11.0.1",
+    "@nestjs/jwt": "^11.0.0",
     "@nestjs/mapped-types": "^2.0.5",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "11.1.6",
+
     "bcrypt": "^6.0.0",
+    "bcryptjs": "3.0.3",
+
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
+
     "cors": "^2.8.5",
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",
+
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
+
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+
+    "@prisma/client": "5.22.0"
   },
 
   "devDependencies": {
     "@nestjs/cli": "^11.0.10",
     "@nestjs/swagger": "^11.2.1",
-    "@prisma/client": "5.22.0",
-    "@types/bcrypt": "^5.0.0",
+
+    "@types/bcryptjs": "^3.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.11.25",
+    "@types/passport": "^1.0.12",
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38",
-    "prisma": "5.22.0",
+
     "ts-node": "^10.9.2",
     "tsx": "^4.20.6",
-    "typescript": "^5.5.4"
+    "typescript": "^5.6.4",
+
+    "prisma": "5.22.0"
   },
 
   "prisma": {

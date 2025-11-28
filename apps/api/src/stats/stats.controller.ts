@@ -1,15 +1,23 @@
-import { Controller, Get } from '@nestjs/common'
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
-import { StatsResponse, StatsService } from './stats.service'
+import { Controller, Get, Param } from '@nestjs/common';
+import { StatsService } from './stats.service';
 
-@ApiTags('Stats')
-@ApiBearerAuth()
 @Controller('stats')
 export class StatsController {
-  constructor(private readonly statsService: StatsService) {}
+  constructor(private readonly service: StatsService) {}
 
-  @Get()
-  getStats(): Promise<StatsResponse> {
-    return this.statsService.getStats()
+  // Estatísticas gerais do usuário
+  @Get('user/:userId')
+  getUserStats(@Param('userId') userId: string) {
+    return this.service.getUserStats(Number(userId));
+  }
+
+  // Estatísticas por categoria
+  @Get('category/:categoryId/:userId')
+  getCategoryStats(
+    @Param('categoryId') categoryId: string,
+    @Param('userId') userId: string,
+  ) {
+    return this.service.getCategoryStats(Number(categoryId), Number(userId));
   }
 }
+

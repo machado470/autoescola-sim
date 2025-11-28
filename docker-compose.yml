@@ -13,6 +13,7 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./pg-seed:/seed
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d autoescola || exit 1"]
       interval: 5s

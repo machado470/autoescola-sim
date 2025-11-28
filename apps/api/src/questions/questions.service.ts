@@ -7,7 +7,15 @@ export class QuestionsService {
 
   async findAll() {
     return this.prisma.question.findMany({
-      include: { answers: true, category: true }
+      include: {
+        answers: true,
+        phase: {
+          include: {
+            category: true,
+          },
+        },
+      },
     });
   }
 }
+
