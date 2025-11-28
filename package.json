@@ -33,7 +33,7 @@
 
     "prisma:seed": "tsx apps/api/prisma/seed.ts",
 
-    "import:questions": "tsx scripts/import-questions.ts",
+    "import:questions": "tsx apps/api/scripts/import-questions.ts",
 
     "db:seed": "pnpm prisma:generate && pnpm prisma:push && pnpm import:questions",
 
