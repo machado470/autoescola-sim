@@ -7,146 +7,123 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-//////////////////////
-// CATEGORY
-//////////////////////
-
-model Category {
-  id        Int       @id @default(autoincrement())
-  name      String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  phases     Phase[]
-  questions  Question[]
-  progress   UserProgress[]
-}
-
-//////////////////////
-// PHASE
-//////////////////////
-
-model Phase {
-  id        Int       @id @default(autoincrement())
-  name      String
-  order     Int
-  category  Category  @relation(fields: [categoryId], references: [id])
-  categoryId Int
-
-  questions Question[]
-  progress  UserProgress[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([categoryId, name])
-}
-
-//////////////////////
-// QUESTION
-//////////////////////
-
-model Question {
-  id         Int      @id @default(autoincrement())
-  statement  String
-  answerA    String
-  answerB    String
-  answerC    String
-  answerD    String
-  correct    String
-  chosen     String   @default("")
-  image      String?
-
-  phase      Phase    @relation(fields: [phaseId], references: [id])
-  phaseId    Int
-
-  category   Category @relation(fields: [categoryId], references: [id])
-  categoryId Int
-
-  answers    ExamAnswer[]
-
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-}
-
-
-//////////////////////
-// EXAM SESSION
-//////////////////////
-
-model ExamSession {
-  id        Int          @id @default(autoincrement())
-  user      User         @relation(fields: [userId], references: [id])
-  userId    Int
-
-  startedAt DateTime     @default(now())
-  finishedAt DateTime?
-  score     Int          @default(0)
-
-  answers   ExamAnswer[]
-}
-
-//////////////////////
-// EXAM ANSWER
-//////////////////////
-
-model ExamAnswer {
-  id         Int          @id @default(autoincrement())
-  session    ExamSession  @relation(fields: [sessionId], references: [id])
-  sessionId  Int
-
-  question   Question     @relation(fields: [questionId], references: [id])
-  questionId Int
-
-  user       User         @relation(fields: [userId], references: [id])
-  userId     Int
-
-  chosen     String
-  isCorrect  Boolean      @default(false)
-
-  createdAt  DateTime     @default(now())
-}
-
-
-//////////////////////
-// USER
-//////////////////////
+//
+// ───────────────────────────────────────────
+//  MODELO DE USUÁRIO (LOGIN / ADMIN)
+// ───────────────────────────────────────────
+//
 
 model User {
-  id        Int            @id @default(autoincrement())
-  email     String         @unique
+  id        Int      @id @default(autoincrement())
+  nome      String
+  email     String    @unique
   password  String
-  name      String?
-
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
-
-  examSessions ExamSession[]
-  examAnswers  ExamAnswer[]
-  progress     UserProgress[]
+  role      Role      @default(USER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
-//////////////////////
-// USER PROGRESS
-//////////////////////
-
-model UserProgress {
-  id         Int       @id @default(autoincrement())
-  user       User      @relation(fields: [userId], references: [id])
-  userId     Int
-
-  category   Category  @relation(fields: [categoryId], references: [id])
-  categoryId Int
-
-  phase      Phase     @relation(fields: [phaseId], references: [id])
-  phaseId    Int
-
-  correct    Int       @default(0)
-  total      Int       @default(0)
-
-  startedAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-
-  @@unique([userId, categoryId, phaseId])
+enum Role {
+  USER
+  ADMIN
 }
 
+//
+// ───────────────────────────────────────────
+//  MODELOS DO AUTOESCOLA-SIM
+// ───────────────────────────────────────────
+//
+
+model Aluno {
+  id         Int              @id @default(autoincrement())
+  nome       String
+  email      String           @unique
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  simulados  Simulado[]
+  progresso  ProgressoAluno[]
+}
+
+model Categoria {
+  id         Int          @id @default(autoincrement())
+  nome       String       @unique
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  fases      Fase[]
+  perguntas  Pergunta[]
+}
+
+model Fase {
+  id          Int              @id @default(autoincrement())
+  titulo      String
+  categoriaId Int
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  categoria   Categoria        @relation(fields: [categoriaId], references: [id])
+  perguntas   Pergunta[]
+  aulas       Aula[]
+  progresso   ProgressoAluno[]
+
+  @@unique([titulo, categoriaId])
+}
+
+model Pergunta {
+  id            Int        @id @default(autoincrement())
+  enunciado     String
+  alternativaA  String
+  alternativaB  String
+  alternativaC  String
+  alternativaD  String
+  correta       String
+  faseId        Int
+  categoriaId   Int
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  fase        Fase       @relation(fields: [faseId], references: [id])
+  categoria   Categoria  @relation(fields: [categoriaId], references: [id])
+}
+
+model Aula {
+  id          Int        @id @default(autoincrement())
+  faseId      Int
+  titulo      String
+  conteudo    String
+  videoUrl    String?
+  ordem       Int        @default(1)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  fase        Fase       @relation(fields: [faseId], references: [id])
+  progresso   ProgressoAluno[]
+}
+
+model ProgressoAluno {
+  id        Int       @id @default(autoincrement())
+  alunoId   Int
+  aulaId    Int
+  faseId    Int
+  concluido Boolean   @default(false)
+  xp        Int       @default(0)
+  updatedAt DateTime  @default(now())
+
+  aluno     Aluno     @relation(fields: [alunoId], references: [id])
+  aula      Aula      @relation(fields: [aulaId], references: [id])
+  fase      Fase      @relation(fields: [faseId], references: [id])
+
+  @@unique([alunoId, aulaId])
+}
+
+model Simulado {
+  id            Int        @id @default(autoincrement())
+  alunoId       Int
+  totalQuestoes Int
+  acertos       Int        @default(0)
+  createdAt     DateTime   @default(now())
+
+  aluno        Aluno      @relation(fields: [alunoId], references: [id])
+}

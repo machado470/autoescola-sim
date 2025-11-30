@@ -30,61 +30,51 @@ async function main() {
   ];
 
   for (const category of data) {
-    const cat = await prisma.category.upsert({
-      where: { name: category.name },
+    const cat = await prisma.categoria.upsert({
+      where: { nome: category.name },
       update: {},
-      create: { name: category.name }
+      create: { nome: category.name }
     });
 
-    console.log(`Categoria OK -> ${cat.name} (id ${cat.id})`);
+    console.log(`Categoria OK -> ${cat.nome} (id ${cat.id})`);
 
     for (const phase of category.phases) {
-      const ph = await prisma.phase.upsert({
+      const ph = await prisma.fase.upsert({
         where: {
-          categoryId_name: {
-            categoryId: cat.id,
-            name: phase.name
+          titulo_categoriaId: {
+            titulo: phase.name,
+            categoriaId: cat.id
           }
         },
         update: {},
         create: {
-          name: phase.name,
-          order: 1,
-          categoryId: cat.id
+          titulo: phase.name,
+          categoriaId: cat.id
         }
       });
 
-      console.log(`  Fase OK -> ${ph.name} (id ${ph.id})`);
+      console.log(`  Fase OK -> ${ph.titulo} (id ${ph.id})`);
 
       for (const q of phase.questions) {
         const correctAnswer =
           q.answers.find(a => a.isCorrect)?.text ?? q.answers[0].text;
 
-        const question = await prisma.question.create({
+        await prisma.pergunta.create({
           data: {
-            statement: q.statement,
-            phaseId: ph.id,
-            categoryId: cat.id,
+            enunciado: q.statement,
+            categoriaId: cat.id,
+            faseId: ph.id,
 
-            answerA: q.answers[0].text,
-            answerB: q.answers[1].text,
-            answerC: q.answers[2].text,
-            answerD: q.answers[3].text,
+            alternativaA: q.answers[0].text,
+            alternativaB: q.answers[1].text,
+            alternativaC: q.answers[2].text,
+            alternativaD: q.answers[3].text,
 
-            correct: correctAnswer,
-            chosen: "",
-
-            answers: {
-              create: q.answers.map(a => ({
-                text: a.text,
-                chosen: "",        // <-- OBRIGATÓRIO
-                isCorrect: a.isCorrect ?? false
-              }))
-            }
+            correta: correctAnswer
           }
         });
 
-        console.log(`      Questão criada -> ${question.statement}`);
+        console.log(`      Questão criada -> ${q.statement}`);
       }
     }
   }
@@ -95,4 +85,3 @@ async function main() {
 main()
   .catch((e) => console.error(e))
   .finally(async () => await prisma.$disconnect());
-

@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Simulado from "./pages/Simulado";
 import Dashboard from "./pages/Dashboard";
+import SimuladoStart from "./pages/SimuladoStart";
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
       <Route path="/simulado" element={<Simulado />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/simulado/start" element={<SimuladoStart />} />
     </Routes>
   );
 }

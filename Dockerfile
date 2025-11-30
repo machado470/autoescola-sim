@@ -11,14 +11,16 @@ RUN apt-get update && apt-get install -y openssl libssl3 \
 # Arquivos base do monorepo
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-# Package da API + Prisma schema
+# Package da API + Prisma schema + SCRIPTS (FUNDAMENTAL)
 COPY apps/api/package.json apps/api/package.json
 COPY apps/api/prisma apps/api/prisma
+COPY apps/api/scripts apps/api/scripts
+COPY apps/api/tsconfig.json apps/api/tsconfig.json
 
 # Instala dependências de tudo (monorepo)
 RUN pnpm install --frozen-lockfile
 
-# Copia o resto do código
+# Copia o restante do código
 COPY . .
 
 # Gera Prisma Client e builda a API
