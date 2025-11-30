@@ -11,15 +11,15 @@
     "start:dev": "nest start --watch",
     "start:prod": "node dist/main.js",
 
-    "format": "prettier --write .",
-    "lint": "eslint . --ext .ts",
-
     "prisma:generate": "prisma generate --schema apps/api/prisma/schema.prisma",
     "prisma:push": "prisma db push --schema apps/api/prisma/schema.prisma",
-    "prisma:migrate": "prisma migrate dev --schema apps/api/prisma/schema.prisma --name init",
+    "prisma:seed": "prisma db seed --schema apps/api/prisma/schema.prisma",
 
-    "db:seed": "pnpm prisma:generate && pnpm prisma:push && tsx apps/api/prisma/seed.ts",
-    "import:questions": "ts-node apps/api/prisma/seed.ts"
+    "import:questions": "tsx scripts/import-questions.ts",
+    "import:lessons": "tsx scripts/import-lessons.ts",
+    "seed:auto": "tsx scripts/seed-auto.ts",
+    "dev:create-admin": "tsx scripts/dev-create-admin.ts",
+    "count:by-category": "tsx scripts/count-by-category.ts"
   },
 
   "dependencies": {
@@ -72,7 +72,6 @@
   },
 
   "prisma": {
-    "seed": "ts-node --transpile-only apps/api/prisma/seed.ts"
+    "seed": "tsx apps/api/prisma/seed.ts"
   }
 }
-
