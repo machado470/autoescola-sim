@@ -10,29 +10,27 @@ RUN apt-get update \
 # habilita pnpm
 RUN corepack enable && corepack prepare pnpm@9.12.3 --activate
 
-# copia manifests do monorepo
+# 1) COPIA SOMENTE OS MANIFESTS DO MONOREPO
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY tsconfig.json ./tsconfig.json
 
-# copia package.json da API
+# 2) COPIA OS MANIFESTS DA API (sem código ainda)
 COPY apps/api/package.json ./apps/api/package.json
-
-# copia prisma, scripts e tsconfig (FUNDAMENTAL)
-COPY apps/api/prisma ./apps/api/prisma
-COPY apps/api/scripts ./apps/api/scripts
 COPY apps/api/tsconfig.json ./apps/api/tsconfig.json
+COPY apps/api/tsconfig.build.json ./apps/api/tsconfig.build.json
 
-# instala dependências
+# 3) INSTALA AS DEPENDÊNCIAS
 RUN pnpm install --frozen-lockfile
 
-# copia o restante do projeto
-
+# 4) AGORA SIM — COPIA O CÓDIGO COMPLETO DA API
 COPY apps/api ./apps/api
 
-# gera prisma client usando o schema correto
+# 5) GERA O CLIENTE PRISMA (agora que o código está completo)
 RUN npx prisma generate --schema=apps/api/prisma/schema.prisma
 
-# build da API
-RUN pnpm --filter ./apps/api build
+# 6) BUILD DA API
+WORKDIR /app/apps/api
+RUN pnpm build
 
-CMD ["node", "apps/api/dist/main.js"]
-
+# 7) COMANDO FINAL
+CMD ["node", "dist/main.js"]

@@ -1,27 +1,40 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { LessonsService } from './lessons.service';
 
 @Controller('lessons')
 export class LessonsController {
-  constructor(private readonly lessonsService: LessonsService) {}
+  constructor(private readonly service: LessonsService) {}
+
+  @Post()
+  create(@Body() body: any) {
+    return this.service.create(body);
+  }
 
   @Get()
   findAll() {
-    return this.lessonsService.findAll();
+    return this.service.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.lessonsService.findOne(Number(id));
+    return this.service.findOne(id);
   }
 
-  @Get('/phase/:phaseId')
-  findByPhase(@Param('phaseId') phaseId: string) {
-    return this.lessonsService.findByPhase(Number(phaseId));
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() body: any) {
+    return this.service.update(id, body);
   }
 
-  @Get('/category/:categoryId')
-  findByCategory(@Param('categoryId') categoryId: string) {
-    return this.lessonsService.findByCategory(Number(categoryId));
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.service.remove(id);
   }
 }
