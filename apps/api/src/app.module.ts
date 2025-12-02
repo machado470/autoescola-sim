@@ -11,12 +11,14 @@ import { QuizModule } from './quiz/quiz.module';
 import { StudentProgressModule } from './student-progress/student-progress.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
 
+    // módulos do domínio
     CategoriesModule,
     QuestionsModule,
     LessonsModule,
@@ -25,8 +27,9 @@ import { AuthModule } from './auth/auth.module';
     StudentProgressModule,
     UsersModule,
     AuthModule,
+
+    // health check
+    HealthModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}

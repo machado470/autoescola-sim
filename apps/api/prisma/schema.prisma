@@ -8,19 +8,20 @@ datasource db {
 }
 
 //
-//  USERS
+// USERS
 //
 model User {
-  id        String        @id @default(uuid())
+  id        String           @id @default(uuid())
   name      String
-  email     String        @unique
+  email     String           @unique
   password  String
-  role      UserRole      @default(STUDENT)
+  role      UserRole         @default(STUDENT)
 
   progress  StudentProgress[]
   quiz      QuizSession[]
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
+
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
 }
 
 enum UserRole {
@@ -29,7 +30,7 @@ enum UserRole {
 }
 
 //
-//  CATEGORY (A, B, C...)
+// CATEGORY
 //
 model Category {
   id        String             @id @default(uuid())
@@ -39,13 +40,12 @@ model Category {
   questions Question[]
   lessons   Lesson[]
 
-  // 🔥 RELACIONAMENTOS QUE FALTAVAM
   studentProgress StudentProgress[]
   quizSessions    QuizSession[]
 }
 
 //
-// PHASES (Fase 1, 2, 3...)
+// PHASES
 //
 model Phase {
   id         String      @id @default(uuid())
@@ -56,13 +56,16 @@ model Phase {
 
   questions  Question[]
   lessons    Lesson[]
+
+  // Essencial para upsert no seed
+  @@unique([categoryId, name])
 }
 
 //
 // QUESTIONS
 //
 model Question {
-  id         String    @id @default(uuid())
+  id         String     @id @default(uuid())
   statement  String
   optionA    String
   optionB    String
@@ -70,8 +73,10 @@ model Question {
   optionD    String
   correct    String
 
+  order      Int        @default(0)
+
   categoryId String
-  category   Category  @relation(fields: [categoryId], references: [id])
+  category   Category   @relation(fields: [categoryId], references: [id])
 
   phaseId    String?
   phase      Phase?     @relation(fields: [phaseId], references: [id])
@@ -81,37 +86,42 @@ model Question {
 // LESSONS
 //
 model Lesson {
-  id         String   @id @default(uuid())
+  id         String     @id @default(uuid())
   title      String
   content    String
 
+  order      Int        @default(0)
+
   categoryId String?
-  category   Category? @relation(fields: [categoryId], references: [id])
+  category   Category?  @relation(fields: [categoryId], references: [id])
 
   phaseId    String?
-  phase      Phase?    @relation(fields: [phaseId], references: [id])
+  phase      Phase?     @relation(fields: [phaseId], references: [id])
 }
 
 //
 // STUDENT PROGRESS
 //
 model StudentProgress {
-  id         String   @id @default(uuid())
+  id         String    @id @default(uuid())
   userId     String
-  user       User     @relation(fields: [userId], references: [id])
+  user       User      @relation(fields: [userId], references: [id])
 
   categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
+  category   Category  @relation(fields: [categoryId], references: [id])
 
-  correct    Int      @default(0)
-  wrong      Int      @default(0)
-  progress   Int      @default(0)
+  correct    Int       @default(0)
+  wrong      Int       @default(0)
+  progress   Int       @default(0)
 
-  updatedAt  DateTime @updatedAt
+  updatedAt  DateTime  @updatedAt
+
+  // Evita duplicar progresso do mesmo aluno
+  @@unique([userId, categoryId])
 }
 
 //
-// QUIZ SESSION (tentativas de simulado)
+// QUIZ SESSION
 //
 model QuizSession {
   id         String    @id @default(uuid())
