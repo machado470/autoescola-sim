@@ -1,25 +1,34 @@
-import { Controller, Get, Post, Body, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { QuestionsService } from './questions.service';
+import { CreateQuestionDto } from './dto/create-question.dto';
+import { UpdateQuestionDto } from './dto/update-question.dto';
 
 @Controller('questions')
 export class QuestionsController {
-  constructor(private service: QuestionsService) {}
+  constructor(private readonly questionsService: QuestionsService) {}
 
   @Get()
   findAll() {
-    return this.service.findAll();
+    return this.questionsService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.questionsService.findOne(id);
   }
 
   @Post()
-  create(@Body() body: any) {
-    return this.service.create(body);
+  create(@Body() dto: CreateQuestionDto) {
+    return this.questionsService.create(dto);
   }
 
-  @Get('random')
-  random(
-    @Query('categoryId') categoryId: string,
-    @Query('take') take = 10,
-  ) {
-    return this.service.random(categoryId, Number(take));
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() dto: UpdateQuestionDto) {
+    return this.questionsService.update(id, dto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.questionsService.remove(id);
   }
 }

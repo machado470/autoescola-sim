@@ -1,20 +1,18 @@
-import { Controller, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body } from '@nestjs/common';
 import { QuizService } from './quiz.service';
+import { SubmitQuizDto } from './dto/submit-quiz.dto';
 
 @Controller('quiz')
 export class QuizController {
-  constructor(private service: QuizService) {}
+  constructor(private readonly quizService: QuizService) {}
 
-  @Post('start')
-  start(@Body() body: { userId: string; categoryId: string; total: number }) {
-    return this.service.start(body.userId, body.categoryId, body.total);
+  @Get('generate/:quantity')
+  generate(@Param('quantity') quantity: string) {
+    return this.quizService.generateQuiz(Number(quantity));
   }
 
-  @Post('finish/:id')
-  finish(
-    @Param('id') id: string,
-    @Body() body: { correct: number; wrong: number },
-  ) {
-    return this.service.finish(id, body);
+  @Post('submit')
+  submit(@Body() dto: SubmitQuizDto) {
+    return this.quizService.submitQuiz(dto);
   }
 }
