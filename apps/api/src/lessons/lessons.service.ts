@@ -5,59 +5,32 @@ import { PrismaService } from '../prisma/prisma.service';
 export class LessonsService {
   constructor(private prisma: PrismaService) {}
 
+  create(data: any) {
+    return this.prisma.lesson.create({
+      data,
+    });
+  }
+
   findAll() {
-    return this.prisma.aula.findMany({
-      include: {
-        fase: {
-          include: {
-            categoria: true,
-          },
-        },
-      },
-    });
+    return this.prisma.lesson.findMany();
   }
 
-  findOne(id: number) {
-    return this.prisma.aula.findUnique({
+  findOne(id: string) {
+    return this.prisma.lesson.findUnique({
       where: { id },
-      include: {
-        fase: {
-          include: {
-            categoria: true,
-          },
-        },
-      },
     });
   }
 
-  findByPhase(phaseId: number) {
-    return this.prisma.aula.findMany({
-      where: { faseId: phaseId },
-      include: {
-        fase: {
-          include: {
-            categoria: true,
-          },
-        },
-      },
+  update(id: string, data: any) {
+    return this.prisma.lesson.update({
+      where: { id },
+      data,
     });
   }
 
-  findByCategory(categoryId: number) {
-    return this.prisma.aula.findMany({
-      where: {
-        fase: {
-          categoriaId: categoryId,
-        },
-      },
-      include: {
-        fase: {
-          include: {
-            categoria: true,
-          },
-        },
-      },
+  remove(id: string) {
+    return this.prisma.lesson.delete({
+      where: { id },
     });
   }
 }
-

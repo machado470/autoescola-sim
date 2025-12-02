@@ -2,49 +2,37 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-
-  // --- Categoria ---
-  const categoria = await prisma.categoria.create({
+  const category = await prisma.category.create({
     data: {
-      nome: 'Geral',
+      name: 'A',
     },
   });
 
-  // --- Fase ---
-  const fase = await prisma.fase.create({
+  const phase = await prisma.phase.create({
     data: {
-      titulo: 'Introdução',
-      categoriaId: categoria.id,
+      name: 'Fase 1',
+      order: 1,
+      categoryId: category.id,
     },
   });
 
-  // --- Perguntas ---
-  await prisma.pergunta.createMany({
-    data: [
-      {
-        enunciado: 'Qual a velocidade máxima em via urbana?',
-        alternativaA: '30 km/h',
-        alternativaB: '40 km/h',
-        alternativaC: '50 km/h',
-        alternativaD: '60 km/h',
-        correta: 'C',
-        faseId: fase.id,
-        categoriaId: categoria.id,
-      },
-      {
-        enunciado: 'O que significa placa de fundo amarelo?',
-        alternativaA: 'Advertência',
-        alternativaB: 'Regulamentação',
-        alternativaC: 'Indicação',
-        alternativaD: 'Serviços',
-        correta: 'A',
-        faseId: fase.id,
-        categoriaId: categoria.id,
-      },
-    ],
+  await prisma.question.create({
+    data: {
+      statement: 'Exemplo de pergunta',
+      optionA: 'A',
+      optionB: 'B',
+      optionC: 'C',
+      optionD: 'D',
+      correct: 'A',
+      categoryId: category.id,
+      phaseId: phase.id,
+    },
   });
-
-  console.log('Seed aplicado com sucesso!');
 }
 
-main().finally(() => prisma.$disconnect());
+main()
+  .then(() => prisma.$disconnect())
+  .catch((e) => {
+    console.error(e);
+    prisma.$disconnect();
+  });

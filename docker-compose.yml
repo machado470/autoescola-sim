@@ -1,10 +1,8 @@
-version: "3.9"
-
 services:
   postgres:
     image: postgres:15
     container_name: autoescola_postgres
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -19,22 +17,28 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+      start_period: 5s
 
   api:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: apps/api/Dockerfile
     container_name: autoescola_api
+    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
-    restart: always
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/autoescola
       NODE_ENV: development
     ports:
       - "3000:3000"
-    # sem volumes aqui pra NÃO sobrescrever o dist dentro da imagem
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 volumes:
   pgdata:
