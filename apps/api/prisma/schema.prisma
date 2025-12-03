@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["clientExtensions"]
 }
 
 datasource db {
@@ -36,10 +37,9 @@ model Category {
   id        String             @id @default(uuid())
   name      String             @unique
 
-  phases    Phase[]
-  questions Question[]
-  lessons   Lesson[]
-
+  phases          Phase[]
+  questions       Question[]
+  lessons         Lesson[]
   studentProgress StudentProgress[]
   quizSessions    QuizSession[]
 }
@@ -57,7 +57,6 @@ model Phase {
   questions  Question[]
   lessons    Lesson[]
 
-  // Essencial para upsert no seed
   @@unique([categoryId, name])
 }
 
@@ -116,7 +115,6 @@ model StudentProgress {
 
   updatedAt  DateTime  @updatedAt
 
-  // Evita duplicar progresso do mesmo aluno
   @@unique([userId, categoryId])
 }
 

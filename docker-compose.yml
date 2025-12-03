@@ -29,12 +29,22 @@ services:
       postgres:
         condition: service_healthy
     environment:
+      # 🔥 Corrigido: agora o secret REAL vai para dentro do container
+      JWT_SECRET: supersecret
+
+      # 🔥 O database URL correto apontando pro container "postgres"
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/autoescola
+
       NODE_ENV: development
+
+      # (opcional) pra evitar problema de timezone com expiração
+      TZ: America/Sao_Paulo
+
     ports:
       - "3000:3000"
+
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
       interval: 10s
       timeout: 5s
       retries: 5

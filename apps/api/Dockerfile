@@ -25,8 +25,8 @@ RUN pnpm install --frozen-lockfile
 # 4) AGORA SIM — COPIA O CÓDIGO COMPLETO DA API
 COPY apps/api ./apps/api
 
-# 5) GERA O CLIENTE PRISMA (agora que o código está completo)
-RUN npx prisma generate --schema=apps/api/prisma/schema.prisma
+# 5) GERA O CLIENTE PRISMA (usando CAMINHO ABSOLUTO)
+RUN npx prisma generate --schema=/app/apps/api/prisma/schema.prisma
 
 # 6) BUILD DA API
 WORKDIR /app/apps/api

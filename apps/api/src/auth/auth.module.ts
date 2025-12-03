@@ -4,11 +4,9 @@ import { PassportModule } from '@nestjs/passport';
 
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { LocalStrategy } from './strategies/local.strategy';
-import { JwtStrategy } from './strategies/jwt.strategy';
 
-import { LocalAuthGuard } from './guards/local-auth.guard';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { RolesGuard } from './roles.guard';
 
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -16,7 +14,7 @@ import { PrismaService } from '../prisma/prisma.service';
   imports: [
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET ?? 'dev-secret',
+      secret: process.env.JWT_SECRET || 'secret123',
       signOptions: { expiresIn: '7d' },
     }),
   ],
@@ -24,10 +22,8 @@ import { PrismaService } from '../prisma/prisma.service';
   providers: [
     AuthService,
     PrismaService,
-    LocalStrategy,
     JwtStrategy,
-    LocalAuthGuard,
-    JwtAuthGuard,
+    RolesGuard,
   ],
   exports: [AuthService],
 })
