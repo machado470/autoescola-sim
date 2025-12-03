@@ -7,9 +7,13 @@ import { UpdatePhaseDto } from './dto/update-phase.dto';
 export class PhasesService {
   constructor(private prisma: PrismaService) {}
 
-  findAll() {
+  async findAll() {
     return this.prisma.phase.findMany({
-      include: { category: true },
+      include: {
+        category: true,
+        questions: true,
+        lessons: true,
+      },
       orderBy: { order: 'asc' },
     });
   }
@@ -17,7 +21,11 @@ export class PhasesService {
   async findOne(id: string) {
     const phase = await this.prisma.phase.findUnique({
       where: { id },
-      include: { category: true },
+      include: {
+        category: true,
+        questions: true,
+        lessons: true,
+      },
     });
 
     if (!phase) throw new NotFoundException('Phase not found');
@@ -25,20 +33,24 @@ export class PhasesService {
     return phase;
   }
 
-  create(data: CreatePhaseDto) {
-    return this.prisma.phase.create({ data });
+  async create(dto: CreatePhaseDto) {
+    return this.prisma.phase.create({
+      data: dto,
+    });
   }
 
-  async update(id: string, data: UpdatePhaseDto) {
+  async update(id: string, dto: UpdatePhaseDto) {
     await this.ensureExists(id);
+
     return this.prisma.phase.update({
       where: { id },
-      data,
+      data: dto,
     });
   }
 
   async remove(id: string) {
     await this.ensureExists(id);
+
     return this.prisma.phase.delete({
       where: { id },
     });
