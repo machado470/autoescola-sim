@@ -12,20 +12,22 @@ datasource db {
 // USERS
 //
 model User {
-  id        String           @id @default(uuid())
+  id        String   @id @default(uuid())
   name      String
-  email     String           @unique
+  email     String   @unique
   password  String
-  role      UserRole         @default(STUDENT)
+  role      UserRole @default(STUDENT)
 
-  // Refresh Token seguro
-  refreshTokenHash String?   @db.Text
+  refreshTokenHash String? @db.Text
 
+  // Progresso por FASE
   progress  StudentProgress[]
+
+  // Sessões de simulado
   quiz      QuizSession[]
 
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum UserRole {
@@ -37,28 +39,29 @@ enum UserRole {
 // CATEGORY
 //
 model Category {
-  id        String             @id @default(uuid())
-  name      String             @unique
+  id   String @id @default(uuid())
+  name String @unique
 
-  phases          Phase[]
-  questions       Question[]
-  lessons         Lesson[]
-  studentProgress StudentProgress[]
-  quizSessions    QuizSession[]
+  phases       Phase[]
+  questions    Question[]
+  lessons      Lesson[]
+  quizSessions QuizSession[]
 }
 
 //
-// PHASES
+// PHASE
 //
 model Phase {
-  id         String      @id @default(uuid())
+  id         String    @id @default(uuid())
   name       String
   order      Int
+
   categoryId String
-  category   Category    @relation(fields: [categoryId], references: [id])
+  category   Category  @relation(fields: [categoryId], references: [id])
 
   questions  Question[]
   lessons    Lesson[]
+  progress   StudentProgress[]
 
   @@unique([categoryId, name])
 }
@@ -67,74 +70,78 @@ model Phase {
 // QUESTIONS
 //
 model Question {
-  id         String     @id @default(uuid())
-  statement  String
-  optionA    String
-  optionB    String
-  optionC    String
-  optionD    String
-  correct    String
+  id        String   @id @default(uuid())
+  statement String
+  optionA   String
+  optionB   String
+  optionC   String
+  optionD   String
+  correct   String
 
-  order      Int        @default(0)
+  order     Int      @default(0)
 
   categoryId String
-  category   Category   @relation(fields: [categoryId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
 
   phaseId    String?
-  phase      Phase?     @relation(fields: [phaseId], references: [id])
+  phase      Phase?   @relation(fields: [phaseId], references: [id])
 }
 
 //
 // LESSONS
 //
 model Lesson {
-  id         String     @id @default(uuid())
-  title      String
-  content    String
+  id      String   @id @default(uuid())
+  title   String
+  content String
 
-  order      Int        @default(0)
+  order   Int @default(0)
 
   categoryId String?
-  category   Category?  @relation(fields: [categoryId], references: [id])
+  category   Category? @relation(fields: [categoryId], references: [id])
 
   phaseId    String?
-  phase      Phase?     @relation(fields: [phaseId], references: [id])
+  phase      Phase?    @relation(fields: [phaseId], references: [id])
 }
 
 //
-// STUDENT PROGRESS
+// STUDENT PROGRESS (por FASE) — VERSÃO FINAL
 //
 model StudentProgress {
-  id         String    @id @default(uuid())
+  id         String   @id @default(uuid())
+
   userId     String
-  user       User      @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
 
-  categoryId String
-  category   Category  @relation(fields: [categoryId], references: [id])
+  phaseId    String
+  phase      Phase    @relation(fields: [phaseId], references: [id])
 
-  correct    Int       @default(0)
-  wrong      Int       @default(0)
-  progress   Int       @default(0)
+  completedLessons Int    @default(0)
+  correctAnswers   Int    @default(0)
+  wrongAnswers     Int    @default(0)
+  isDone           Boolean @default(false)
 
-  updatedAt  DateTime  @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  @@unique([userId, categoryId])
+  @@unique([userId, phaseId])
 }
 
 //
 // QUIZ SESSION
 //
 model QuizSession {
-  id         String    @id @default(uuid())
+  id         String   @id @default(uuid())
+
   userId     String
-  user       User      @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
 
   categoryId String
-  category   Category  @relation(fields: [categoryId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
 
   total      Int
   correct    Int
   wrong      Int
 
-  createdAt  DateTime  @default(now())
+  createdAt  DateTime @default(now())
 }
