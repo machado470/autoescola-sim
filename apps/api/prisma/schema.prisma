@@ -18,6 +18,9 @@ model User {
   password  String
   role      UserRole         @default(STUDENT)
 
+  // Refresh Token seguro
+  refreshTokenHash String?   @db.Text
+
   progress  StudentProgress[]
   quiz      QuizSession[]
 
