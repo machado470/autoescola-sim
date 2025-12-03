@@ -28,17 +28,9 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    environment:
-      # 🔥 Corrigido: agora o secret REAL vai para dentro do container
-      JWT_SECRET: supersecret
 
-      # 🔥 O database URL correto apontando pro container "postgres"
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/autoescola
-
-      NODE_ENV: development
-
-      # (opcional) pra evitar problema de timezone com expiração
-      TZ: America/Sao_Paulo
+    env_file:
+      - .env     # ✅ Agora o container carrega TUDO do .env
 
     ports:
       - "3000:3000"
