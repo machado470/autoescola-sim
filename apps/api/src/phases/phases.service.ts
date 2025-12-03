@@ -13,6 +13,7 @@ export class PhasesService {
         category: true,
         questions: true,
         lessons: true,
+        _count: { select: { lessons: true } },
       },
       orderBy: { order: 'asc' },
     });
@@ -25,6 +26,7 @@ export class PhasesService {
         category: true,
         questions: true,
         lessons: true,
+        _count: { select: { lessons: true } },
       },
     });
 
@@ -34,26 +36,17 @@ export class PhasesService {
   }
 
   async create(dto: CreatePhaseDto) {
-    return this.prisma.phase.create({
-      data: dto,
-    });
+    return this.prisma.phase.create({ data: dto });
   }
 
   async update(id: string, dto: UpdatePhaseDto) {
     await this.ensureExists(id);
-
-    return this.prisma.phase.update({
-      where: { id },
-      data: dto,
-    });
+    return this.prisma.phase.update({ where: { id }, data: dto });
   }
 
   async remove(id: string) {
     await this.ensureExists(id);
-
-    return this.prisma.phase.delete({
-      where: { id },
-    });
+    return this.prisma.phase.delete({ where: { id } });
   }
 
   private async ensureExists(id: string) {

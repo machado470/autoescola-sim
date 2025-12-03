@@ -3,31 +3,35 @@ import { StudentProgressService } from './student-progress.service';
 
 @Controller('student-progress')
 export class StudentProgressController {
-  constructor(private readonly progressService: StudentProgressService) {}
+  constructor(private service: StudentProgressService) {}
 
-  // Buscar progresso geral do aluno na categoria
-  @Get(':userId/:categoryId')
-  getProgress(
-    @Param('userId') userId: string,
-    @Param('categoryId') categoryId: string,
-  ) {
-    return this.progressService.getProgress(userId, categoryId);
+  @Get('dashboard/:userId')
+  getDashboard(@Param('userId') userId: string) {
+    return this.service.getUserDashboard(userId);
   }
 
-  // Registrar resultado de uma questão
-  @Post('register')
-  registerResult(
-    @Body()
-    body: {
-      userId: string;
-      categoryId: string;
-      isCorrect: boolean;
-    },
-  ) {
-    return this.progressService.registerResult(
-      body.userId,
-      body.categoryId,
-      body.isCorrect,
-    );
+  @Get(':userId/:phaseId')
+  get(@Param('userId') userId: string, @Param('phaseId') phaseId: string) {
+    return this.service.getPhaseProgress(userId, phaseId);
+  }
+
+  @Post('start')
+  start(@Body() body: any) {
+    return this.service.startPhase(body.userId, body.phaseId);
+  }
+
+  @Post('complete-lesson')
+  completeLesson(@Body() body: any) {
+    return this.service.completeLesson(body.userId, body.phaseId);
+  }
+
+  @Post('answer')
+  answer(@Body() body: any) {
+    return this.service.registerAnswer(body.userId, body.phaseId, body.correct);
+  }
+
+  @Post('finish-phase')
+  finish(@Body() body: any) {
+    return this.service.finishPhase(body.userId, body.phaseId);
   }
 }
