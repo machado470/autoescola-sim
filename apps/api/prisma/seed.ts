@@ -10,7 +10,10 @@ async function main() {
   // ADMIN USER
   //
   const adminEmail = 'admin@autoescola.com';
-  const adminExists = await prisma.user.findUnique({ where: { email: adminEmail } });
+
+  const adminExists = await prisma.user.findUnique({
+    where: { email: adminEmail },
+  });
 
   if (!adminExists) {
     const hashed = await bcrypt.hash('123456', 10);
@@ -32,7 +35,12 @@ async function main() {
   //
   // CATEGORIES
   //
-  const categories = ['Legislação de Trânsito', 'Direção Defensiva', 'Primeiros Socorros', 'Meio Ambiente e Cidadania'];
+  const categories = [
+    'Legislação de Trânsito',
+    'Direção Defensiva',
+    'Primeiros Socorros',
+    'Meio Ambiente e Cidadania',
+  ];
 
   for (const name of categories) {
     await prisma.category.upsert({
@@ -48,12 +56,20 @@ async function main() {
   // PHASES
   //
   const phases = [
-    { category: 'Legislação de Trânsito', items: ['Introdução', 'Sinalização', 'Normas de Circulação'] },
-    { category: 'Direção Defensiva', items: ['Riscos', 'Prevenção', 'Condições Adversas'] },
+    {
+      category: 'Legislação de Trânsito',
+      items: ['Introdução', 'Sinalização', 'Normas de Circulação'],
+    },
+    {
+      category: 'Direção Defensiva',
+      items: ['Riscos', 'Prevenção', 'Condições Adversas'],
+    },
   ];
 
   for (const p of phases) {
-    const category = await prisma.category.findUnique({ where: { name: p.category } });
+    const category = await prisma.category.findUnique({
+      where: { name: p.category },
+    });
 
     if (!category) continue;
 
@@ -82,7 +98,7 @@ async function main() {
   console.log('📘 Fases criadas.');
 
   //
-  // SAMPLE QUESTIONS (para garantir que existe algo no banco)
+  // SAMPLE QUESTIONS
   //
   const sampleCategory = await prisma.category.findUnique({
     where: { name: 'Legislação de Trânsito' },
