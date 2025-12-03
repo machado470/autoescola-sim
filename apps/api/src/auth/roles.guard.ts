@@ -6,17 +6,17 @@ import { ROLES_KEY } from './roles.decorator';
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
-  canActivate(context: ExecutionContext): boolean {
-    const allowedRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
+  canActivate(ctx: ExecutionContext): boolean {
+    const roles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
+      ctx.getHandler(),
+      ctx.getClass(),
     ]);
 
-    if (!allowedRoles) return true;
+    if (!roles) return true;
 
-    const { user } = context.switchToHttp().getRequest();
+    const { user } = ctx.switchToHttp().getRequest();
     if (!user) return false;
 
-    return allowedRoles.includes(user.role);
+    return roles.includes(user.role);
   }
 }

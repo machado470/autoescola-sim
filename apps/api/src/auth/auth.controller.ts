@@ -1,39 +1,65 @@
-import { 
-  Controller, Post, Body, Get, UseGuards 
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Req,
+  Res,
+  UseGuards,
 } from '@nestjs/common';
-
+import { Response, Request } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-
-import { JwtAuthGuard } from './auth.guard';
-import { CurrentUser } from './decorators/current-user.decorator';
-import { Roles } from './roles.decorator';
+import { LocalAuthGuard } from './guards/local-auth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { RefreshGuard } from './guards/refresh.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private auth: AuthService) {}
 
-  @Post('login')
-  login(@Body() dto: LoginDto) {
-    return this.authService.login(dto.email, dto.password);
-  }
-
+  //
+  // REGISTER
+  //
   @Post('register')
-  register(@Body() dto: RegisterDto) {
-    return this.authService.register(dto);
+  async register(@Body() dto: RegisterDto) {
+    return this.auth.register(dto);
   }
 
+  //
+  // LOGIN
+  //
+  @UseGuards(LocalAuthGuard)
+  @Post('login')
+  async login(@Req() req: Request, @Body() dto: LoginDto) {
+    return this.auth.login(dto.email, dto.password);
+  }
+
+  //
+  // ME
+  //
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  getMe(@CurrentUser() user: any) {
-    return user;
+  me(@Req() req: any) {
+    return req.user;
   }
 
+  //
+  // REFRESH
+  //
+  @UseGuards(RefreshGuard)
+  @Get('refresh')
+  refresh(@Req() req: any) {
+    return this.auth.refresh(req.user);
+  }
+
+  //
+  // LOGOUT
+  //
   @UseGuards(JwtAuthGuard)
-  @Roles('ADMIN')
-  @Get('admin')
-  onlyAdmins(@CurrentUser() user: any) {
-    return { message: 'Área restrita', user };
+  @Post('logout')
+  async logout(@Req() req: any) {
+    return this.auth.logout(req.user.id);
   }
 }
