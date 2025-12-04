@@ -1,6 +1,9 @@
+// -----------------------------------------------------
+// Prisma Schema — AutoEscola-Sim (versão final corrigida)
+// -----------------------------------------------------
+
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["clientExtensions"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -8,140 +11,137 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-//
-// USERS
-//
-model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  role      UserRole @default(STUDENT)
-
-  refreshTokenHash String? @db.Text
-
-  // Progresso por FASE
-  progress  StudentProgress[]
-
-  // Sessões de simulado
-  quiz      QuizSession[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
+// -----------------------------------------------------
+// ENUMS
+// -----------------------------------------------------
 
 enum UserRole {
-  ADMIN
   STUDENT
+  ADMIN
 }
 
-//
-// CATEGORY
-//
-model Category {
-  id   String @id @default(uuid())
-  name String @unique
+// -----------------------------------------------------
+// MODELS
+// -----------------------------------------------------
 
-  phases       Phase[]
-  questions    Question[]
-  lessons      Lesson[]
+model User {
+  id               String   @id @default(uuid())
+  name             String
+  email            String   @unique
+  passwordHash     String
+  role             UserRole @default(STUDENT)
+  xp               Int      @default(0)
+  refreshTokenHash String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
   quizSessions QuizSession[]
+  progress      StudentProgress[]
 }
 
-//
-// PHASE
-//
+// -----------------------------------------------------
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  phases    Phase[]
+  questions Question[]
+  lessons   Lesson[]
+}
+
+// -----------------------------------------------------
+
 model Phase {
-  id         String    @id @default(uuid())
+  id         String   @id @default(uuid())
   name       String
   order      Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   categoryId String
-  category   Category  @relation(fields: [categoryId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
 
   questions  Question[]
   lessons    Lesson[]
   progress   StudentProgress[]
 
-  @@unique([categoryId, name])
+  // �� Relação que estava faltando
+  quizSessions QuizSession[]
 }
 
-//
-// QUESTIONS
-//
-model Question {
-  id        String   @id @default(uuid())
-  statement String
-  optionA   String
-  optionB   String
-  optionC   String
-  optionD   String
-  correct   String
+// -----------------------------------------------------
 
-  order     Int      @default(0)
+model Lesson {
+  id         String   @id @default(uuid())
+  title      String
+  content    String?
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
 
-  phaseId    String?
-  phase      Phase?   @relation(fields: [phaseId], references: [id])
-}
-
-//
-// LESSONS
-//
-model Lesson {
-  id      String   @id @default(uuid())
-  title   String
-  content String
-
-  order   Int @default(0)
-
-  categoryId String?
-  category   Category? @relation(fields: [categoryId], references: [id])
-
-  phaseId    String?
-  phase      Phase?    @relation(fields: [phaseId], references: [id])
-}
-
-//
-// STUDENT PROGRESS (por FASE) — VERSÃO FINAL
-//
-model StudentProgress {
-  id         String   @id @default(uuid())
-
-  userId     String
-  user       User     @relation(fields: [userId], references: [id])
-
   phaseId    String
-  phase      Phase    @relation(fields: [phaseId], references: [id])
+  phase      Phase @relation(fields: [phaseId], references: [id])
+}
 
-  completedLessons Int    @default(0)
-  correctAnswers   Int    @default(0)
-  wrongAnswers     Int    @default(0)
-  isDone           Boolean @default(false)
+// -----------------------------------------------------
+
+model Question {
+  id         String   @id @default(uuid())
+  statement  String
+  optionA    String
+  optionB    String
+  optionC    String
+  optionD    String
+  correct    String
+  order      Int      @default(0)
 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  @@unique([userId, phaseId])
-}
-
-//
-// QUIZ SESSION
-//
-model QuizSession {
-  id         String   @id @default(uuid())
-
-  userId     String
-  user       User     @relation(fields: [userId], references: [id])
-
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
 
-  total      Int
-  correct    Int
-  wrong      Int
+  phaseId    String
+  phase      Phase @relation(fields: [phaseId], references: [id])
+}
+
+// -----------------------------------------------------
+
+model QuizSession {
+  id         String   @id @default(uuid())
+  userId     String
+  phaseId    String
+  score      Int      @default(0)
 
   createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user       User @relation(fields: [userId], references: [id])
+  phase      Phase @relation(fields: [phaseId], references: [id])
+}
+
+// -----------------------------------------------------
+
+model StudentProgress {
+  id               String   @id @default(uuid())
+  userId           String
+  phaseId          String
+  lessonsCompleted Int      @default(0)
+  correctAnswers   Int      @default(0)
+  finished         Boolean  @default(false)
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user             User  @relation(fields: [userId], references: [id])
+  phase            Phase @relation(fields: [phaseId], references: [id])
+
+  @@unique([userId, phaseId])
 }

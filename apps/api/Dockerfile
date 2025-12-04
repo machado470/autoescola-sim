@@ -4,7 +4,7 @@ WORKDIR /app
 
 # libs necessárias
 RUN apt-get update \
-  && apt-get install -y openssl libssl3 \
+  && apt-get install -y openssl libssl3 curl \
   && rm -rf /var/lib/apt/lists/*
 
 # habilita pnpm
@@ -25,7 +25,7 @@ RUN pnpm install --frozen-lockfile
 # 4) AGORA SIM — COPIA O CÓDIGO COMPLETO DA API
 COPY apps/api ./apps/api
 
-# 5) GERA O CLIENTE PRISMA (usando CAMINHO ABSOLUTO)
+# 5) GERA O CLIENTE PRISMA
 RUN npx prisma generate --schema=/app/apps/api/prisma/schema.prisma
 
 # 6) BUILD DA API
