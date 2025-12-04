@@ -1,0 +1,24 @@
+import { useEffect, useState } from "react";
+import api from "@/lib/api";
+
+export function useAula(lessonId: string) {
+  const [aula, setAula] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!lessonId) return;
+
+    async function load() {
+      try {
+        const res = await api.get(`/lessons/${lessonId}`);
+        setAula(res.data);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    load();
+  }, [lessonId]);
+
+  return { aula, loading };
+}

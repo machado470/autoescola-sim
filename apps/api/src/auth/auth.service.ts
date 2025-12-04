@@ -14,14 +14,11 @@ export class AuthService {
     private jwt: JwtService,
   ) {}
 
-  //
-  // LOGIN
-  //
   async validateUser(email: string, password: string) {
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) return null;
 
-    const match = await bcrypt.compare(password, user.password);
+    const match = await bcrypt.compare(password, user.passwordHash);
     if (!match) return null;
 
     return user;
@@ -34,9 +31,6 @@ export class AuthService {
     return this.generateTokens(user);
   }
 
-  //
-  // REGISTRO
-  //
   async register(dto: RegisterDto) {
     const hashed = await bcrypt.hash(dto.password, 10);
 
@@ -44,7 +38,7 @@ export class AuthService {
       data: {
         name: dto.name,
         email: dto.email,
-        password: hashed,
+        passwordHash: hashed,
         role: 'STUDENT',
       },
     });
@@ -52,26 +46,26 @@ export class AuthService {
     return this.generateTokens(user);
   }
 
-  //
-  // GERA ACCESS + REFRESH
-  //
+  // -------------------------------------------------------------------
+  // 🔥 VERSÃO FINAL — compatível com NestJS + TypeScript + JWT 100% 🔥
+  // -------------------------------------------------------------------
   async generateTokens(user: any) {
     const payload = {
-      sub: String(user.id), // corrigido
+      sub: user.id,
       email: user.email,
       role: user.role,
     };
 
-    const accessToken = this.jwt.sign(payload, {
-      expiresIn: process.env.JWT_EXPIRES_IN as any, // corrigido
+    const accessToken = await this.jwt.signAsync(payload, {
+      secret: process.env.JWT_SECRET,
+      expiresIn: process.env.JWT_EXPIRES_IN as any, // <- FIX DO TYPE
     });
 
-    const refreshToken = this.jwt.sign(payload, {
+    const refreshToken = await this.jwt.signAsync(payload, {
       secret: process.env.JWT_REFRESH_SECRET,
-      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN as any, // corrigido
+      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN as any, // <- FIX DO TYPE
     });
 
-    // salva hash do refresh
     await this.prisma.user.update({
       where: { id: user.id },
       data: {
@@ -79,16 +73,9 @@ export class AuthService {
       },
     });
 
-    return {
-      accessToken,
-      refreshToken,
-      user,
-    };
+    return { accessToken, refreshToken, user };
   }
 
-  //
-  // VALIDA REFRESH TOKEN
-  //
   async validateRefreshToken(userId: string, incomingToken: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user || !user.refreshTokenHash) return null;
@@ -97,16 +84,10 @@ export class AuthService {
     return isValid ? user : null;
   }
 
-  //
-  // REFRESH
-  //
   async refresh(user: any) {
     return this.generateTokens(user);
   }
 
-  //
-  // LOGOUT
-  //
   async logout(userId: string) {
     await this.prisma.user.update({
       where: { id: userId },
