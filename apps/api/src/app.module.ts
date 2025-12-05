@@ -1,38 +1,33 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 
+// CORE
 import { PrismaModule } from './prisma/prisma.module';
-
-import { CategoriesModule } from './categories/categories.module';
-import { QuestionsModule } from './questions/questions.module';
-import { LessonsModule } from './lessons/lessons.module';
-import { PhasesModule } from './phases/phases.module';
-import { QuizModule } from './quiz/quiz.module';
-import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-import { HealthModule } from './health/health.module';
 
-import { StatsModule } from './stats/stats.module';
+// DOMÍNIOS
+import { CategoriesModule } from './categories/categories.module';
+import { PhasesModule } from './phases/phases.module';
+import { LessonsModule } from './lessons/lessons.module';
+import { QuestionsModule } from './questions/questions.module';
+import { QuizModule } from './quiz/quiz.module';
 import { ProgressModule } from './progress/progress.module';
+import { StatsModule } from './stats/stats.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
-
-    // Domínio principal
-    CategoriesModule,
-    QuestionsModule,
-    LessonsModule,
-    PhasesModule,
-    QuizModule,
-    UsersModule,
     AuthModule,
 
-    // Módulos extras
-    StatsModule,
+    // Domínios da AutoEscola
+    CategoriesModule,
+    PhasesModule,
+    LessonsModule,
+    QuestionsModule,
+    QuizModule,
     ProgressModule,
-    HealthModule,
+    StatsModule,
+    UsersModule,
   ],
 })
 export class AppModule {}

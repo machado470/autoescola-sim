@@ -1,35 +1,33 @@
-import { Controller, Post, Body } from "@nestjs/common";
+import { Controller, Post, Body, Req, Get, Param, UseGuards } from "@nestjs/common";
 import { ProgressService } from "./progress.service";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 
 @Controller("progress")
+@UseGuards(JwtAuthGuard)
 export class ProgressController {
   constructor(private service: ProgressService) {}
 
-  // POST /progress/lesson
   @Post("lesson")
-  completeLesson(
-    @Body() body: { userId: string; phaseId: string }
-  ) {
-    return this.service.completeLesson(body.userId, body.phaseId);
+  completeLesson(@Req() req, @Body() body: { phaseId: string }) {
+    return this.service.completeLesson(req.user.sub, body.phaseId);
   }
 
-  // POST /progress/answer
   @Post("answer")
-  answerQuestion(
-    @Body() body: { userId: string; phaseId: string; isCorrect: boolean }
-  ) {
+  answer(@Req() req, @Body() body: { phaseId: string; isCorrect: boolean }) {
     return this.service.answerQuestion(
-      body.userId,
+      req.user.sub,
       body.phaseId,
-      body.isCorrect,
+      body.isCorrect
     );
   }
 
-  // POST /progress/finish
   @Post("finish")
-  finishPhase(
-    @Body() body: { userId: string; phaseId: string }
-  ) {
-    return this.service.finishPhase(body.userId, body.phaseId);
+  finishPhase(@Req() req, @Body() body: { phaseId: string }) {
+    return this.service.finishPhase(req.user.sub, body.phaseId);
+  }
+
+  @Get("phase/:phaseId")
+  getPhase(@Req() req, @Param("phaseId") phaseId: string) {
+    return this.service.getPhaseProgress(req.user.sub, phaseId);
   }
 }

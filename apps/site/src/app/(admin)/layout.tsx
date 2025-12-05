@@ -1,18 +1,28 @@
+import Link from "next/link";
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
-      <aside style={{ width: 240, background: "#111", color: "#fff", padding: 24 }}>
-        <h2 style={{ fontSize: 24, marginBottom: 20 }}>Admin</h2>
-        <nav style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <a href="/(admin)/dashboard">Dashboard</a>
-          <a href="/(admin)/categorias">Categorias</a>
-          <a href="/(admin)/fases">Fases</a>
-          <a href="/(admin)/questoes">Questões</a>
-          <a href="/(admin)/aulas">Aulas</a>
+    <div className="min-h-screen flex bg-gray-100">
+
+      {/* SIDEBAR */}
+      <aside className="w-64 bg-gray-900 text-white p-6 flex flex-col gap-6 shadow-xl">
+        <h2 className="text-2xl font-bold mb-6">Admin</h2>
+
+        <nav className="flex flex-col gap-4 text-gray-300">
+          <Link href="/(admin)/dashboard" className="hover:text-blue-400 transition">�� Dashboard</Link>
+          <Link href="/(admin)/categorias" className="hover:text-blue-400 transition">🗂 Categorias</Link>
+          <Link href="/(admin)/fases" className="hover:text-blue-400 transition">📚 Fases</Link>
+          <Link href="/(admin)/questoes" className="hover:text-blue-400 transition">❓ Questões</Link>
+          <Link href="/(admin)/aulas" className="hover:text-blue-400 transition">🎥 Aulas</Link>
         </nav>
+
+        <div className="mt-auto text-sm text-gray-500">
+          AutoEscola-Sim © {new Date().getFullYear()}
+        </div>
       </aside>
 
-      <main style={{ flex: 1, padding: 32 }}>
+      {/* CONTEÚDO */}
+      <main className="flex-1 p-10">
         {children}
       </main>
     </div>

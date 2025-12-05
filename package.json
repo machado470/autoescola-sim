@@ -29,6 +29,7 @@
   "packageManager": "pnpm@8.15.4",
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",
+    "@types/cookie-parser": "^1.4.10",
     "@types/node": "^20.19.21",
     "concurrently": "^9.2.1",
     "prisma": "^5.22.0",
@@ -39,7 +40,8 @@
   },
   "dependencies": {
     "@nestjs/mapped-types": "*",
-    "@prisma/client": "^5.22.0"
+    "@prisma/client": "^5.22.0",
+    "cookie-parser": "^1.4.7"
   },
   "prisma": {
     "seed": "tsx apps/api/prisma/seed.ts"

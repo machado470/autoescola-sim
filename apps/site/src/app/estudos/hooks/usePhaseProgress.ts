@@ -1,34 +1,20 @@
-const USER_ID = "demo-user";
+import api from "@/lib/api";
 
-export async function getPhaseProgress() {
-  const res = await fetch("http://localhost:3001/phase-progress", {
-    cache: "no-store",
-  });
-
-  if (!res.ok) {
-    throw new Error("Erro ao carregar progresso.");
-  }
-
-  const all = await res.json();
-
-  return all.filter((p: any) => p.userId === USER_ID);
+/**
+ * Retorna progresso real da fase:
+ * - lessonsCompleted
+ * - correctAnswers
+ * - finished
+ */
+export async function getPhaseProgress(phaseId: string) {
+  const res = await api.get(`/progress/phase/${phaseId}`);
+  return res.data;
 }
 
+/**
+ * Marca início da fase (primeiro acesso)
+ */
 export async function startPhase(phaseId: string) {
-  const res = await fetch("http://localhost:3001/phase-progress/start", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      userId: USER_ID,
-      phaseId,
-    }),
-  });
-
-  if (!res.ok) {
-    throw new Error("Erro ao iniciar fase.");
-  }
-
-  return res.json();
+  const res = await api.post("/progress/lesson", { phaseId });
+  return res.data;
 }
