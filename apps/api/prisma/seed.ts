@@ -4,108 +4,147 @@ import * as bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🚀 Iniciando seed...");
+  console.log('🌱 Iniciando seed...');
 
-  // ---------------------------------------------------------
-  // ADMIN
-  // ---------------------------------------------------------
-  const adminEmail = "admin@admin.com";
+  // -----------------------------------------------------
+  // 1) ADMIN USER
+  // -----------------------------------------------------
+  const adminPassword = await bcrypt.hash('admin123', 10);
 
-  const admin = await prisma.user.findUnique({
-    where: { email: adminEmail }
+  const admin = await prisma.user.create({
+    data: {
+      name: 'Administrador',
+      email: 'admin@autoescola.com',
+      passwordHash: adminPassword,
+      role: 'ADMIN',
+      xp: 0,
+    },
   });
 
-  if (!admin) {
-    await prisma.user.create({
-      data: {
-        name: "Administrador",
-        email: adminEmail,
-        passwordHash: await bcrypt.hash("123456", 10),
-        role: "ADMIN"
-      }
-    });
+  console.log('✓ Admin criado:', admin.email);
 
-    console.log("✔ Admin criado!");
-  } else {
-    console.log("✔ Admin já existe, pulando criação.");
-  }
+  // -----------------------------------------------------
+  // 2) CATEGORY
+  // -----------------------------------------------------
 
-  // ---------------------------------------------------------
-  // CATEGORY
-  // ---------------------------------------------------------
   const category = await prisma.category.create({
     data: {
-      name: "Categoria A"
-    }
+      name: 'Categoria A',
+      description: 'Conteúdo para motos e ciclomotores.',
+    },
   });
 
-  console.log("✔ Categoria criada:", category.name);
+  console.log('✓ Categoria criada:', category.name);
 
-  // ---------------------------------------------------------
-  // PHASES
-  // ---------------------------------------------------------
-  const phasesData = [
-    { name: "Introdução", order: 1 },
-    { name: "Regras Básicas", order: 2 },
-    { name: "Sinalização", order: 3 }
-  ];
+  // -----------------------------------------------------
+  // 3) PHASES
+  // -----------------------------------------------------
 
-  const phases = [];
-
-  for (const p of phasesData) {
-    const phase = await prisma.phase.create({
+  const phases = await Promise.all([
+    prisma.phase.create({
       data: {
-        name: p.name,
-        order: p.order,
-        categoryId: category.id
-      }
-    });
-    phases.push(phase);
-  }
+        name: 'Fase 1 - Introdução',
+        order: 1,
+        categoryId: category.id,
+      },
+    }),
 
-  console.log("✔ Fases criadas:", phases.length);
+    prisma.phase.create({
+      data: {
+        name: 'Fase 2 - Sinalização',
+        order: 2,
+        categoryId: category.id,
+      },
+    }),
 
-  // ---------------------------------------------------------
-  // LESSONS + QUESTIONS
-  // ---------------------------------------------------------
+    prisma.phase.create({
+      data: {
+        name: 'Fase 3 - Direção Defensiva',
+        order: 3,
+        categoryId: category.id,
+      },
+    }),
+  ]);
+
+  console.log('✓ Fases criadas:', phases.length);
+
+  // -----------------------------------------------------
+  // 4) LESSONS POR FASE
+  // -----------------------------------------------------
+
   for (const phase of phases) {
-
-    // 3 lessons por fase
-    for (let i = 1; i <= 3; i++) {
-      await prisma.lesson.create({
-        data: {
-          title: `Aula ${i} da fase ${phase.name}`,
-          content: `Conteúdo da aula ${i}.`,
-          order: i,
+    await prisma.lesson.createMany({
+      data: [
+        {
+          title: `${phase.name} - Aula 1`,
+          content: `Conteúdo introdutório da ${phase.name}.`,
+          order: 1,
           categoryId: category.id,
-          phaseId: phase.id
-        }
-      });
-    }
-
-    // 3 questions por fase
-    for (let i = 1; i <= 3; i++) {
-      await prisma.question.create({
-        data: {
-          statement: `Pergunta ${i} da fase ${phase.name}?`,
-          optionA: "Opção A",
-          optionB: "Opção B",
-          optionC: "Opção C",
-          optionD: "Opção D",
-          correct: "A",
-          order: i,
+          phaseId: phase.id,
+        },
+        {
+          title: `${phase.name} - Aula 2`,
+          content: `Conceitos avançados da ${phase.name}.`,
+          order: 2,
           categoryId: category.id,
-          phaseId: phase.id
-        }
-      });
-    }
+          phaseId: phase.id,
+        },
+      ],
+    });
   }
 
-  console.log("✔ Lessons e Questions criadas!");
+  console.log('✓ Aulas criadas para cada fase');
+
+  // -----------------------------------------------------
+  // 5) QUESTIONS POR FASE
+  // -----------------------------------------------------
+
+  for (const phase of phases) {
+    await prisma.question.createMany({
+      data: [
+        {
+          statement: `Questão 1 da ${phase.name}`,
+          optionA: 'Opção A',
+          optionB: 'Opção B',
+          optionC: 'Opção C',
+          optionD: 'Opção D',
+          correct: 'A',
+          order: 1,
+          categoryId: category.id,
+          phaseId: phase.id,
+        },
+        {
+          statement: `Questão 2 da ${phase.name}`,
+          optionA: 'Opção A',
+          optionB: 'Opção B',
+          optionC: 'Opção C',
+          optionD: 'Opção D',
+          correct: 'B',
+          order: 2,
+          categoryId: category.id,
+          phaseId: phase.id,
+        },
+        {
+          statement: `Questão 3 da ${phase.name}`,
+          optionA: 'Opção A',
+          optionB: 'Opção B',
+          optionC: 'Opção C',
+          optionD: 'Opção D',
+          correct: 'C',
+          order: 3,
+          categoryId: category.id,
+          phaseId: phase.id,
+        },
+      ],
+    });
+  }
+
+  console.log('✓ Questões criadas para cada fase');
+
+  console.log('🌱 Seed finalizado com sucesso!');
 }
 
 main()
-  .then(() => console.log("🌱 Seed finalizado!"))
   .catch((e) => {
     console.error(e);
     process.exit(1);

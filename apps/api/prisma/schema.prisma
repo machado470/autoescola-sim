@@ -11,18 +11,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// -----------------------------------------------------
-// ENUMS
-// -----------------------------------------------------
-
 enum UserRole {
   STUDENT
   ADMIN
 }
-
-// -----------------------------------------------------
-// MODELS
-// -----------------------------------------------------
 
 model User {
   id               String   @id @default(uuid())
@@ -40,10 +32,11 @@ model User {
 }
 
 model Category {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?  // <-- AQUI ESTÁ O CAMPO QUE FALTAVA
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   phases    Phase[]
   questions Question[]
@@ -131,10 +124,6 @@ model StudentProgress {
 
   @@unique([userId, phaseId])
 }
-
-// -----------------------------------------------------
-// SEED CONFIG
-// -----------------------------------------------------
 
 generator seed {
   provider = "prisma-client-js"
