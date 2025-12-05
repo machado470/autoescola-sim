@@ -12,8 +12,10 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
-  await app.listen(3001);
-  console.log(`�� API rodando em http://localhost:3001`);
+  const port = process.env.PORT || 3001;   // <- AQUI É O SEGREDO
+
+  await app.listen(port);
+  console.log(`🚀 API rodando na porta ${port}`);
 }
 
 bootstrap();

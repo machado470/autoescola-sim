@@ -1,12 +1,13 @@
 export async function getPhases() {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  const api = process.env.NEXT_PUBLIC_API_URL;
 
-  const res = await fetch(`${API_URL}/phases`, {
+  const res = await fetch(`${api}/phases`, {
+    method: "GET",
     cache: "no-store",
   });
 
   if (!res.ok) {
-    throw new Error("Não foi possível carregar as fases.");
+    throw new Error("Erro ao carregar fases");
   }
 
   return res.json();
