@@ -1,9 +1,14 @@
 #!/bin/sh
 set -euo pipefail
 
-if [ -f "./prisma/schema.prisma" ]; then
-  echo "Applying database migrations..."
-  npx prisma migrate deploy
-fi
+# Nenhuma migration automática deve rodar aqui.
+# O container sobe limpo e pronto.
+
+exec "$@"
+#!/bin/sh
+set -euo pipefail
+
+# Nenhuma migration automática deve rodar aqui.
+# O container sobe limpo e pronto.
 
 exec "$@"

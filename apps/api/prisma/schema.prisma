@@ -35,16 +35,13 @@ model User {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  // Relations
   quizSessions QuizSession[]
   progress      StudentProgress[]
 }
 
-// -----------------------------------------------------
-
 model Category {
   id        String   @id @default(uuid())
-  name      String
+  name      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -52,8 +49,6 @@ model Category {
   questions Question[]
   lessons   Lesson[]
 }
-
-// -----------------------------------------------------
 
 model Phase {
   id         String   @id @default(uuid())
@@ -69,11 +64,8 @@ model Phase {
   lessons    Lesson[]
   progress   StudentProgress[]
 
-  // �� Relação que estava faltando
   quizSessions QuizSession[]
 }
-
-// -----------------------------------------------------
 
 model Lesson {
   id         String   @id @default(uuid())
@@ -89,8 +81,6 @@ model Lesson {
   phaseId    String
   phase      Phase @relation(fields: [phaseId], references: [id])
 }
-
-// -----------------------------------------------------
 
 model Question {
   id         String   @id @default(uuid())
@@ -112,8 +102,6 @@ model Question {
   phase      Phase @relation(fields: [phaseId], references: [id])
 }
 
-// -----------------------------------------------------
-
 model QuizSession {
   id         String   @id @default(uuid())
   userId     String
@@ -126,8 +114,6 @@ model QuizSession {
   user       User @relation(fields: [userId], references: [id])
   phase      Phase @relation(fields: [phaseId], references: [id])
 }
-
-// -----------------------------------------------------
 
 model StudentProgress {
   id               String   @id @default(uuid())
@@ -144,4 +130,13 @@ model StudentProgress {
   phase            Phase @relation(fields: [phaseId], references: [id])
 
   @@unique([userId, phaseId])
+}
+
+// -----------------------------------------------------
+// SEED CONFIG
+// -----------------------------------------------------
+
+generator seed {
+  provider = "prisma-client-js"
+  run      = "tsx prisma/seed.ts"
 }
