@@ -1,5 +1,7 @@
 export async function getPhases() {
-  const res = await fetch("http://localhost:3001/phases", {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+  const res = await fetch(`${API_URL}/phases`, {
     cache: "no-store",
   });
 
@@ -9,4 +11,3 @@ export async function getPhases() {
 
   return res.json();
 }
-

@@ -1,13 +1,14 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, Req, UseGuards } from "@nestjs/common";
 import { StatsService } from "./stats.service";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 
 @Controller("stats")
+@UseGuards(JwtAuthGuard)
 export class StatsController {
   constructor(private statsService: StatsService) {}
 
   @Get("student")
-  async getStats() {
-    const studentId = "1"; // ⚠️ Temporário — depois vamos pegar do JWT
-    return this.statsService.getStudentStats(studentId);
+  async getStats(@Req() req) {
+    return this.statsService.getStudentStats(req.user.sub);
   }
 }

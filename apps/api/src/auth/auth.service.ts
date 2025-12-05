@@ -5,7 +5,6 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
-import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -16,76 +15,39 @@ export class AuthService {
 
   async validateUser(email: string, password: string) {
     const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user) return null;
+    if (!user) throw new UnauthorizedException();
 
     const match = await bcrypt.compare(password, user.passwordHash);
-    if (!match) return null;
+    if (!match) throw new UnauthorizedException();
 
     return user;
   }
 
-  async login(email: string, password: string) {
-    const user = await this.validateUser(email, password);
-    if (!user) throw new UnauthorizedException('Credenciais inválidas');
-
-    return this.generateTokens(user);
+  generateTokens(payload: any) {
+    const access_token = this.jwt.sign(payload, { expiresIn: '15m' });
+    const refresh_token = this.jwt.sign(payload, { expiresIn: '7d' });
+    return { access_token, refresh_token };
   }
 
-  async register(dto: RegisterDto) {
-    const hashed = await bcrypt.hash(dto.password, 10);
-
-    const user = await this.prisma.user.create({
-      data: {
-        name: dto.name,
-        email: dto.email,
-        passwordHash: hashed,
-        role: 'STUDENT',
-      },
-    });
-
-    return this.generateTokens(user);
-  }
-
-  // -------------------------------------------------------------------
-  // 🔥 VERSÃO FINAL — compatível com NestJS + TypeScript + JWT 100% 🔥
-  // -------------------------------------------------------------------
-  async generateTokens(user: any) {
-    const payload = {
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    };
-
-    const accessToken = await this.jwt.signAsync(payload, {
-      secret: process.env.JWT_SECRET,
-      expiresIn: process.env.JWT_EXPIRES_IN as any, // <- FIX DO TYPE
-    });
-
-    const refreshToken = await this.jwt.signAsync(payload, {
-      secret: process.env.JWT_REFRESH_SECRET,
-      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN as any, // <- FIX DO TYPE
-    });
+  async login(user: any) {
+    const tokens = this.generateTokens({ sub: user.id, role: user.role });
 
     await this.prisma.user.update({
       where: { id: user.id },
-      data: {
-        refreshTokenHash: await bcrypt.hash(refreshToken, 10),
-      },
+      data: { refreshTokenHash: await bcrypt.hash(tokens.refresh_token, 10) },
     });
 
-    return { accessToken, refreshToken, user };
+    return { ...tokens, user };
   }
 
-  async validateRefreshToken(userId: string, incomingToken: string) {
+  async refresh(userId: string, token: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user || !user.refreshTokenHash) return null;
+    if (!user || !user.refreshTokenHash) throw new UnauthorizedException();
 
-    const isValid = await bcrypt.compare(incomingToken, user.refreshTokenHash);
-    return isValid ? user : null;
-  }
+    const valid = await bcrypt.compare(token, user.refreshTokenHash);
+    if (!valid) throw new UnauthorizedException();
 
-  async refresh(user: any) {
-    return this.generateTokens(user);
+    return this.generateTokens({ sub: user.id, role: user.role });
   }
 
   async logout(userId: string) {
@@ -93,7 +55,5 @@ export class AuthService {
       where: { id: userId },
       data: { refreshTokenHash: null },
     });
-
-    return { success: true };
   }
 }
