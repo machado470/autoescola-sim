@@ -33,10 +33,11 @@ services:
       - .env
 
     ports:
-      - "3001:3001"   # ✅ PORTA CORRETA
+      - "3001:3001"   # API
+      - "5566:5566"   # Prisma Studio (✔ agora funciona no navegador)
 
     environment:
-      PORT: 3001      # ✅ GARANTE QUE A API USE 3001
+      PORT: 3001
 
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:3001/health || exit 1"]

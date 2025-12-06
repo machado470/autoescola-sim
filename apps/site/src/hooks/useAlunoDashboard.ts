@@ -1,30 +1,31 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchAlunoDashboard, fetchAlunoInfo } from "@/lib/api-student";
+import { getAlunoDashboard } from "@/lib/api-student";
 
-export default function useAlunoDashboard(userId: string) {
+export default function useAlunoDashboard(studentId: string) {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
-  const [phases, setPhases] = useState([]);
-  const [progress, setProgress] = useState([]);
+  const [phases, setPhases] = useState<any[]>([]);
 
   useEffect(() => {
     async function load() {
       setLoading(true);
 
-      const userData = await fetchAlunoInfo(userId);
-      const dash = await fetchAlunoDashboard(userId);
+      try {
+        const data = await getAlunoDashboard(studentId);
 
-      setUser(userData);
-      setPhases(dash.phases);
-      setProgress(dash.progress);
+        setUser(data.user);
+        setPhases(data.phases);
+      } catch (err) {
+        console.error("Erro carregando dashboard do aluno:", err);
+      }
 
       setLoading(false);
     }
 
     load();
-  }, [userId]);
+  }, [studentId]);
 
-  return { loading, user, phases, progress };
+  return { loading, user, phases };
 }

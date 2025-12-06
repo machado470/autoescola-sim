@@ -14,6 +14,9 @@ import { ProgressModule } from './progress/progress.module';
 import { StatsModule } from './stats/stats.module';
 import { UsersModule } from './users/users.module';
 
+// ALUNO (NOVO)
+import { StudentsModule } from './students/students.module';
+
 @Module({
   imports: [
     PrismaModule,
@@ -28,6 +31,9 @@ import { UsersModule } from './users/users.module';
     ProgressModule,
     StatsModule,
     UsersModule,
+
+    // 🔥 REGISTRA O MÓDULO DO ALUNO
+    StudentsModule,
   ],
 })
 export class AppModule {}

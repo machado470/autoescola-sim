@@ -11,8 +11,14 @@ export class QuestionsService {
     return this.prisma.question.findMany();
   }
 
-  findOne(id: string) {
-    return this.prisma.question.findUnique({ where: { id } });
+  async findOne(id: string) {
+    const question = await this.prisma.question.findUnique({ where: { id } });
+
+    if (!question) {
+      throw new NotFoundException('Question not found');
+    }
+
+    return question;
   }
 
   findByPhase(phaseId: string) {
@@ -26,14 +32,19 @@ export class QuestionsService {
     return this.prisma.question.create({ data: dto });
   }
 
-  update(id: string, dto: UpdateQuestionDto) {
+  async update(id: string, dto: UpdateQuestionDto) {
+    await this.findOne(id);
+
     return this.prisma.question.update({
       where: { id },
       data: dto,
     });
   }
 
-  remove(id: string) {
-    return this.prisma.question.delete({ where: { id } });
+  async remove(id: string) {
+    await this.findOne(id);
+
+    return this.prisma.question.delete({
+      where: { id }});
   }
 }

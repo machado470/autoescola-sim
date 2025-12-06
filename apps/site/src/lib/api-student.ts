@@ -1,22 +1,20 @@
-import axios from "axios";
+export async function getAlunoDashboard(id: string) {
+  const res = await fetch(`http://localhost:3000/students/${id}/dashboard`, {
+    cache: "no-store",
+  });
 
-const api = axios.create({
-  baseURL: "http://localhost:3001",
-});
+  if (!res.ok) throw new Error("Erro ao buscar dashboard do aluno");
 
-export async function fetchAlunoDashboard(userId: string) {
-  const [phases, progress] = await Promise.all([
-    api.get("/phases"),
-    api.get(`/progress/user/${userId}`),
-  ]);
-
-  return {
-    phases: phases.data,
-    progress: progress.data,
-  };
+  return res.json();
 }
 
-export async function fetchAlunoInfo(userId: string) {
-  const user = await api.get(`/users/${userId}`);
-  return user.data;
+export async function getAlunoFase(studentId: string, phaseId: string) {
+  const res = await fetch(
+    `http://localhost:3000/students/${studentId}/fase/${phaseId}`,
+    { cache: "no-store" }
+  );
+
+  if (!res.ok) throw new Error("Erro ao buscar dados da fase");
+
+  return res.json();
 }
