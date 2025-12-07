@@ -1,10 +1,19 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
+import { Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { StudentsService } from './students.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('students')
+@UseGuards(JwtAuthGuard)
 export class StudentsController {
   constructor(private readonly studentsService: StudentsService) {}
 
+  // 🔥 NOVA ROTA: /students/me/dashboard
+  @Get('me/dashboard')
+  getMyDashboard(@Req() req) {
+    return this.studentsService.getDashboard(req.user.sub);
+  }
+
+  // ROTA EXISTENTE (continua funcionando)
   @Get(':id/dashboard')
   getDashboard(@Param('id') id: string) {
     return this.studentsService.getDashboard(id);
@@ -18,7 +27,6 @@ export class StudentsController {
     return this.studentsService.getFaseAluno(studentId, phaseId);
   }
 
-  // 🔥 CONCLUIR AULA
   @Post(':studentId/fase/:phaseId/concluir-aula/:lessonIndex')
   concluirAula(
     @Param('studentId') studentId: string,
@@ -32,7 +40,6 @@ export class StudentsController {
     );
   }
 
-  // 🔥 RESPONDER QUESTÃO
   @Post(':studentId/fase/:phaseId/responder-questao/:questionIndex')
   responderQuestao(
     @Param('studentId') studentId: string,

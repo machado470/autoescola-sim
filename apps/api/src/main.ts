@@ -5,14 +5,22 @@ import cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // CORS CORRIGIDO PARA FRONTEND DO VITE (5173)
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: [
+      'http://localhost:5173', // Vite
+      'http://localhost:3000', // fallback
+    ],
+    methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type, Authorization',
     credentials: true,
   });
 
+  // Habilitar cookies
   app.use(cookieParser());
 
-  const port = process.env.PORT || 3001;   // <- AQUI É O SEGREDO
+  // Porta da API
+  const port = process.env.PORT || 3001;
 
   await app.listen(port);
   console.log(`🚀 API rodando na porta ${port}`);

@@ -28,17 +28,13 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-
     env_file:
       - .env
-
-    ports:
-      - "3001:3001"   # API
-      - "5566:5566"   # Prisma Studio (✔ agora funciona no navegador)
-
     environment:
       PORT: 3001
-
+    ports:
+      - "3001:3001"
+      - "5566:5566"
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:3001/health || exit 1"]
       interval: 10s
