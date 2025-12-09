@@ -1,39 +1,27 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateQuestionDto } from './dto/create-question.dto';
-import { UpdateQuestionDto } from './dto/update-question.dto';
 
 @Injectable()
 export class QuestionsService {
   constructor(private prisma: PrismaService) {}
 
-  findAll() {
-    return this.prisma.question.findMany();
-  }
-
-  findOne(id: string) {
-    return this.prisma.question.findUnique({ where: { id } });
-  }
-
-  findByPhase(phaseId: string) {
-    return this.prisma.question.findMany({
-      where: { phaseId },
-      orderBy: { order: 'asc' },
-    });
-  }
-
-  create(dto: CreateQuestionDto) {
-    return this.prisma.question.create({ data: dto });
-  }
-
-  update(id: string, dto: UpdateQuestionDto) {
-    return this.prisma.question.update({
+  async findOne(id: string) {
+    const q = await this.prisma.question.findUnique({
       where: { id },
-      data: dto,
     });
-  }
 
-  remove(id: string) {
-    return this.prisma.question.delete({ where: { id } });
+    if (!q) throw new NotFoundException('Question not found');
+
+    return {
+      id: q.id,
+      text: q.statement,
+      explanation: q.explanation,
+      answers: [
+        { id: "A", text: q.optionA, correct: q.correct === "A" },
+        { id: "B", text: q.optionB, correct: q.correct === "B" },
+        { id: "C", text: q.optionC, correct: q.correct === "C" },
+        { id: "D", text: q.optionD, correct: q.correct === "D" },
+      ]
+    };
   }
 }

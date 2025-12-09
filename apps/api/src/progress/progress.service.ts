@@ -5,45 +5,58 @@ import { PrismaService } from "../prisma/prisma.service";
 export class ProgressService {
   constructor(private prisma: PrismaService) {}
 
-  async getPhaseProgress(userId: string, phaseId: string) {
-    return this.prisma.studentProgress.findUnique({
-      where: { userId_phaseId: { userId, phaseId } },
+  // usado pelo controller
+  async getStudentProgress(userId: string) {
+    return this.prisma.studentProgress.findMany({
+      where: { userId },
     });
   }
 
-  async completeLesson(userId: string, phaseId: string) {
-    return this.prisma.studentProgress.upsert({
-      where: { userId_phaseId: { userId, phaseId } },
-      update: { lessonsCompleted: { increment: 1 } },
-      create: { userId, phaseId, lessonsCompleted: 1 },
+  // usado pelo controller
+  async getProgressByPhase(userId: string, phaseId: string) {
+    return this.prisma.studentProgress.findFirst({
+      where: { userId, phaseId },
     });
   }
 
-  async answerQuestion(userId: string, phaseId: string, isCorrect: boolean) {
-    return this.prisma.studentProgress.upsert({
-      where: { userId_phaseId: { userId, phaseId } },
-      update: isCorrect ? { correctAnswers: { increment: 1 } } : {},
-      create: {
-        userId,
-        phaseId,
-        correctAnswers: isCorrect ? 1 : 0,
+  // já existia — deixamos intacto
+  async registerQuestionAnswer(userId: string, questionId: string, correct: boolean) {
+    const question = await this.prisma.question.findUnique({
+      where: { id: questionId },
+      include: { phase: { include: { lessons: true, questions: true } } },
+    });
+
+    if (!question) throw new Error("Question not found");
+
+    const phase = question.phase;
+    const totalItems = phase.lessons.length + phase.questions.length;
+
+    let progress = await this.prisma.studentProgress.findFirst({
+      where: { userId, phaseId: phase.id },
+    });
+
+    if (!progress) {
+      progress = await this.prisma.studentProgress.create({
+        data: { userId, phaseId: phase.id },
+      });
+    }
+
+    const newCorrect = correct
+      ? progress.correctAnswers + 1
+      : progress.correctAnswers;
+
+    const percent = Math.round(
+      ((progress.lessonsCompleted + newCorrect) / totalItems) * 100,
+    );
+
+    const updated = await this.prisma.studentProgress.update({
+      where: { id: progress.id },
+      data: {
+        correctAnswers: newCorrect,
+        finished: percent >= 100,
       },
     });
-  }
 
-  async finishPhase(userId: string, phaseId: string) {
-    const progress = await this.prisma.studentProgress.upsert({
-      where: { userId_phaseId: { userId, phaseId } },
-      update: { finished: true },
-      create: { userId, phaseId, finished: true },
-    });
-
-    // entrega XP
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { xp: { increment: 20 } },
-    });
-
-    return progress;
+    return updated;
   }
 }

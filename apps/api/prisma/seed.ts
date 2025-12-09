@@ -1,115 +1,128 @@
-import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcryptjs';
+import { PrismaClient } from "@prisma/client";
+import * as bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🚀 Iniciando seed...");
+  console.log("🌱 Iniciando SEED...");
 
-  // ---------------------------------------------------------
+  const adminPassword = await bcrypt.hash("123456", 10);
+  const studentPassword = await bcrypt.hash("123456", 10);
+
   // ADMIN
-  // ---------------------------------------------------------
-  const adminEmail = "admin@admin.com";
-
-  const admin = await prisma.user.findUnique({
-    where: { email: adminEmail }
+  const admin = await prisma.user.upsert({
+    where: { email: "admin@autoescola.com" },
+    update: {},
+    create: {
+      name: "Administrador",
+      email: "admin@autoescola.com",
+      passwordHash: adminPassword,
+      role: "ADMIN",
+    },
   });
 
-  if (!admin) {
-    await prisma.user.create({
-      data: {
-        name: "Administrador",
-        email: adminEmail,
-        passwordHash: await bcrypt.hash("123456", 10),
-        role: "ADMIN"
-      }
-    });
-
-    console.log("✔ Admin criado!");
-  } else {
-    console.log("✔ Admin já existe, pulando criação.");
-  }
-
-  // ---------------------------------------------------------
-  // CATEGORY
-  // ---------------------------------------------------------
-  const category = await prisma.category.create({
-    data: {
-      name: "Categoria A"
-    }
+  // ALUNO
+  const student = await prisma.user.upsert({
+    where: { email: "aluno@autoescola.com" },
+    update: {},
+    create: {
+      name: "Aluno Teste",
+      email: "aluno@autoescola.com",
+      passwordHash: studentPassword,
+      role: "STUDENT",
+    },
   });
 
-  console.log("✔ Categoria criada:", category.name);
+  console.log("Usuários criados.");
 
-  // ---------------------------------------------------------
-  // PHASES
-  // ---------------------------------------------------------
-  const phasesData = [
-    { name: "Introdução", order: 1 },
-    { name: "Regras Básicas", order: 2 },
-    { name: "Sinalização", order: 3 }
-  ];
+  // CATEGORIA
+  const category = await prisma.category.upsert({
+    where: { name: "Categoria A" },
+    update: {},
+    create: {
+      name: "Categoria A",
+      description: "Categoria básica de treinamento",
+    },
+  });
 
-  const phases = [];
+  // FASE
+  const fase1 = await prisma.phase.upsert({
+    where: {
+      categoryId_name: {
+        categoryId: category.id,
+        name: "Fase 1 — Noções Básicas",
+      },
+    },
+    update: {},
+    create: {
+      name: "Fase 1 — Noções Básicas",
+      order: 1,
+      categoryId: category.id,
+    },
+  });
 
-  for (const p of phasesData) {
-    const phase = await prisma.phase.create({
-      data: {
-        name: p.name,
-        order: p.order,
-        categoryId: category.id
-      }
-    });
-    phases.push(phase);
-  }
+  // AULAS
+  await prisma.lesson.createMany({
+    data: [
+      {
+        title: "Introdução ao Trânsito",
+        content: "Conteúdo básico...",
+        categoryId: category.id,
+        phaseId: fase1.id,
+      },
+      {
+        title: "Comandos do Veículo",
+        content: "Aprendendo os controles...",
+        categoryId: category.id,
+        phaseId: fase1.id,
+      },
+    ],
+    skipDuplicates: true,
+  });
 
-  console.log("✔ Fases criadas:", phases.length);
+  // PERGUNTAS
+  await prisma.question.createMany({
+    data: [
+      {
+        statement: "Para que serve o cinto?",
+        optionA: "Estética",
+        optionB: "Proteção",
+        optionC: "Segurar roupas",
+        optionD: "Nada",
+        correct: "B",
+        categoryId: category.id,
+        phaseId: fase1.id,
+      },
+      {
+        statement: "Semáforo amarelo significa?",
+        optionA: "Acelerar",
+        optionB: "Frear forte",
+        optionC: "Reduzir e preparar para parar",
+        optionD: "Nada",
+        correct: "C",
+        categoryId: category.id,
+        phaseId: fase1.id,
+      },
+    ],
+    skipDuplicates: true,
+  });
 
-  // ---------------------------------------------------------
-  // LESSONS + QUESTIONS
-  // ---------------------------------------------------------
-  for (const phase of phases) {
+  // PROGRESSO DO ALUNO
+  await prisma.studentProgress.upsert({
+    where: {
+      userId_phaseId: {
+        userId: student.id,
+        phaseId: fase1.id,
+      },
+    },
+    update: {},
+    create: {
+      userId: student.id,
+      phaseId: fase1.id,
+    },
+  });
 
-    // 3 lessons por fase
-    for (let i = 1; i <= 3; i++) {
-      await prisma.lesson.create({
-        data: {
-          title: `Aula ${i} da fase ${phase.name}`,
-          content: `Conteúdo da aula ${i}.`,
-          order: i,
-          categoryId: category.id,
-          phaseId: phase.id
-        }
-      });
-    }
-
-    // 3 questions por fase
-    for (let i = 1; i <= 3; i++) {
-      await prisma.question.create({
-        data: {
-          statement: `Pergunta ${i} da fase ${phase.name}?`,
-          optionA: "Opção A",
-          optionB: "Opção B",
-          optionC: "Opção C",
-          optionD: "Opção D",
-          correct: "A",
-          order: i,
-          categoryId: category.id,
-          phaseId: phase.id
-        }
-      });
-    }
-  }
-
-  console.log("✔ Lessons e Questions criadas!");
+  console.log("🌱 SEED FINALIZADO!");
 }
 
-main()
-  .then(() => console.log("🌱 Seed finalizado!"))
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+main().finally(() => prisma.$disconnect());

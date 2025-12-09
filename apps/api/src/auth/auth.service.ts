@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
@@ -13,47 +10,34 @@ export class AuthService {
     private jwt: JwtService,
   ) {}
 
+  // Valida o usuário
   async validateUser(email: string, password: string) {
-    const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user) throw new UnauthorizedException();
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
 
-    const match = await bcrypt.compare(password, user.passwordHash);
-    if (!match) throw new UnauthorizedException();
+    if (!user) throw new UnauthorizedException('Credenciais inválidas');
+
+    const valid = await bcrypt.compare(password, user.passwordHash);
+    if (!valid) throw new UnauthorizedException('Credenciais inválidas');
 
     return user;
   }
 
-  generateTokens(payload: any) {
-    const access_token = this.jwt.sign(payload, { expiresIn: '15m' });
-    const refresh_token = this.jwt.sign(payload, { expiresIn: '7d' });
-    return { access_token, refresh_token };
-  }
+  // Login
+  async login(email: string, password: string) {
+    const user = await this.validateUser(email, password);
 
-  async login(user: any) {
-    const tokens = this.generateTokens({ sub: user.id, role: user.role });
+    const payload = { sub: user.id, role: user.role };
 
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: { refreshTokenHash: await bcrypt.hash(tokens.refresh_token, 10) },
-    });
-
-    return { ...tokens, user };
-  }
-
-  async refresh(userId: string, token: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user || !user.refreshTokenHash) throw new UnauthorizedException();
-
-    const valid = await bcrypt.compare(token, user.refreshTokenHash);
-    if (!valid) throw new UnauthorizedException();
-
-    return this.generateTokens({ sub: user.id, role: user.role });
-  }
-
-  async logout(userId: string) {
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { refreshTokenHash: null },
-    });
+    return {
+      access_token: this.jwt.sign(payload),
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      },
+    };
   }
 }
+
