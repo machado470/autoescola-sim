@@ -1,11 +1,24 @@
-/* Estilos globais — base limpa */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: Inter, sans-serif;
 }
 
 body {
-  font-family: sans-serif;
-  background: #f7f9fc;
+  background-color: var(--background);
+  color: var(--text);
+  transition: background 0.2s ease, color 0.2s ease;
 }
+
+:root {
+  --background: #F7F7F7;
+  --text: #1A1A1A;
+}
+
+[data-theme='dark'] {
+  --background: #121212;
+  --text: #FFFFFF;
+}
+	
+

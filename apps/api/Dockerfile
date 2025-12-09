@@ -10,22 +10,27 @@ RUN apt-get update \
 # pnpm
 RUN corepack enable && corepack prepare pnpm@9.12.3 --activate
 
-# Copia arquivos do monorepo
+# Copia arquivos principais do monorepo
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json ./
 
-# Copia API inteira
+# Copia Prisma antes de tudo
+COPY apps/api/prisma ./apps/api/prisma
+
+# Copia o restante da API
 COPY apps/api ./apps/api
 
-# Instala dependências do monorepo
+# Instala dependências
 RUN pnpm install --frozen-lockfile
 
-# Gera PRISMA CLIENT com o SCHEMA correto
+# Gera Prisma Client
 WORKDIR /app/apps/api
 RUN npx prisma generate --schema=prisma/schema.prisma
 
 # Build da API
 RUN pnpm build
 
-EXPOSE 3001
+# Porta da API NestJS
+EXPOSE 3000
 
+# Agora WORKDIR correto para rodar o dist
 CMD ["node", "dist/main.js"]

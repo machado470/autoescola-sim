@@ -6,6 +6,23 @@ export class StudentsService {
   constructor(private readonly prisma: PrismaService) {}
 
   // ==================================================
+  // RETORNA DADOS BÁSICOS DO ALUNO
+  // ==================================================
+  async getStudent(studentId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: studentId },
+    });
+
+    if (!user) throw new NotFoundException("Aluno não encontrado");
+
+    return {
+      id: user.id,
+      name: user.name,
+      xp: user.xp,
+    };
+  }
+
+  // ==================================================
   // DASHBOARD DO ALUNO
   // ==================================================
   async getDashboard(studentId: string) {
@@ -101,7 +118,7 @@ export class StudentsService {
   }
 
   // ==================================================
-  // 🔥 CONCLUIR AULA
+  // CONCLUIR AULA
   // ==================================================
   async concluirAula(studentId: string, phaseId: string, lessonIndex: number) {
     let progress = await this.prisma.studentProgress.findFirst({
@@ -110,10 +127,7 @@ export class StudentsService {
 
     if (!progress) {
       progress = await this.prisma.studentProgress.create({
-        data: {
-          userId: studentId,
-          phaseId,
-        },
+        data: { userId: studentId, phaseId },
       });
     }
 
@@ -130,23 +144,16 @@ export class StudentsService {
   }
 
   // ==================================================
-  // 🔥 RESPONDER QUESTÃO
+  // RESPONDER QUESTÃO
   // ==================================================
-  async responderQuestao(
-    studentId: string,
-    phaseId: string,
-    questionIndex: number,
-  ) {
+  async responderQuestao(studentId: string, phaseId: string, questionIndex: number) {
     let progress = await this.prisma.studentProgress.findFirst({
       where: { userId: studentId, phaseId },
     });
 
     if (!progress) {
       progress = await this.prisma.studentProgress.create({
-        data: {
-          userId: studentId,
-          phaseId,
-        },
+        data: { userId: studentId, phaseId },
       });
     }
 
@@ -163,7 +170,7 @@ export class StudentsService {
   }
 
   // ==================================================
-  // UTILITÁRIO — DAR XP AO ALUNO
+  // DAR XP
   // ==================================================
   async incrementXP(userId: string, amount: number) {
     await this.prisma.user.update({

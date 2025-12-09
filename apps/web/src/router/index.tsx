@@ -1,64 +1,45 @@
-import { createBrowserRouter } from "react-router-dom";
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Start from "../pages/Start";
-import Login from "../pages/Login";
+import LandingPage from "../modules/landing/LandingPage";
+import Login from "../modules/auth/Login";
+import StudentDashboard from "../modules/student/StudentDashboard";
+import AdminDashboard from "../modules/admin/AdminDashboard";
 
-import AppLayout from "../layout/AppLayout";
-import AdminLayout from "../layout/AdminLayout";
+import RequireAuth from "./RequireAuth";
 
-import DashboardAluno from "../features/student/DashboardAluno";
+export default function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
 
-import SimuladoHome from "../features/simulado/SimuladoHome";
-import SimuladoStart from "../features/simulado/SimuladoStart";
-import SimuladoQuestion from "../features/simulado/SimuladoQuestion";
-import SimuladoResult from "../features/simulado/SimuladoResult";
+        {/* Rota pública */}
+        <Route path="/" element={<LandingPage />} />
 
-import Dashboard from "../pages/admin/Dashboard";
-import Categorias from "../pages/admin/Categorias";
-import Fases from "../pages/admin/Fases";
-import Aulas from "../pages/admin/Aulas";
-import Questoes from "../pages/admin/Questoes";
-import Alunos from "../pages/admin/Alunos";
+        {/* Login público */}
+        <Route path="/login" element={<Login />} />
 
-import { RequireAuth } from "./RequireAuth";
+        {/* ÁREA DO ALUNO */}
+        <Route
+          path="/aluno"
+          element={
+            <RequireAuth allowed={["STUDENT"]}>
+              <StudentDashboard />
+            </RequireAuth>
+          }
+        />
 
-export const router = createBrowserRouter([
-  { path: "/", element: <Start /> },
-  { path: "/login", element: <Login /> },
+        {/* ÁREA DO ADMIN */}
+        <Route
+          path="/admin"
+          element={
+            <RequireAuth allowed={["ADMIN"]}>
+              <AdminDashboard />
+            </RequireAuth>
+          }
+        />
 
-  // ADMIN
-  {
-    path: "/admin",
-    element: (
-      <RequireAuth>
-        <AdminLayout />
-      </RequireAuth>
-    ),
-    children: [
-      { index: true, element: <Dashboard /> },
-      { path: "dashboard", element: <Dashboard /> },
-      { path: "categorias", element: <Categorias /> },
-      { path: "fases", element: <Fases /> },
-      { path: "aulas", element: <Aulas /> },
-      { path: "questoes", element: <Questoes /> },
-      { path: "alunos", element: <Alunos /> },
-    ],
-  },
-
-  // ALUNO
-  {
-    path: "/aluno",
-    element: (
-      <RequireAuth>
-        <AppLayout />
-      </RequireAuth>
-    ),
-    children: [
-      { index: true, element: <DashboardAluno /> },
-      { path: "simulado", element: <SimuladoHome /> },
-      { path: "simulado/start", element: <SimuladoStart /> },
-      { path: "simulado/pergunta", element: <SimuladoQuestion /> },
-      { path: "simulado/resultado", element: <SimuladoResult /> },
-    ],
-  },
-]);
+      </Routes>
+    </BrowserRouter>
+  );
+}

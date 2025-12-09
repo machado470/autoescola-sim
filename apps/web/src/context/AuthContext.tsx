@@ -1,98 +1,59 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import api from "../services/api";
 
 interface User {
   id: string;
   name: string;
   email: string;
-  role: "ADMIN" | "STUDENT";
+  role: string;
 }
 
-interface AuthContextProps {
+interface AuthContextType {
   user: User | null;
-  accessToken: string | null;
-  refreshToken: string | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<User | null>;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
-  isAuthenticated: boolean;
 }
 
-const AuthContext = createContext<AuthContextProps>({} as AuthContextProps);
+const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export const AuthProvider = ({ children }: any) => {
   const [user, setUser] = useState<User | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    const savedAccess = localStorage.getItem("access_token");
-    const savedRefresh = localStorage.getItem("refresh_token");
-
-    if (savedUser && savedAccess) {
-      setUser(JSON.parse(savedUser));
-      setAccessToken(savedAccess);
-      setRefreshToken(savedRefresh);
-    }
-
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) setUser(JSON.parse(storedUser));
     setLoading(false);
   }, []);
 
-  async function login(email: string, password: string): Promise<User | null> {
+  const login = async (email: string, password: string) => {
     try {
-      const res = await fetch("http://localhost:3001/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      const res = await api.post("/auth/login", { email, password });
 
-      if (!res.ok) return null;
+      localStorage.setItem("access_token", res.data.access_token);
+      localStorage.setItem("refresh_token", res.data.refresh_token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      const data = await res.json();
-
-      setUser(data.user);
-      setAccessToken(data.access_token);
-      setRefreshToken(data.refresh_token);
-
-      localStorage.setItem("user", JSON.stringify(data.user));
-      localStorage.setItem("access_token", data.access_token);
-      localStorage.setItem("refresh_token", data.refresh_token);
-
-      return data.user; // << agora retorna o user
-    } catch (err) {
-      console.error("Login error:", err);
-      return null;
+      setUser(res.data.user);
+      return true;
+    } catch {
+      return false;
     }
-  }
+  };
 
-  function logout() {
-    setUser(null);
-    setAccessToken(null);
-    setRefreshToken(null);
-    localStorage.removeItem("user");
+  const logout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
-  }
+    localStorage.removeItem("user");
+    setUser(null);
+  };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        accessToken,
-        refreshToken,
-        loading,
-        login,
-        logout,
-        isAuthenticated: !!user && !!accessToken,
-      }}
-    >
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
-
+export const useAuth = () => useContext(AuthContext);

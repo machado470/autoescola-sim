@@ -45,9 +45,14 @@ async function main() {
     },
   });
 
-  // FASES
+  // FASE
   const fase1 = await prisma.phase.upsert({
-    where: { categoryId_name: { categoryId: category.id, name: "Fase 1 — Noções Básicas" } },
+    where: {
+      categoryId_name: {
+        categoryId: category.id,
+        name: "Fase 1 — Noções Básicas",
+      },
+    },
     update: {},
     create: {
       name: "Fase 1 — Noções Básicas",
@@ -72,6 +77,7 @@ async function main() {
         phaseId: fase1.id,
       },
     ],
+    skipDuplicates: true,
   });
 
   // PERGUNTAS
@@ -98,16 +104,21 @@ async function main() {
         phaseId: fase1.id,
       },
     ],
+    skipDuplicates: true,
   });
 
   // PROGRESSO DO ALUNO
-  await prisma.studentProgress.create({
-    data: {
+  await prisma.studentProgress.upsert({
+    where: {
+      userId_phaseId: {
+        userId: student.id,
+        phaseId: fase1.id,
+      },
+    },
+    update: {},
+    create: {
       userId: student.id,
       phaseId: fase1.id,
-      lessonsCompleted: 0,
-      correctAnswers: 0,
-      finished: false,
     },
   });
 

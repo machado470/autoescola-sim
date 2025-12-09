@@ -13,19 +13,18 @@ enum UserRole {
 }
 
 model User {
-  id               String             @id @default(uuid())
+  id               String   @id @default(uuid())
   name             String
-  email            String             @unique
+  email            String   @unique
   passwordHash     String
-  role             UserRole           @default(STUDENT)
-  xp               Int                @default(0)
+  role             UserRole @default(STUDENT)
+  xp               Int      @default(0)
   refreshTokenHash String?
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
 
-  quizSessions     QuizSession[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
   progress         StudentProgress[]
-  attempts         SimuladoAttempt[]
 }
 
 model Category {
@@ -36,127 +35,80 @@ model Category {
   updatedAt   DateTime  @updatedAt
 
   phases      Phase[]
-  questions   Question[]
   lessons     Lesson[]
+  questions   Question[]
 }
 
 model Phase {
-  id         String     @id @default(uuid())
+  id         String    @id @default(uuid())
   name       String
   order      Int
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   categoryId String
-  category   Category   @relation(fields: [categoryId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
 
-  questions    Question[]
   lessons      Lesson[]
+  questions    Question[]
   progress     StudentProgress[]
-  quizSessions QuizSession[]
 
-  @@unique([categoryId, name], name: "categoryId_name")
+  @@unique([categoryId, name])
 }
 
 model Lesson {
-  id         String     @id @default(uuid())
+  id         String    @id @default(uuid())
   title      String
   content    String?
+  imageUrl   String?
+  videoUrl   String?
   order      Int        @default(0)
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 
-  categoryId String
-  category   Category   @relation(fields: [categoryId], references: [id])
-
   phaseId    String
-  phase      Phase      @relation(fields: [phaseId], references: [id])
+  categoryId String
 
-  @@unique([categoryId, title], name: "categoryId_title")
+  category   Category   @relation(fields: [categoryId], references: [id])
+  phase      Phase      @relation(fields: [phaseId], references: [id])
 }
 
 model Question {
-  id         String          @id @default(uuid())
-  statement  String
-  optionA    String
-  optionB    String
-  optionC    String
-  optionD    String
-  correct    String
-  order      Int             @default(0)
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
+  id          String   @id @default(uuid())
+  statement   String
+  optionA     String
+  optionB     String
+  optionC     String
+  optionD     String
+  correct     String
+  explanation String?
 
-  categoryId String
-  category   Category        @relation(fields: [categoryId], references: [id])
+  order       Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
-  phaseId    String
-  phase      Phase           @relation(fields: [phaseId], references: [id])
+  categoryId  String
+  category    Category   @relation(fields: [categoryId], references: [id])
 
-  answers    SimuladoAnswer[]
+  phaseId     String
+  phase       Phase      @relation(fields: [phaseId], references: [id])
 
-  @@unique([categoryId, statement], name: "categoryId_statement")
-}
-
-model QuizSession {
-  id         String     @id @default(uuid())
-  userId     String
-  phaseId    String
-  score      Int        @default(0)
-
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-
-  user       User       @relation(fields: [userId], references: [id])
-  phase      Phase      @relation(fields: [phaseId], references: [id])
+  @@unique([categoryId, statement])
 }
 
 model StudentProgress {
-  id               String     @id @default(uuid())
+  id               String   @id @default(uuid())
   userId           String
   phaseId          String
-  lessonsCompleted Int        @default(0)
-  correctAnswers   Int        @default(0)
-  finished         Boolean    @default(false)
+  lessonsCompleted Int      @default(0)
+  correctAnswers   Int      @default(0)
+  finished         Boolean  @default(false)
 
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  user             User       @relation(fields: [userId], references: [id])
-  phase            Phase      @relation(fields: [phaseId], references: [id])
+  user             User     @relation(fields: [userId], references: [id])
+  phase            Phase    @relation(fields: [phaseId], references: [id])
 
-  @@unique([userId, phaseId], name: "userId_phaseId")
-}
-
-//
-// --------------------------
-// SIMULADO
-// --------------------------
-//
-
-model SimuladoAttempt {
-  id             String           @id @default(cuid())
-  userId         String
-  type           String
-  totalQuestions Int
-  createdAt      DateTime         @default(now())
-
-  user     User              @relation(fields: [userId], references: [id])
-  answers  SimuladoAnswer[]
-}
-
-model SimuladoAnswer {
-  id         String           @id @default(cuid())
-  attemptId  String
-  questionId String
-  selected   Int
-  correct    Boolean
-
-  attempt    SimuladoAttempt  @relation(fields: [attemptId], references: [id])
-  question   Question         @relation(fields: [questionId], references: [id])
-}
-
-generator seed {
-  provider = "prisma-client-js"
-  run      = "tsx prisma/seed.ts"
+  @@unique([userId, phaseId])
 }

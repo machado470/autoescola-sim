@@ -1,13 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class LessonsService {
   constructor(private prisma: PrismaService) {}
 
-  findAll() {
-    return this.prisma.lesson.findMany({
-      include: { phase: true, category: true },
+  async findOne(id: string) {
+    const lesson = await this.prisma.lesson.findUnique({
+      where: { id },
     });
+
+    if (!lesson) {
+      throw new NotFoundException('Aula não encontrada');
+    }
+
+    return lesson;
   }
 }

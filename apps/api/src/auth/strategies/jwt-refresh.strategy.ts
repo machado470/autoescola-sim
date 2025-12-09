@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
@@ -10,13 +10,12 @@ export class JwtRefreshStrategy extends PassportStrategy(
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromBodyField('refresh_token'),
-      ignoreExpiration: false,
       secretOrKey: process.env.JWT_REFRESH_SECRET,
+      ignoreExpiration: false,
     });
   }
 
   validate(payload: any) {
-    if (!payload) throw new UnauthorizedException();
     return payload;
   }
 }

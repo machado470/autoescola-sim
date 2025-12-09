@@ -1,55 +1,33 @@
-import { Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
-import { StudentsService } from './students.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Controller, Get, Req, UseGuards, Param } from "@nestjs/common";
+import { StudentsService } from "./students.service";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 
-@Controller('students')
+@Controller("students")
 @UseGuards(JwtAuthGuard)
 export class StudentsController {
-  constructor(private readonly studentsService: StudentsService) {}
+  constructor(private service: StudentsService) {}
 
-  // 🔥 NOVA ROTA: /students/me/dashboard
-  @Get('me/dashboard')
-  getMyDashboard(@Req() req) {
-    return this.studentsService.getDashboard(req.user.sub);
+  // =============================
+  // /students/me  → dados básicos
+  // =============================
+  @Get("me")
+  async getMe(@Req() req) {
+    return this.service.getStudent(req.user.sub);
   }
 
-  // ROTA EXISTENTE (continua funcionando)
-  @Get(':id/dashboard')
-  getDashboard(@Param('id') id: string) {
-    return this.studentsService.getDashboard(id);
+  // =========================================
+  // /students/me/dashboard  → todas as fases
+  // =========================================
+  @Get("me/dashboard")
+  async getDashboard(@Req() req) {
+    return this.service.getDashboard(req.user.sub);
   }
 
-  @Get(':studentId/fase/:phaseId')
-  getFaseAluno(
-    @Param('studentId') studentId: string,
-    @Param('phaseId') phaseId: string,
-  ) {
-    return this.studentsService.getFaseAluno(studentId, phaseId);
-  }
-
-  @Post(':studentId/fase/:phaseId/concluir-aula/:lessonIndex')
-  concluirAula(
-    @Param('studentId') studentId: string,
-    @Param('phaseId') phaseId: string,
-    @Param('lessonIndex') lessonIndex: string,
-  ) {
-    return this.studentsService.concluirAula(
-      studentId,
-      phaseId,
-      Number(lessonIndex),
-    );
-  }
-
-  @Post(':studentId/fase/:phaseId/responder-questao/:questionIndex')
-  responderQuestao(
-    @Param('studentId') studentId: string,
-    @Param('phaseId') phaseId: string,
-    @Param('questionIndex') questionIndex: string,
-  ) {
-    return this.studentsService.responderQuestao(
-      studentId,
-      phaseId,
-      Number(questionIndex),
-    );
+  // ==================================================
+  // /students/me/fase/:id  → detalhes da fase específica
+  // ==================================================
+  @Get("me/fase/:id")
+  async getFase(@Req() req, @Param("id") id: string) {
+    return this.service.getFaseAluno(req.user.sub, id);
   }
 }

@@ -1,66 +1,93 @@
-import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import { colors } from "../../design/colors";
+import useAuth from "../../store/auth";
 
 export default function Login() {
-  const { login } = useAuth();
+  const mode = document.body.dataset.theme || "light";
+  const palette = colors[mode];
+
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleLogin() {
     setError("");
 
-    // Agora o login retorna o próprio user
-    const result = await login(email, password);
+    try {
+      const res = await fetch("http://localhost:3001/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (!result) {
-      setError("Credenciais inválidas");
-      return;
-    }
+      const data = await res.json();
 
-    const role = result.role;
+      if (!res.ok) {
+        setError(data.message || "Erro ao entrar");
+        return;
+      }
 
-    if (role === "ADMIN") {
-      navigate("/admin");
-    } else {
-      navigate("/aluno");
+      // salvar token e role
+      login(data.access_token, data.user.role);
+
+      // REDIRECIONAMENTO
+      if (data.user.role === "ADMIN") {
+        navigate("/admin");
+      } else {
+        navigate("/aluno");
+      }
+
+    } catch (e) {
+      setError("Erro de conexão com o servidor");
     }
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <h1 className="text-2xl font-bold mb-4">Entrar</h1>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: palette.background,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "20px",
+      }}
+    >
+      <Card style={{ width: "350px", padding: "20px" }}>
+        <div style={{ fontSize: "60px", textAlign: "center" }}>🚧</div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full max-w-sm">
-        <input
-          type="email"
-          placeholder="Email"
-          className="border p-2 rounded"
+        <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Entrar</h2>
+
+        {error && (
+          <p style={{ color: "red", textAlign: "center", marginBottom: "10px" }}>
+            {error}
+          </p>
+        )}
+
+        <Input
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          placeholder="email@autoescola.com"
+          style={{ marginBottom: "10px" }}
         />
 
-        <input
+        <Input
           type="password"
-          placeholder="Senha"
-          className="border p-2 rounded"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          placeholder="******"
+          style={{ marginBottom: "20px" }}
         />
 
-        {error && <p className="text-red-500">{error}</p>}
-
-        <button
-          type="submit"
-          className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
-        >
-          Entrar
-        </button>
-      </form>
+        <Button onClick={handleLogin}>Entrar</Button>
+      </Card>
     </div>
   );
 }
