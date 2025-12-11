@@ -5,33 +5,41 @@ import ProgressBar from "../../components/ui/ProgressBar";
 import BottomNav from "../../components/ui/BottomNav";
 import { colors } from "../../design/colors";
 import useAuth from "../../store/auth";
+import { useNavigate } from "react-router-dom";
 
 export default function StudentDashboard() {
   const mode = document.body.dataset.theme || "light";
   const palette = colors[mode];
 
   const { token } = useAuth();
+  const navigate = useNavigate();
 
   const [data, setData] = useState<any>(null);
+  const [tree, setTree] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       try {
+        // Dashboard
         const res = await fetch("http://localhost:3001/students/me/dashboard", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-
         const json = await res.json();
         setData(json);
+
+        // Trilha para achar a próxima aula
+        const treeRes = await fetch(
+          "http://localhost:3001/students/me/lessons-tree",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const treeJson = await treeRes.json();
+        setTree(treeJson);
       } catch (e) {
-        console.log("Erro ao carregar dashboard:", e);
+        console.log("Erro:", e);
       }
       setLoading(false);
     }
-
     load();
   }, []);
 
@@ -63,12 +71,35 @@ export default function StudentDashboard() {
           padding: "20px",
         }}
       >
-        <h2>Erro ao carregar dados do aluno.</h2>
+        <h2>Erro ao carregar dados.</h2>
       </div>
     );
   }
 
-  const { user, phases } = data;
+  // Encontrar próxima aula
+  let nextLesson: any = null;
+  for (const c of tree) {
+    for (const p of c.phases) {
+      if (!p.finished) {
+        nextLesson = p.lessons[0];
+        break;
+      }
+    }
+    if (nextLesson) break;
+  }
+
+  const {
+    name,
+    lessonsCompleted,
+    correctAnswers,
+    totalQuestions,
+    lastSimulations,
+  } = data;
+
+  const percent =
+    totalQuestions > 0
+      ? Math.min(100, (correctAnswers / totalQuestions) * 100)
+      : 0;
 
   return (
     <div
@@ -80,53 +111,79 @@ export default function StudentDashboard() {
       }}
     >
       <div style={{ padding: "20px" }}>
-        {/* Mascote */}
         <div style={{ fontSize: "60px", textAlign: "center" }}>🚧</div>
 
         <h1 style={{ textAlign: "center", marginBottom: "10px" }}>
-          Bem-vindo, {user.name}
+          Bem-vindo, {name}
         </h1>
 
-        {/* XP */}
+        {/* PROGRESSO GERAL */}
         <Card style={{ marginBottom: "20px" }}>
-          <p style={{ fontSize: "1rem", marginBottom: "6px" }}>XP</p>
-          <ProgressBar value={user.xp % 100} color={palette.progressGreen} />
-          <p style={{ marginTop: "6px", fontSize: "0.85rem", color: palette.textSecondary }}>
-            {user.xp} XP total
+          <p style={{ fontSize: "1rem", marginBottom: "6px" }}>
+            Seu Progresso Geral
+          </p>
+          <ProgressBar value={percent} color={palette.progressGreen} />
+          <p
+            style={{
+              marginTop: "6px",
+              fontSize: "0.85rem",
+              color: palette.textSecondary,
+            }}
+          >
+            {correctAnswers}/{totalQuestions} questões certas (
+            {percent.toFixed(0)}%)
           </p>
         </Card>
 
-        {/* Fases */}
-        <h2 style={{ marginBottom: "10px" }}>Seu Progresso</h2>
+        {/* AULAS */}
+        <Card style={{ marginBottom: "20px" }}>
+          <p style={{ marginBottom: "6px" }}>
+            Aulas Concluídas: <strong>{lessonsCompleted}</strong>
+          </p>
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "16px",
-          }}
-        >
-          {phases.map((phase: any) => (
-            <Card key={phase.id}>
-              <h3 style={{ marginBottom: "6px" }}>{phase.name}</h3>
+          {nextLesson ? (
+            <Button
+              onClick={() => navigate(`/aluno/aulas/${nextLesson.id}`)}
+              style={{ marginBottom: "10px" }}
+            >
+              Continuar Curso →
+            </Button>
+          ) : (
+            <Button disabled>Curso Concluído ✔</Button>
+          )}
 
-              <ProgressBar value={phase.percent} color={palette.progressYellow} />
+          <Button onClick={() => navigate("/aluno/trilha")}>
+            Ver Trilha Completa
+          </Button>
+        </Card>
 
-              <p
-                style={{
-                  marginTop: "6px",
-                  fontSize: "0.85rem",
-                  color: palette.textSecondary,
-                }}
-              >
-                {phase.percent.toFixed(0)}% concluído ({phase.completed}/{phase.totalItems})
-              </p>
-            </Card>
-          ))}
-        </div>
+        {/* SIMULADOS */}
+        <h2 style={{ marginBottom: "10px" }}>Últimos Simulados</h2>
 
-        {/* CTA */}
-        <Button style={{ marginTop: "20px" }}>Iniciar Próxima Fase</Button>
+        {lastSimulations.length === 0 && (
+          <p style={{ color: palette.textSecondary }}>
+            Nenhum simulado realizado ainda.
+          </p>
+        )}
+
+        {lastSimulations.map((sim: any) => (
+          <Card key={sim.id} style={{ marginBottom: "10px" }}>
+            <p>
+              📘 <strong>{sim.percentage}%</strong> de acertos
+            </p>
+            <p
+              style={{
+                fontSize: "0.8rem",
+                color: palette.textSecondary,
+                marginTop: "6px",
+              }}
+            >
+              {new Date(sim.createdAt).toLocaleDateString("pt-BR")}
+            </p>
+          </Card>
+        ))}
+
+        <Button style={{ marginTop: "20px" }}>Iniciar Simulado</Button>
       </div>
 
       <BottomNav />

@@ -9,40 +9,42 @@ import { CategoriesModule } from './categories/categories.module';
 import { PhasesModule } from './phases/phases.module';
 import { LessonsModule } from './lessons/lessons.module';
 import { QuestionsModule } from './questions/questions.module';
-import { ProgressModule } from './progress/progress.module';
-import { StatsModule } from './stats/stats.module';
 import { UsersModule } from './users/users.module';
 
 // ALUNO
 import { StudentsModule } from './students/students.module';
 
-// ADMIN (NOVO)
+// ADMIN
 import { AdminModule } from './admin/admin.module';
 
 // HEALTHCHECK
 import { HealthModule } from './health/health.module';
+
+// SIMULATIONS (NOVO)
+import { SimulationsModule } from './simulations/simulations.module';
 
 @Module({
   imports: [
     PrismaModule,
     AuthModule,
 
-    // Domínios da AutoEscola
+    // Domínios
     CategoriesModule,
     PhasesModule,
     LessonsModule,
     QuestionsModule,
-    ProgressModule,
-    StatsModule,
     UsersModule,
 
-    // Módulo do aluno
+    // Aluno
     StudentsModule,
 
-    // Módulo administrativo (agora funcionando)
+    // Admin
     AdminModule,
 
-    // Healthcheck — evita container travar como unhealthy
+    // Simulados (NOVO)
+    SimulationsModule,
+
+    // Health
     HealthModule,
   ],
 })

@@ -1,93 +1,84 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Card from "../../components/ui/Card";
-import Button from "../../components/ui/Button";
-import Input from "../../components/ui/Input";
-import { colors } from "../../design/colors";
-import useAuth from "../../store/auth";
 
 export default function Login() {
-  const mode = document.body.dataset.theme || "light";
-  const palette = colors[mode];
-
   const navigate = useNavigate();
-  const { login } = useAuth();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleLogin() {
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
     setError("");
 
     try {
-      const res = await fetch("http://localhost:3001/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      const res = await axios.post("http://localhost:3001/auth/login", {
+        email,
+        password,
       });
 
-      const data = await res.json();
+      const { access_token, user } = res.data;
 
-      if (!res.ok) {
-        setError(data.message || "Erro ao entrar");
-        return;
-      }
+      localStorage.setItem("token", access_token);
+      localStorage.setItem("user", JSON.stringify(user));
 
-      // salvar token e role
-      login(data.access_token, data.user.role);
-
-      // REDIRECIONAMENTO
-      if (data.user.role === "ADMIN") {
-        navigate("/admin");
+      if (user.role === "STUDENT") {
+        navigate("/aluno/dashboard");
+      } else if (user.role === "ADMIN") {
+        navigate("/admin/dashboard");
       } else {
-        navigate("/aluno");
+        navigate("/");
       }
-
-    } catch (e) {
-      setError("Erro de conexão com o servidor");
+    } catch (err) {
+      setError("Credenciais inválidas.");
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: palette.background,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "20px",
-      }}
-    >
-      <Card style={{ width: "350px", padding: "20px" }}>
-        <div style={{ fontSize: "60px", textAlign: "center" }}>🚧</div>
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-[#0D1117] px-4">
+      <div className="w-full max-w-md rounded-xl bg-white dark:bg-[#161B22] p-8 shadow">
+        <h1 className="text-2xl font-semibold text-center mb-6 text-gray-800 dark:text-gray-200">
+          AutoEscola Sim — Entrar
+        </h1>
 
-        <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Entrar</h2>
+        <form onSubmit={handleLogin} className="flex flex-col gap-4">
+          <input
+            type="email"
+            placeholder="E-mail"
+            className="px-4 py-3 rounded-lg border bg-gray-50 dark:bg-[#0D1117] text-gray-800 dark:text-gray-200"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
 
-        {error && (
-          <p style={{ color: "red", textAlign: "center", marginBottom: "10px" }}>
-            {error}
-          </p>
-        )}
+          <input
+            type="password"
+            placeholder="Senha"
+            className="px-4 py-3 rounded-lg border bg-gray-50 dark:bg-[#0D1117] text-gray-800 dark:text-gray-200"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
 
-        <Input
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="email@autoescola.com"
-          style={{ marginBottom: "10px" }}
-        />
+          {error && (
+            <p className="text-red-500 text-center text-sm">{error}</p>
+          )}
 
-        <Input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="******"
-          style={{ marginBottom: "20px" }}
-        />
-
-        <Button onClick={handleLogin}>Entrar</Button>
-      </Card>
+          <button
+            type="submit"
+            disabled={loading}
+            className="mt-2 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition disabled:opacity-50"
+          >
+            {loading ? "Entrando..." : "Entrar"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
+

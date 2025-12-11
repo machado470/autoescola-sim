@@ -1,33 +1,15 @@
-import { Controller, Get, Req, UseGuards, Param } from "@nestjs/common";
-import { StudentsService } from "./students.service";
-import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { StudentsService } from './students.service';
+import { JwtAuthGuard } from '../auth/jwt.guard';
 
-@Controller("students")
-@UseGuards(JwtAuthGuard)
+@Controller('students')
 export class StudentsController {
-  constructor(private service: StudentsService) {}
+  constructor(private readonly studentsService: StudentsService) {}
 
-  // =============================
-  // /students/me  → dados básicos
-  // =============================
-  @Get("me")
-  async getMe(@Req() req) {
-    return this.service.getStudent(req.user.sub);
-  }
-
-  // =========================================
-  // /students/me/dashboard  → todas as fases
-  // =========================================
-  @Get("me/dashboard")
+  @UseGuards(JwtAuthGuard)
+  @Get('me/dashboard')
   async getDashboard(@Req() req) {
-    return this.service.getDashboard(req.user.sub);
-  }
-
-  // ==================================================
-  // /students/me/fase/:id  → detalhes da fase específica
-  // ==================================================
-  @Get("me/fase/:id")
-  async getFase(@Req() req, @Param("id") id: string) {
-    return this.service.getFaseAluno(req.user.sub, id);
+    const userId = req.user.sub;
+    return this.studentsService.getDashboard(userId);
   }
 }
