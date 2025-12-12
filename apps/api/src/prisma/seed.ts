@@ -1,141 +1,76 @@
-import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcryptjs';
-
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
+import * as bcrypt from "bcryptjs";
 
 async function main() {
-  console.log("🌱 Iniciando seed completo...\n");
+  console.log("🌱 Iniciando seed...");
 
-  const adminEmail = "admin@local";
-  const adminPassword = "admin";
-
-  const adminExists = await prisma.user.findUnique({
-    where: { email: adminEmail }
+  // ========================
+  // CATEGORIA
+  // ========================
+  const cat1 = await prisma.category.create({
+    data: {
+      name: "Sinalização de Trânsito",
+    },
   });
 
-  if (!adminExists) {
-    const hash = await bcrypt.hash(adminPassword, 10);
+  // ========================
+  // FASE
+  // ========================
+  const fase1 = await prisma.phase.create({
+    data: {
+      name: "Placas de Advertência",
+      order: 1,
+      categoryId: cat1.id,
+    },
+  });
 
-    await prisma.user.create({
-      data: {
-        name: "Administrador",
-        email: adminEmail,
-        passwordHash: hash,
-        role: "ADMIN"
-      }
-    });
+  // ========================
+  // AULA
+  // ========================
+  await prisma.lesson.create({
+    data: {
+      title: "Placas - Introdução",
+      order: 1,
+      content: "Conteúdo inicial da aula...",
+      categoryId: cat1.id,
+      phaseId: fase1.id,
+    },
+  });
 
-    console.log("✔ Admin criado:", adminEmail);
-  } else {
-    console.log("✔ Admin já existe, ignorando criação.");
-  }
+  // ========================
+  // QUESTÃO
+  // ========================
+  await prisma.question.create({
+    data: {
+      text: "O que significa a placa A-1?",
+      answer: "Curva à esquerda",
+      phaseId: fase1.id,
+    },
+  });
 
-  const categoriesData = [
-    { name: "Sinalização", description: "Regras e padrões de sinalização" },
-    { name: "Direção Defensiva", description: "Prevenção e segurança" },
-    { name: "Mecânica", description: "Conhecimentos básicos de veículo" }
-  ];
+  // ========================
+  // USUÁRIOS
+  // ========================
+  await prisma.user.create({
+    data: {
+      name: "Admin",
+      email: "admin@autoescola.com",
+      passwordHash: await bcrypt.hash("123456", 10),
+      role: "ADMIN",
+    },
+  });
 
-  const categories = [];
+  await prisma.user.create({
+    data: {
+      name: "Aluno",
+      email: "aluno@autoescola.com",
+      passwordHash: await bcrypt.hash("123456", 10),
+      role: "STUDENT",
+    },
+  });
 
-  for (const cat of categoriesData) {
-    const category = await prisma.category.upsert({
-      where: { name: cat.name },
-      update: {},
-      create: cat
-    });
-
-    categories.push(category);
-    console.log(`✔ Categoria OK -> ${category.name}`);
-  }
-
-  const phasesTemplate = [
-    "Fase 1 - Introdução",
-    "Fase 2 - Conceitos Básicos",
-    "Fase 3 - Aplicação Prática",
-    "Fase 4 - Análise de Cenários",
-    "Fase 5 - Regras Importantes",
-    "Fase 6 - Preparação para Prova",
-    "Fase 7 - Revisão Final"
-  ];
-
-  for (const category of categories) {
-    for (let i = 0; i < phasesTemplate.length; i++) {
-      await prisma.phase.upsert({
-        where: {
-          categoryId_name: {
-            categoryId: category.id,
-            name: phasesTemplate[i]
-          }
-        },
-        update: {},
-        create: {
-          name: phasesTemplate[i],
-          order: i + 1,
-          categoryId: category.id
-        }
-      });
-    }
-    console.log(`✔ Fases criadas para ${category.name}`);
-  }
-
-  const allPhases = await prisma.phase.findMany();
-
-  for (const phase of allPhases) {
-    await prisma.lesson.createMany({
-      data: [
-        {
-          title: "Introdução ao Tema",
-          content: "Conteúdo introdutório desta fase.",
-          order: 1,
-          categoryId: phase.categoryId,
-          phaseId: phase.id
-        },
-        {
-          title: "Conteúdo Principal",
-          content: "Explicação detalhada do assunto.",
-          order: 2,
-          categoryId: phase.categoryId,
-          phaseId: phase.id
-        }
-      ],
-      skipDuplicates: true
-    });
-  }
-
-  console.log("✔ Aulas adicionadas.");
-
-  for (const phase of allPhases) {
-    await prisma.question.upsert({
-      where: {
-        categoryId_statement: {
-          categoryId: phase.categoryId,
-          statement: `Pergunta da ${phase.name}`
-        }
-      },
-      update: {},
-      create: {
-        statement: `Pergunta da ${phase.name}`,
-        optionA: "Opção A",
-        optionB: "Opção B",
-        optionC: "Opção C",
-        optionD: "Opção D",
-        correct: "Opção A",
-        order: 1,
-        categoryId: phase.categoryId,
-        phaseId: phase.id
-      }
-    });
-  }
-
-  console.log("✔ Questões criadas.");
-
-  console.log("\n🎉 Seed finalizado com sucesso!");
+  console.log("🌱 Seed finalizado com sucesso!");
 }
 
-main()
-  .catch((err) => {
-    console.error("Erro no seed:", err);
-    process.exit(1);
-  })
-  .finally(() => prisma.$disconnect());
+main().finally(() => prisma.$disconnect());

@@ -1,93 +1,68 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Card from "../../components/ui/Card";
-import Button from "../../components/ui/Button";
-import Input from "../../components/ui/Input";
-import { colors } from "../../design/colors";
-import useAuth from "../../store/auth";
 
 export default function Login() {
-  const mode = document.body.dataset.theme || "light";
-  const palette = colors[mode];
-
-  const navigate = useNavigate();
-  const { login } = useAuth();
-
+  const nav = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  async function handleLogin() {
-    setError("");
+  async function handleLogin(e: any) {
+    e.preventDefault();
+    setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:3001/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      const res = await axios.post("http://localhost:3001/auth/login", {
+        email,
+        password,
       });
 
-      const data = await res.json();
+      const token = res.data.access_token;
+      localStorage.setItem("token", token);
 
-      if (!res.ok) {
-        setError(data.message || "Erro ao entrar");
-        return;
-      }
-
-      // salvar token e role
-      login(data.access_token, data.user.role);
-
-      // REDIRECIONAMENTO
-      if (data.user.role === "ADMIN") {
-        navigate("/admin");
-      } else {
-        navigate("/aluno");
-      }
-
-    } catch (e) {
-      setError("Erro de conexão com o servidor");
+      nav("/aluno/home");
+    } catch (err) {
+      alert("Email ou senha incorretos.");
     }
+
+    setLoading(false);
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: palette.background,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "20px",
-      }}
-    >
-      <Card style={{ width: "350px", padding: "20px" }}>
-        <div style={{ fontSize: "60px", textAlign: "center" }}>🚧</div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
+      <form
+        onSubmit={handleLogin}
+        className="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-8 w-full max-w-sm"
+      >
+        <h1 className="text-2xl font-semibold mb-6 text-center dark:text-white">
+          AutoEscola SIM
+        </h1>
 
-        <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Entrar</h2>
-
-        {error && (
-          <p style={{ color: "red", textAlign: "center", marginBottom: "10px" }}>
-            {error}
-          </p>
-        )}
-
-        <Input
+        <input
+          type="email"
+          placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="email@autoescola.com"
-          style={{ marginBottom: "10px" }}
+          className="w-full p-3 border rounded-md mb-4 dark:bg-gray-700 dark:text-white"
         />
 
-        <Input
+        <input
           type="password"
+          placeholder="Senha"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="******"
-          style={{ marginBottom: "20px" }}
+          className="w-full p-3 border rounded-md mb-4 dark:bg-gray-700 dark:text-white"
         />
 
-        <Button onClick={handleLogin}>Entrar</Button>
-      </Card>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full p-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+        >
+          {loading ? "Entrando..." : "Entrar"}
+        </button>
+      </form>
     </div>
   );
 }

@@ -1,27 +1,24 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateQuestionDto } from './dto/create-question.dto';
 
 @Injectable()
 export class QuestionsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async findOne(id: string) {
-    const q = await this.prisma.question.findUnique({
-      where: { id },
+  findByPhase(phaseId: string) {
+    return this.prisma.question.findMany({
+      where: { phaseId },
     });
+  }
 
-    if (!q) throw new NotFoundException('Question not found');
-
-    return {
-      id: q.id,
-      text: q.statement,
-      explanation: q.explanation,
-      answers: [
-        { id: "A", text: q.optionA, correct: q.correct === "A" },
-        { id: "B", text: q.optionB, correct: q.correct === "B" },
-        { id: "C", text: q.optionC, correct: q.correct === "C" },
-        { id: "D", text: q.optionD, correct: q.correct === "D" },
-      ]
-    };
+  create(dto: CreateQuestionDto) {
+    return this.prisma.question.create({
+      data: {
+        text: dto.text,
+        answer: dto.answer,
+        phaseId: dto.phaseId,
+      },
+    });
   }
 }

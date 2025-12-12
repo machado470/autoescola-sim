@@ -1,49 +1,38 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 
-// CORE
-import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
-
-// DOMÍNIOS
 import { CategoriesModule } from './categories/categories.module';
 import { PhasesModule } from './phases/phases.module';
 import { LessonsModule } from './lessons/lessons.module';
 import { QuestionsModule } from './questions/questions.module';
-import { ProgressModule } from './progress/progress.module';
-import { StatsModule } from './stats/stats.module';
-import { UsersModule } from './users/users.module';
-
-// ALUNO
 import { StudentsModule } from './students/students.module';
-
-// ADMIN (NOVO)
-import { AdminModule } from './admin/admin.module';
-
-// HEALTHCHECK
+import { SimulationsModule } from './simulations/simulations.module';
 import { HealthModule } from './health/health.module';
+
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { RolesGuard } from './auth/guards/roles.guard';
 
 @Module({
   imports: [
-    PrismaModule,
     AuthModule,
-
-    // Domínios da AutoEscola
     CategoriesModule,
     PhasesModule,
     LessonsModule,
     QuestionsModule,
-    ProgressModule,
-    StatsModule,
-    UsersModule,
-
-    // Módulo do aluno
     StudentsModule,
-
-    // Módulo administrativo (agora funcionando)
-    AdminModule,
-
-    // Healthcheck — evita container travar como unhealthy
+    SimulationsModule,
     HealthModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard, // 🔐 primeiro autentica
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,   // 🧱 depois valida role
+    },
   ],
 })
 export class AppModule {}

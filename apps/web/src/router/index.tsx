@@ -1,44 +1,66 @@
-import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import LandingPage from "../modules/landing/LandingPage";
 import Login from "../modules/auth/Login";
-import StudentDashboard from "../modules/student/StudentDashboard";
-import AdminDashboard from "../modules/admin/AdminDashboard";
+import StudentHome from "../modules/student/Home";
+import StudentDashboard from "../modules/student/Dashboard";
+import Simulado from "../modules/student/Simulado";
+import ResultadoSimulado from "../modules/student/ResultadoSimulado";
+import Ranking from "../modules/student/Ranking";
 
 import RequireAuth from "./RequireAuth";
 
-export default function Router() {
+export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<Login />} />
 
-        {/* Rota pública */}
-        <Route path="/" element={<LandingPage />} />
-
-        {/* Login público */}
-        <Route path="/login" element={<Login />} />
-
-        {/* ÁREA DO ALUNO */}
         <Route
-          path="/aluno"
+          path="/aluno/home"
           element={
-            <RequireAuth allowed={["STUDENT"]}>
+            <RequireAuth>
+              <StudentHome />
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="/aluno/dashboard"
+          element={
+            <RequireAuth>
               <StudentDashboard />
             </RequireAuth>
           }
         />
 
-        {/* ÁREA DO ADMIN */}
         <Route
-          path="/admin"
+          path="/aluno/simulado"
           element={
-            <RequireAuth allowed={["ADMIN"]}>
-              <AdminDashboard />
+            <RequireAuth>
+              <Simulado />
             </RequireAuth>
           }
         />
 
+        <Route
+          path="/aluno/simulado/resultado"
+          element={
+            <RequireAuth>
+              <ResultadoSimulado />
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="/aluno/ranking"
+          element={
+            <RequireAuth>
+              <Ranking />
+            </RequireAuth>
+          }
+        />
+
+        <Route path="*" element={<Login />} />
       </Routes>
     </BrowserRouter>
   );

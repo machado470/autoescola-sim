@@ -1,19 +1,29 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateLessonDto } from './dto/create-lesson.dto';
 
 @Injectable()
 export class LessonsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async findOne(id: string) {
-    const lesson = await this.prisma.lesson.findUnique({
-      where: { id },
+  findByPhase(phaseId: string) {
+    return this.prisma.lesson.findMany({
+      where: { phaseId },
+      orderBy: { order: 'asc' },
     });
+  }
 
-    if (!lesson) {
-      throw new NotFoundException('Aula não encontrada');
-    }
-
-    return lesson;
+  create(dto: CreateLessonDto) {
+    return this.prisma.lesson.create({
+      data: {
+        title: dto.title,
+        content: dto.content ?? '',
+        order: dto.order,
+        categoryId: dto.categoryId,
+        phaseId: dto.phaseId,
+        imageUrl: dto.imageUrl ?? null,
+        videoUrl: dto.videoUrl ?? null,
+      },
+    });
   }
 }

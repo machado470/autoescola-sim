@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -10,28 +11,33 @@ export class AuthService {
     private jwt: JwtService,
   ) {}
 
-  // Valida o usuário
   async validateUser(email: string, password: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { email },
-    });
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) return null;
 
-    if (!user) throw new UnauthorizedException('Credenciais inválidas');
-
-    const valid = await bcrypt.compare(password, user.passwordHash);
-    if (!valid) throw new UnauthorizedException('Credenciais inválidas');
+    const match = await bcrypt.compare(password, user.passwordHash);
+    if (!match) return null;
 
     return user;
   }
 
-  // Login
   async login(email: string, password: string) {
     const user = await this.validateUser(email, password);
 
-    const payload = { sub: user.id, role: user.role };
+    if (!user) {
+      throw new UnauthorizedException('Credenciais inválidas');
+    }
+
+    const payload = {
+      sub: user.id,
+      role: user.role,
+      email: user.email,
+    };
+
+    const access_token = this.jwt.sign(payload);
 
     return {
-      access_token: this.jwt.sign(payload),
+      access_token,
       user: {
         id: user.id,
         email: user.email,
@@ -39,5 +45,27 @@ export class AuthService {
       },
     };
   }
-}
 
+  async register(data: RegisterDto) {
+    const existing = await this.prisma.user.findUnique({
+      where: { email: data.email },
+    });
+
+    if (existing) {
+      throw new UnauthorizedException('Email já está em uso');
+    }
+
+    const passwordHash = await bcrypt.hash(data.password, 10);
+
+    const user = await this.prisma.user.create({
+      data: {
+        name: data.name,
+        email: data.email,
+        passwordHash,
+        role: 'STUDENT',
+      },
+    });
+
+    return user;
+  }
+}
