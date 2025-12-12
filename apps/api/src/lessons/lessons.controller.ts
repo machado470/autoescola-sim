@@ -1,15 +1,26 @@
-import { Controller, Get, Param } from "@nestjs/common";
-import { LessonsService } from "./lessons.service";
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Query,
+} from '@nestjs/common';
+import { LessonsService } from './lessons.service';
+import { CreateLessonDto } from './dto/create-lesson.dto';
+import { Roles } from '../auth/decorators/roles.decorator';
 
-@Controller("categories/:categoryId/phases/:phaseId/lessons")
+@Controller('lessons')
 export class LessonsController {
-  constructor(private lessonsService: LessonsService) {}
+  constructor(private readonly service: LessonsService) {}
 
   @Get()
-  async list(
-    @Param("categoryId") categoryId: string,
-    @Param("phaseId") phaseId: string
-  ) {
-    return this.lessonsService.getLessonsByPhase(categoryId, phaseId);
+  findByPhase(@Query('phaseId') phaseId: string) {
+    return this.service.findByPhase(phaseId);
+  }
+
+  @Roles('ADMIN')
+  @Post()
+  create(@Body() dto: CreateLessonDto) {
+    return this.service.create(dto);
   }
 }

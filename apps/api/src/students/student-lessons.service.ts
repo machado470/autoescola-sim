@@ -6,7 +6,6 @@ export class StudentsLessonsService {
   constructor(private prisma: PrismaService) {}
 
   async completeLesson(userId: string, lessonId: string) {
-    // Verificar se a aula existe
     const lesson = await this.prisma.lesson.findUnique({
       where: { id: lessonId },
       include: { phase: true },
@@ -16,28 +15,17 @@ export class StudentsLessonsService {
       throw new NotFoundException('Aula não encontrada');
     }
 
-    // Criar StudentLesson (ou ignorar se já existe)
+    // Marca aula como concluída
     await this.prisma.studentLesson.upsert({
-      where: {
-        userId_lessonId: { userId, lessonId },
-      },
+      where: { userId_lessonId: { userId, lessonId } },
       update: {},
-      create: {
-        userId,
-        lessonId,
-      },
+      create: { userId, lessonId },
     });
 
-    // Atualizar progresso da fase
+    // Atualiza progresso da fase
     await this.prisma.studentProgress.upsert({
-      where: {
-        userId_phaseId: { userId, phaseId: lesson.phaseId },
-      },
-      update: {
-        lessonsCompleted: {
-          increment: 1,
-        },
-      },
+      where: { userId_phaseId: { userId, phaseId: lesson.phaseId } },
+      update: { lessonsCompleted: { increment: 1 } },
       create: {
         userId,
         phaseId: lesson.phaseId,

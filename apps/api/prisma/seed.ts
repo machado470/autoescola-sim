@@ -1,25 +1,39 @@
-import { execSync } from "child_process";
+import { PrismaClient } from '@prisma/client';
+import * as bcrypt from 'bcryptjs';
 
-console.log("🌱 Rodando seeds...");
-
-function run(file: string) {
-  console.log(`➡️ Executando ${file}`);
-  execSync(`npx ts-node --transpile-only prisma/seeds/${file}`, {
-    stdio: "inherit",
-  });
-}
+const prisma = new PrismaClient();
 
 async function main() {
-  run("categories.ts");
-  run("phases.ts");
-  run("lessons.ts");
-  run("questions.ts");
-  run("users.ts");
+  console.log("🌱 Iniciando seed...");
 
-  console.log("✅ Todos os seeds foram executados com sucesso!");
+  // Criar ALUNO
+  await prisma.user.create({
+    data: {
+      name: "Aluno Teste",
+      email: "aluno@autoescola.com",
+      passwordHash: await bcrypt.hash("123456", 10),
+      role: "STUDENT",
+    },
+  });
+
+  // Criar ADMIN
+  await prisma.user.create({
+    data: {
+      name: "Administrador",
+      email: "admin@autoescola.com",
+      passwordHash: await bcrypt.hash("admin123", 10),
+      role: "ADMIN",
+    },
+  });
+
+  console.log("🌱 Seed finalizado com sucesso!");
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

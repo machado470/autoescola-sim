@@ -11,11 +11,11 @@ import { PrismaService } from '../prisma/prisma.service';
 @Module({
   controllers: [
     StudentsController,
-    StudentLessonsController, // ← novo controller registrado
+    StudentLessonsController,
   ],
   providers: [
     StudentsService,
-    StudentsLessonsService,  // ← novo service registrado
+    StudentsLessonsService,
     PrismaService,
   ],
 })

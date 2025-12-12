@@ -1,51 +1,38 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 
-// CORE
-import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
-
-// DOMÍNIOS
 import { CategoriesModule } from './categories/categories.module';
 import { PhasesModule } from './phases/phases.module';
 import { LessonsModule } from './lessons/lessons.module';
 import { QuestionsModule } from './questions/questions.module';
-import { UsersModule } from './users/users.module';
-
-// ALUNO
 import { StudentsModule } from './students/students.module';
-
-// ADMIN
-import { AdminModule } from './admin/admin.module';
-
-// HEALTHCHECK
+import { SimulationsModule } from './simulations/simulations.module';
 import { HealthModule } from './health/health.module';
 
-// SIMULATIONS (NOVO)
-import { SimulationsModule } from './simulations/simulations.module';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { RolesGuard } from './auth/guards/roles.guard';
 
 @Module({
   imports: [
-    PrismaModule,
     AuthModule,
-
-    // Domínios
     CategoriesModule,
     PhasesModule,
     LessonsModule,
     QuestionsModule,
-    UsersModule,
-
-    // Aluno
     StudentsModule,
-
-    // Admin
-    AdminModule,
-
-    // Simulados (NOVO)
     SimulationsModule,
-
-    // Health
     HealthModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard, // 🔐 primeiro autentica
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,   // 🧱 depois valida role
+    },
   ],
 })
 export class AppModule {}

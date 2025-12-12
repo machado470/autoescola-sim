@@ -1,41 +1,36 @@
-import { Controller, Post, Body, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Req, Get } from '@nestjs/common';
 import { SimulationsService } from './simulations.service';
-import { JwtAuthGuard } from '../auth/jwt.guard';
-import { Request } from 'express';
+import { StartSimulationDto } from './dto/start-simulation.dto';
+import { AnswerDto } from './dto/answer.dto';
+import { FinishDto } from './dto/finish.dto';
 
 @Controller('simulations')
-@UseGuards(JwtAuthGuard)
 export class SimulationsController {
-  constructor(private readonly simulations: SimulationsService) {}
+  constructor(private service: SimulationsService) {}
 
   @Post('start')
-  async start(@Req() req: Request) {
-    const user = req.user as any;
-    const attempt = await this.simulations.startSimulation(user.sub);
+  start(@Req() req, @Body() dto: StartSimulationDto) {
+    return this.service.startSimulation(req.user.sub, dto.phaseId);
+  }
 
-    return {
-      message: 'Simulado iniciado',
-      attemptId: attempt.id,
-    };
+  @Post('answer')
+  answer(@Body() dto: AnswerDto) {
+    return this.service.recordAnswer(dto);
   }
 
   @Post('finish')
-  async finish(
-    @Req() req: Request,
-    @Body('percentage') percentage: number,
-  ) {
-    const user = req.user as any;
-    const attempt = await this.simulations.finishSimulation(user.sub, percentage);
-
-    return {
-      message: 'Simulado finalizado',
-      attempt,
-    };
+  finish(@Req() req, @Body() dto: FinishDto) {
+    return this.service.finishSimulation(dto.simulationId, req.user.sub);
   }
 
-  @Get('history')
-  async history(@Req() req: Request) {
-    const user = req.user as any;
-    return this.simulations.getHistory(user.sub);
+  @Get('me')
+  myResults(@Req() req) {
+    return this.service.getMySimulations(req.user.sub);
+  }
+
+  // 🔥 NOVO ENDPOINT — RANKING GLOBAL
+  @Get('ranking')
+  ranking() {
+    return this.service.getRanking();
   }
 }

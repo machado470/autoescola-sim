@@ -1,24 +1,29 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Login from "../modules/auth/Login";
-import RequireAuth from "./RequireAuth";
-
+import StudentHome from "../modules/student/Home";
 import StudentDashboard from "../modules/student/Dashboard";
-import Aulas from "../modules/student/Aulas";
-import Simulados from "../modules/student/Simulados";
+import Simulado from "../modules/student/Simulado";
+import ResultadoSimulado from "../modules/student/ResultadoSimulado";
+import Ranking from "../modules/student/Ranking";
 
-import AdminDashboard from "../modules/admin/AdminDashboard";
-import Alunos from "../modules/admin/Alunos";
-import SimuladosAdmin from "../modules/admin/Simulados";
+import RequireAuth from "./RequireAuth";
 
 export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* ROTA PÚBLICA */}
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Login />} />
 
-        {/* ROTAS PROTEGIDAS - ALUNO */}
+        <Route
+          path="/aluno/home"
+          element={
+            <RequireAuth>
+              <StudentHome />
+            </RequireAuth>
+          }
+        />
+
         <Route
           path="/aluno/dashboard"
           element={
@@ -29,52 +34,32 @@ export default function AppRouter() {
         />
 
         <Route
-          path="/aluno/aulas"
+          path="/aluno/simulado"
           element={
             <RequireAuth>
-              <Aulas />
+              <Simulado />
             </RequireAuth>
           }
         />
 
         <Route
-          path="/aluno/simulados"
+          path="/aluno/simulado/resultado"
           element={
             <RequireAuth>
-              <Simulados />
-            </RequireAuth>
-          }
-        />
-
-        {/* ROTAS PROTEGIDAS - ADMIN */}
-        <Route
-          path="/admin/dashboard"
-          element={
-            <RequireAuth>
-              <AdminDashboard />
+              <ResultadoSimulado />
             </RequireAuth>
           }
         />
 
         <Route
-          path="/admin/alunos"
+          path="/aluno/ranking"
           element={
             <RequireAuth>
-              <Alunos />
+              <Ranking />
             </RequireAuth>
           }
         />
 
-        <Route
-          path="/admin/simulados"
-          element={
-            <RequireAuth>
-              <SimuladosAdmin />
-            </RequireAuth>
-          }
-        />
-
-        {/* Fallback */}
         <Route path="*" element={<Login />} />
       </Routes>
     </BrowserRouter>

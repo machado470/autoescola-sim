@@ -1,11 +1,10 @@
 import { Navigate } from "react-router-dom";
 
-export default function RequireAuth({ children }: { children: JSX.Element }) {
+export default function RequireAuth({ children }: any) {
   const token = localStorage.getItem("token");
-  const user = localStorage.getItem("user");
 
-  if (!token || !user) {
-    return <Navigate to="/login" replace />;
+  if (!token) {
+    return <Navigate to="/" replace />;
   }
 
   return children;

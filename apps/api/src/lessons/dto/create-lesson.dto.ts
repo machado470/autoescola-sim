@@ -1,21 +1,10 @@
-import { IsString, IsOptional, IsInt, MinLength } from 'class-validator';
-
 export class CreateLessonDto {
-  @IsString()
-  @MinLength(2)
   title: string;
-
-  @IsOptional()
-  @IsString()
-  content?: string;
-
-  @IsOptional()
-  @IsInt()
-  order?: number;
-
-  @IsString()
+  content: string;
+  order: number;
   categoryId: string;
-
-  @IsString()
   phaseId: string;
+
+  imageUrl?: string;
+  videoUrl?: string;
 }

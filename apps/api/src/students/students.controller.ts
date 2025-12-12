@@ -1,6 +1,6 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { StudentsService } from './students.service';
-import { JwtAuthGuard } from '../auth/jwt.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('students')
 export class StudentsController {
@@ -9,7 +9,6 @@ export class StudentsController {
   @UseGuards(JwtAuthGuard)
   @Get('me/dashboard')
   async getDashboard(@Req() req) {
-    const userId = req.user.sub;
-    return this.studentsService.getDashboard(userId);
+    return this.studentsService.getProfile(req.user.userId);
   }
 }

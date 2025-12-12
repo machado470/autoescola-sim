@@ -1,28 +1,25 @@
-import React from "react";
-import { colors } from "../../design/colors";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function BottomNav() {
-  const mode = document.body.dataset.theme || "light";
-  const palette = colors[mode];
+  const nav = useNavigate();
+  const path = useLocation().pathname;
 
-  const style = {
-    position: "fixed",
-    bottom: 0,
-    left: 0,
-    width: "100%",
-    height: "60px",
-    background: palette.card,
-    borderTop: `1px solid ${palette.border}`,
-    display: "flex",
-    justifyContent: "space-around",
-    alignItems: "center",
-  };
+  const btn = (label: string, route: string) => (
+    <button
+      onClick={() => nav(route)}
+      className={`flex-1 py-3 text-sm ${
+        path === route ? "text-blue-600 font-semibold" : "text-gray-500"
+      }`}
+    >
+      {label}
+    </button>
+  );
 
   return (
-    <div style={style}>
-      <span style={{ color: palette.navIcon }}>🚧</span>
-      <span style={{ color: palette.navIcon }}>🔍</span>
-      <span style={{ color: palette.navIcon }}>👤</span>
+    <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-xl flex border-t dark:border-gray-700">
+      {btn("Home", "/aluno/home")}
+      {btn("Dashboard", "/aluno/dashboard")}
+      {btn("Simulado", "/aluno/simulado")}
     </div>
   );
 }

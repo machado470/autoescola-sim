@@ -18,8 +18,10 @@ model User {
 
   studentProgress StudentProgress[]
   studentLessons  StudentLesson[]
-  simulados       SimuladoAttempt[]
   simulations     Simulation[]
+
+  // Apenas UMA relação com SimuladoAttempt → OK
+  attempts        SimuladoAttempt[] @relation("UserAttempts")
 }
 
 model Category {
@@ -100,7 +102,7 @@ model SimuladoAttempt {
   percentage Int
   createdAt  DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation("UserAttempts", fields: [userId], references: [id])
 }
 
 model Simulation {
